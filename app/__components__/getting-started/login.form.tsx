@@ -1,4 +1,3 @@
-import { userMutation } from "@/sActions/userLoginSignupMutation";
 import { Button, CircularProgress, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { useState, ChangeEvent } from "react";
@@ -6,6 +5,7 @@ import { CustomInput } from "./customInput";
 import { validateInput } from "@/lib/helpers/validateForm";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { init_user_auth_mutation } from "@/sActions/userLoginSignupMutation";
 
 /* ====================== LOGIN FORM ====================== */
 export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, value: string) => void }) => {
@@ -16,13 +16,14 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
             const formDataObj = new FormData();
             formDataObj.append("type", "login");
             Object.entries(formData).forEach(([key, value]) => formDataObj.append(key, value));
-            return await userMutation(null, formDataObj);
+            return await init_user_auth_mutation(null, formDataObj);
         },
     });
 
     const router = useRouter();
     if (isSuccess && data.success) {
         router.push('/')
+        return <>Redirecting...</>;
     }
 
     return (
@@ -38,8 +39,8 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
                 </Typography>
             </div>
 
-            {data?.error && <Typography mt={2} fontWeight={500} color="red">{data?.error}</Typography>}
-            {data?.success && <Typography mt={2} fontWeight={500} color="green">{data?.message}</Typography>}
+            {!data?.success && <Typography mt={2} fontWeight={500} color="red">{data?.msg}</Typography>}
+            {data?.success && <Typography mt={2} fontWeight={500} color="green">{data?.msg}</Typography>}
 
             <motion.form onSubmit={(e) => {
                 e.preventDefault();

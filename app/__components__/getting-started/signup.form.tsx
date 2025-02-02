@@ -1,18 +1,34 @@
-import { userMutation } from "@/sActions/userLoginSignupMutation";
-import { Button, Typography } from "@mui/material";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import { motion } from "framer-motion";
-import { useSearchParams } from "next/navigation";
-import { useState, useActionState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { CustomInput } from "./customInput";
 import { validateInput } from "@/lib/helpers/validateForm";
+import { init_user_auth_mutation } from "@/sActions/userLoginSignupMutation";
+import { useMutation } from "@tanstack/react-query";
 
 /* ====================== SIGNUP FORM ====================== */
 export const SignupForm = ({ setQueryParam }: { setQueryParam: (key: string, value: string) => void }) => {
+
     const searchParams = useSearchParams();
     const invitedBy = searchParams.get("invitedBy") || "";
 
     const [formData, setFormData] = useState({ phonenumber: "", password: "", name: "", parent: invitedBy });
-    const [formState, formAction] = useActionState(userMutation, { success: false, message: "", error: "" });
+
+    const { isPending, isSuccess, data, mutate } = useMutation({
+        mutationFn: async () => {
+            const formDataObj = new FormData();
+            formDataObj.append("type", "signup");
+            Object.entries(formData).forEach(([key, value]) => formDataObj.append(key, value));
+            return await init_user_auth_mutation(null, formDataObj);
+        },
+    });
+
+    const router = useRouter();
+    if (isSuccess && data.success) {
+        router.push('/')
+        return <>Redirecting...</>
+    }
 
     return (
         <>
@@ -25,8 +41,14 @@ export const SignupForm = ({ setQueryParam }: { setQueryParam: (key: string, val
                     Create New
                 </Typography>
             </div>
-            <motion.form action={formAction}>
-                <input type="hidden" name="type" value="signup" />
+
+            {!data?.success && <Typography mt={2} color="red">{data?.msg}</Typography>}
+            {data?.success && <Typography mt={2} color="green">{data?.msg}</Typography>}
+
+            <motion.form onSubmit={(e) => {
+                e.preventDefault();
+                mutate();
+            }}>
 
                 <CustomInput label="Phone Number" name="phonenumber" inputMode="numeric"
                     isValid={validateInput('phonenumber', formData.phonenumber)}
@@ -49,12 +71,9 @@ export const SignupForm = ({ setQueryParam }: { setQueryParam: (key: string, val
                 </Typography>
 
                 <Button type="submit" fullWidth variant="contained" sx={{ mt: 5, bgcolor: "#78dafb", py: 2, textTransform: 'initial', color: "black", fontWeight: 700 }}>
-                    Sign Up
+                    {isPending ? <CircularProgress sx={{ color: 'black' }} size={'1rem'} /> : "Sign up"}
                 </Button>
             </motion.form>
-
-            {formState.error && <Typography mt={2} color="red">{formState.error}</Typography>}
-            {formState.success && <Typography mt={2} color="green">{formState.message}</Typography>}
         </>
     );
 };
