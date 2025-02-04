@@ -1,8 +1,8 @@
 "use client"
-import { USER_SERVICE } from "@/(backend)/services/user.service";
+import { getUserDetails } from "@/(backend)/services/user.service.serv";
 import { UserType } from "@/__types__/user.types";
 import { useQuery } from "@tanstack/react-query";
-import { SetStateAction, createContext, useState } from "react";
+import { SetStateAction, createContext, useEffect, useState } from "react";
 
 const User: UserType = {
     _id: '',
@@ -31,10 +31,12 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
 
     const { data, isSuccess, isPending, isError } = useQuery({
         queryKey: ['user'],
-        queryFn: USER_SERVICE.getUser
+        queryFn: getUserDetails
     })
 
-    if (isSuccess && data?.data) setUserInfo(data.data)
+    useEffect(() => {
+        if (isSuccess && data?.data) setUserInfo(data.data)
+    }, [isSuccess, data]);
 
     if (isPending) return <>...loading</>;
     if (isError || !data || !data.valid) return <>Error....</>;

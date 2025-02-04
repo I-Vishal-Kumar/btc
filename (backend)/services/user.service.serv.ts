@@ -1,34 +1,53 @@
 "use server"
-export class USER_SERVICE_SERV {
-    static getTest = async () => {
-        try {
-            
-            console.log('called')
-            await new Promise((resolve, rejects) => {
-                setTimeout(resolve, 1000);
-            })
-            return {valid: true, data: {}};
+import { CONNECT } from "@/lib/_db/db.config";
+import { VerifyToken } from "@/lib/auth/verifyToken"
+import { cookies } from "next/headers";
+import { USER } from "@/(backend)/(modals)/schema/user.schema";
+import { ServiceReturnType } from "@/__types__/service.types";
+import { UserType } from "@/__types__/user.types";
 
-        } catch (error) {
-            
-        }
+
+export const getUserDetails = async (): ServiceReturnType<UserType> => {
+    try {
+
+        const cookie = await cookies();
+        const token = cookie.get('token')?.value || "";
+
+        if(!token) return { valid: false, data: undefined }
+
+        const {success, decoded=null} = await VerifyToken(token);
+
+        if(!success || !decoded) return {valid: false}
+        
+        await CONNECT();
+
+        const dbUser = await USER.findOne({PhoneNumber: decoded.PhoneNumber}, {_id : 0, Session: 0});
+
+        if(!dbUser) return {valid: false};
+
+        return {valid: true, data: dbUser?.toObject()};
+
+    } catch (error) {
+
+        console.log(error);
+        return {valid: false}
     }
-
-
 }
-// 1️⃣ Server Action for Login & Signup
-// async function authenticateUser(prevState: any, formData: FormData) {
-//     const type = formData.get("type"); // login or signup
-//     const phone = formData.get("phone")?.toString();
-//     const password = formData.get("password")?.toString();
-//     const name = formData.get("name")?.toString();
-//     const inviteCode = formData.get("inviteCode")?.toString();
 
-//     // 🚀 Simulating API Call (Replace with actual API)
-//     await new Promise((resolve) => setTimeout(resolve, 1000));
+// export class USER_SERVICE_SERV {
+//     static getTest = async () => {
+//         try {
+            
+//             console.log('called')
+//             await new Promise((resolve, rejects) => {
+//                 setTimeout(resolve, 1000);
+//             })
+//             return {valid: true, data: {}};
 
-//     if (!phone || !password) return { success: false, error: "Phone & Password required!" };
-//     if (type === "signup" && (!name || !inviteCode)) return { success: false, error: "All fields required!" };
+//         } catch (error) {
+            
+//         }
+//     }
 
-//     return { success: true, message: `${ type === "signup" ? "Signup" : "Login" } Successful!` };
+
 // }

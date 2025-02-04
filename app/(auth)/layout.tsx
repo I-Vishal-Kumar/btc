@@ -4,6 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { UserContextProvider } from '@/lib/hooks/user.context';
 import Providers from '../providers';
+import Footer from '../__components__/footer/footer';
+import { Box } from '@mui/material';
 
 
 const geistSans = Geist({
@@ -34,7 +36,10 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <Providers>
             <UserContextProvider>
-              {children}
+              <Box className="flex flex-col h-screen">
+                <Box className="flex-1 overflow-y-auto">{children}</Box>
+                <Footer />
+              </Box>
             </UserContextProvider>
           </Providers>
         </AppRouterCacheProvider>
