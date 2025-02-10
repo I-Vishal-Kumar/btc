@@ -1,0 +1,108 @@
+"use client"
+import { ArrowRightAlt } from "@mui/icons-material";
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SxProps, Typography } from "@mui/material";
+import { History as HistoryIcon, Logout } from "@mui/icons-material";
+import { ReactNode } from "react";
+import { SectionsAvailable } from "@/__types__/ui_types/profil.types";
+import { useRouter } from "next/navigation";
+
+type ButtonType = {
+    key: SectionsAvailable,
+    sx?: SxProps,
+    startIcon: ReactNode,
+    endIcon?: ReactNode,
+    label: string,
+    onClick?: VoidFunction,
+}
+
+type Sections = Record<string, ButtonType[]>
+
+const sections: Sections = {
+    'History': [
+        {
+            key: SectionsAvailable.RECHARGE_HISTORY,
+            startIcon: <HistoryIcon />,
+            label: "Recharge History",
+        },
+        {
+            key: SectionsAvailable.WITHDRAWAL_HISTORY,
+            startIcon: <HistoryIcon />,
+            label: "Withdrawal History",
+        },
+    ],
+    'Preference': [
+        {
+            key: SectionsAvailable.WITHDRAWAL_FUNDS,
+            startIcon: <HistoryIcon />,
+            label: "Withdrawal Funds",
+        },
+        {
+            key: SectionsAvailable.TEAM_COMMISSION,
+            startIcon: <HistoryIcon />,
+            label: "Team Commission",
+        },
+        {
+            key: SectionsAvailable.SUPPORT,
+            startIcon: <HistoryIcon />,
+            label: "Support",
+        },
+        {
+            key: SectionsAvailable.LOGOUT,
+            startIcon: <Logout />,
+            label: "Log Out",
+            sx: { color: 'red' },
+            onClick: () => { console.log("logout") }
+        },
+    ]
+}
+
+export const NavigationSection: React.FC = () => {
+    return (
+        <div className="w-full">
+            {
+                Object.entries(sections).map(([title, childButtons]) => (
+                    <CustomList title={title} key={title} childButtons={childButtons} />
+                ))
+            }
+        </div>
+    )
+}
+
+const CustomList = (
+    { title, childButtons }:
+        {
+            title: string,
+            childButtons: ButtonType[]
+        }
+) => {
+
+    const router = useRouter();
+
+    return (
+        <Box sx={{ width: "100%", bgcolor: "background.paper", borderRadius: 2, p: 1 }}>
+            <Typography variant="caption" sx={{ pl: 2, color: "text.secondary", fontWeight: 500, fontSize: 14 }}>
+                {title}
+            </Typography>
+            <List sx={{ outline: 1, outlineColor: '#d6d6d6', borderRadius: 3, bgcolor: '#f3f3f3' }}>
+                {childButtons.map((item, index) => (
+                    <ListItem
+                        onClick={item?.onClick ? item.onClick : () => {
+                            router.push(`profile/${ item.key }`)
+                        }}
+                        sx={{ ...item?.sx }}
+                        secondaryAction={
+                            item?.endIcon ? item.endIcon : <ArrowRightAlt color="disabled" />
+                        }
+                        key={index} disablePadding>
+                        <ListItemButton sx={{ borderRadius: 2 }}>
+                            {item.startIcon && <ListItemIcon sx={item?.sx ? { ...item.sx } : { color: 'black' }}>{item.startIcon}</ListItemIcon>}
+                            <ListItemText primary={item.label} />
+                        </ListItemButton>
+
+                    </ListItem>
+                ))}
+            </List>
+
+        </Box>
+    );
+};

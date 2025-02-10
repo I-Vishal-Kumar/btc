@@ -17,19 +17,23 @@ const Footer = () => {
     return (
         <footer className="w-full bg-white shadow-md border-t p-3">
             <nav className="flex justify-around items-center">
-                {navItems.map(({ label, icon, path }) => (
-                    <motion.button
-                        key={label}
-                        onClick={() => router.push(path)}
-                        className={`flex flex-col items-center transition-colors duration-300 ${ pathname === path ? "text-cyan-400" : "text-gray-500"
-                            }`}
-                        whileTap={{ scale: 0.9 }} // Subtle click animation
-                        whileHover={{ y: -2 }} // Slight hover lift
-                    >
-                        {icon}
-                        <span className="text-xs">{label}</span>
-                    </motion.button>
-                ))}
+                {navItems.map(({ label, icon, path }) => {
+
+                    const isActive = pathname === path || pathname.startsWith(path + "/");
+
+                    return (
+                        <motion.button
+                            key={label}
+                            onClick={() => router.push(path)}
+                            className={`flex flex-col items-center transition-colors duration-300 ${ isActive ? "text-cyan-400" : "text-gray-500" }`}
+                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ y: -2 }} // Slight hover lift
+                        >
+                            {icon}
+                            <span className="text-xs">{label}</span>
+                        </motion.button>
+                    );
+                })}
             </nav>
         </footer>
     );
