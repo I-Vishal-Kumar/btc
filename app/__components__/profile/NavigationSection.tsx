@@ -1,10 +1,11 @@
 "use client"
-import { ArrowRightAlt } from "@mui/icons-material";
+import { ArrowRightAlt, GroupOutlined, LocalPrintshopOutlined, Print, SupportAgent, WidthWide } from "@mui/icons-material";
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SxProps, Typography } from "@mui/material";
 import { History as HistoryIcon, Logout } from "@mui/icons-material";
 import { ReactNode } from "react";
 import { SectionsAvailable } from "@/__types__/ui_types/profil.types";
 import { useRouter } from "next/navigation";
+import { PiHandWithdraw } from "react-icons/pi";
 
 type ButtonType = {
     key: SectionsAvailable,
@@ -33,17 +34,17 @@ const sections: Sections = {
     'Preference': [
         {
             key: SectionsAvailable.WITHDRAWAL_FUNDS,
-            startIcon: <HistoryIcon />,
+            startIcon: <LocalPrintshopOutlined />,
             label: "Withdrawal Funds",
         },
         {
             key: SectionsAvailable.TEAM_COMMISSION,
-            startIcon: <HistoryIcon />,
+            startIcon: <GroupOutlined />,
             label: "Team Commission",
         },
         {
             key: SectionsAvailable.SUPPORT,
-            startIcon: <HistoryIcon />,
+            startIcon: <SupportAgent />,
             label: "Support",
         },
         {

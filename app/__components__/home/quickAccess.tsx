@@ -1,10 +1,11 @@
 import LineClamp from "@/lib/helpers/lineClamper"
 import { USER_CONTEXT } from "@/lib/hooks/user.context"
-import { Wallet } from "@mui/icons-material"
+import { AccountBalance, AdbOutlined, CardGiftcard, ShareOutlined, SupportAgent, TextSnippetOutlined, Wallet } from "@mui/icons-material"
 import { Typography, Box, TextField } from "@mui/material"
 import { useRouter } from "next/navigation"
 import { ReactNode, useContext } from "react"
 import { MdContentCopy } from "react-icons/md"
+import { RenderInvitationLink } from "../_commonComponents/RenderInvitationLink"
 
 
 const QuickAccess = ({ icon, label, onClick }: { icon: ReactNode, label: string, onClick?: VoidFunction }) => {
@@ -24,15 +25,14 @@ const QuickAccess = ({ icon, label, onClick }: { icon: ReactNode, label: string,
 
 export const QuickAccessSection = () => {
 
-    const { userInfo } = useContext(USER_CONTEXT);
     const router = useRouter();
 
     const quickLinks = [
-        { label: "Recharge", icon: <Wallet />, onClick: () => { router.push('/profile/recharge') } },
-        { label: "PDF", icon: <Wallet /> },
-        { label: "Application", icon: <Wallet /> },
-        { label: "Gift", icon: <Wallet /> },
-        { label: "Support", icon: <Wallet />, onClick: () => { router.push('/profile/support') } },
+        { label: "Recharge", icon: <AccountBalance />, onClick: () => { router.push('/profile/recharge') } },
+        { label: "PDF", icon: <TextSnippetOutlined /> },
+        { label: "Application", icon: <AdbOutlined /> },
+        { label: "Gift", icon: <CardGiftcard /> },
+        { label: "Support", icon: <SupportAgent />, onClick: () => { router.push('/profile/support') } },
     ]
 
     return (
@@ -45,31 +45,7 @@ export const QuickAccessSection = () => {
                 {quickLinks.map(details => <QuickAccess key={details.label} label={details.label} icon={details.icon} {...(details.onClick ? { onClick: details.onClick } : {})} />)}
             </Box>
 
-            <Box display={'flex'} mt={1} bgcolor={'white'} borderRadius={1}>
-                <Box>
-                    <Typography fontSize={8}>
-                        invite link
-                    </Typography>
-                </Box>
-                <Box flex={1}>
-                    <TextField
-                        value={`${ window?.location.origin }/getting-started?type=signup&invitedBy=${ userInfo.InvitationCode }`}
-                        fullWidth
-                        size='small'
-                        sx={{ pointerEvents: 'none', '& fieldset': { display: 'none' } }}
-                        slotProps={{
-                            input: {
-                                style: { fontSize: 10 },
-                                endAdornment: (
-                                    <div className='bg-white pl-3'>
-                                        <MdContentCopy fontSize={15} />
-                                    </div>
-                                )
-                            }
-                        }}
-                    />
-                </Box>
-            </Box>
+            <RenderInvitationLink />
         </div>
 
     )

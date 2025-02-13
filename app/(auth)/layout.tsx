@@ -31,12 +31,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${ geistSans.variable } ${ geistMono.variable } antialiased`}
+        className={`${ geistSans.variable } ${ geistMono.variable } bg-emerald-500 antialiased`}
       >
         <AppRouterCacheProvider>
           <Providers>
             <UserContextProvider>
-              <Box className="flex flex-col h-screen">
+              <Box className="flex flex-col mx-auto max-w-screen-sm bg-slate-100 h-screen">
                 <Box className="flex-1 overflow-y-auto">{children}</Box>
                 <Footer />
               </Box>
