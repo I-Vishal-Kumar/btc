@@ -1,10 +1,8 @@
 import LineClamp from "@/lib/helpers/lineClamper"
-import { USER_CONTEXT } from "@/lib/hooks/user.context"
-import { AccountBalance, AdbOutlined, CardGiftcard, ShareOutlined, SupportAgent, TextSnippetOutlined, Wallet } from "@mui/icons-material"
-import { Typography, Box, TextField } from "@mui/material"
+import { AccountBalance, AdbOutlined, CardGiftcard, SupportAgent, TextSnippetOutlined } from "@mui/icons-material"
+import { Typography, Box } from "@mui/material"
 import { useRouter } from "next/navigation"
-import { ReactNode, useContext } from "react"
-import { MdContentCopy } from "react-icons/md"
+import { ReactNode } from "react"
 import { RenderInvitationLink } from "../_commonComponents/RenderInvitationLink"
 
 

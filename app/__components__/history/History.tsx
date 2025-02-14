@@ -42,8 +42,8 @@ function TermDepositCard() {
                 <p className="mt-4">Investment Agreement</p>
                 <p className="mt-2">
                     This document constitutes an actual binding agreement
-                    between you, hereinafter referred to as the "Investor," and BTC
-                    Construction Inc. (the "Company"), regarding the Investor's intent
+                    between you, hereinafter referred to as the &quot;Investor,&quot; and BTC
+                    Construction Inc. (the &quot;Company&quot;), regarding the Investor&apos;s intent
                     to invest/trade in the Company. This agreement is executed
                     under the provisions of Section 10 of the Companies Act, 2013,
                     and both parties commit to fulfilling the terms outlined herein.

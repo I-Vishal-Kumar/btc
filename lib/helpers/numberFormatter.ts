@@ -1,7 +1,7 @@
 export const formatNumber = (num: number, options: { compact?: boolean, separator?: string } = {}) => {
     if (isNaN(num)) return "0";
   
-    const { compact = true, separator = "," } = options;
+    const { compact = false, separator = "," } = options;
   
     // Compact notation (e.g., 1.2K, 3.4M)
     if (compact) {

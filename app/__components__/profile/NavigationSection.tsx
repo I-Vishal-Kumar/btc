@@ -1,11 +1,10 @@
 "use client"
-import { ArrowRightAlt, GroupOutlined, LocalPrintshopOutlined, Print, SupportAgent, WidthWide } from "@mui/icons-material";
+import { ArrowRightAlt, GroupOutlined, LocalPrintshopOutlined, SupportAgent } from "@mui/icons-material";
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SxProps, Typography } from "@mui/material";
 import { History as HistoryIcon, Logout } from "@mui/icons-material";
 import { ReactNode } from "react";
 import { SectionsAvailable } from "@/__types__/ui_types/profil.types";
 import { useRouter } from "next/navigation";
-import { PiHandWithdraw } from "react-icons/pi";
 
 type ButtonType = {
     key: SectionsAvailable,

@@ -6,3 +6,10 @@ export enum SectionsAvailable {
     SUPPORT = 'support',
     LOGOUT = 'logout'
 } 
+
+export enum SubSectionsAvailable {
+    TODAY_DEPOSIT = 'today_deposit',
+    TODAY_WITHDRAWAL = 'today_withdrawal',
+    TODAY_REGISTRATION = 'today_registration',
+    DIRECT_MEMBERS = 'direct_members',
+} 

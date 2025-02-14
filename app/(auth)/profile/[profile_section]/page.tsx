@@ -8,7 +8,7 @@ import { WithdrawalHistory } from "@/app/__components__/profile/Sections/Withdra
 
 type SectionComponentMapping = Partial<Record<SectionsAvailable, React.FC>>;
 
-export default async function ProfileSections({ params }: { params: { profile_section: SectionsAvailable } }) {
+export default async function ProfileSections({ params }: { params: Promise<{ profile_section: SectionsAvailable }> }) {
 
     const { profile_section } = await params;
 

@@ -7,13 +7,22 @@ import { useSearchParams } from "next/navigation"
 import { LoginForm } from "@/app/__components__/getting-started/login.form";
 import { SignupForm } from "@/app/__components__/getting-started/signup.form";
 import { ForgotPasswordForm } from "@/app/__components__/getting-started/forgotPassword.form";
+import { Suspense } from "react";
 
 
 export default function AuthForm() {
 
+    return (
+        <Suspense fallback={<div>loading...</div>}>
+            <AuthFormContents />
+        </Suspense>
+    );
+}
+
+function AuthFormContents() {
     const searchParams = useSearchParams();
+    const type = (searchParams.get("type") || "login") as 'login' | 'signup' | 'forgot-password'; // Default to login
     const { setQueryParam } = useQueryParams();
-    const type = searchParams.get("type") || "login"; // Default to login
 
     return (
         <Container disableGutters maxWidth="md" sx={{ height: "100vh", overflow: "hidden", width: "100vw", position: "relative" }}>
@@ -39,5 +48,5 @@ export default function AuthForm() {
                 {type === "forgot-password" && <ForgotPasswordForm setQueryParam={setQueryParam} />}
             </div>
         </Container>
-    );
+    )
 }
