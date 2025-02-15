@@ -1,4 +1,4 @@
-import { Box, Container, Typography } from "@mui/material"
+import { Box, Button, Container, Typography } from "@mui/material"
 import { Header } from "../header/Header"
 import { formatNumber } from "@/lib/helpers/numberFormatter"
 import Image from "next/image"
@@ -37,6 +37,11 @@ function TermDepositCard() {
                     <p>Profit- {formatNumber(28323)}</p>
                 </div>
             </Box>
+
+            <Box width={'80%'} margin={"0 auto"} py={1} pb={2}>
+                <Button sx={{ bgcolor: '#98bbffe8', color: 'black', boxShadow: 0 }} fullWidth variant="contained">Claim</Button>
+            </Box>
+
             <div className="flex flex-col text-center pb-4 text-slate-400 text-[0.6rem] px-4 items-center">
                 <Image width={60} height={10} src={"/getting-started/logo_full.png"} alt="btc" />
                 <p className="mt-4">Investment Agreement</p>

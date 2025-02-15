@@ -13,3 +13,10 @@ export enum SubSectionsAvailable {
     TODAY_REGISTRATION = 'today_registration',
     DIRECT_MEMBERS = 'direct_members',
 } 
+
+export const ActiveTabs = {
+    TODAY : 'today',
+    ALL : 'all'
+} as const;
+
+export type ActiveTabs = typeof ActiveTabs[ keyof typeof ActiveTabs ];

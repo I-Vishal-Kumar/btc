@@ -1,7 +1,11 @@
 
 export enum db_schema {
-    USERS = 'users',
-    FIXED_DEPOSIT = 'fixed_deposits'
+    USERS           = 'users',
+    FIXED_DEPOSIT   = 'fixed_deposits',
+    TRANSACTION     = 'transactions',
+    WALLET          = 'user_wallets',
+    ADMIN_CONFIG    = 'admin_configs',
+
 }
 
 export const FdStatus = {
@@ -10,8 +14,41 @@ export const FdStatus = {
     HALTED: "HALTED",
 } as const; // HALTED -> if admin want to pause this users fd.
 
+
+
+export const TransactionType = {
+    WITHDRAWAL  : 'WITHDRAWAL', 
+    DEPOSIT     : 'DEPOSIT',
+    GIFT        : 'GIFT'
+} as const;
+
+export type TransactionType = typeof TransactionType[keyof typeof TransactionType]
   
 export type FdStatusType  = typeof FdStatus[keyof typeof FdStatus]; 
+
+export const TransactionStatusType = {
+    PENDING: 'PENDING',
+    SUCCESS: 'SUCCESS',
+    FAILED: 'FAILED',
+} as const;
+
+export type TransactionStatusType = typeof TransactionStatusType[keyof typeof TransactionStatusType];
+
+
+
+
+
+
+export const GatewayTypes = {
+    AUTO_1 : 'AUTO-1',
+    AUTO_2 : 'AUTO-2',
+    DEFAULT : 'AUTO-2',
+} as const;
+
+export type GatewayTypes = typeof GatewayTypes[keyof typeof GatewayTypes]
+
+
+
 
 // ========= common schema types.
 

@@ -9,12 +9,12 @@ const Sections = {
     "Team Transaction": [
         { name: "Total Deposit", value: `₹ ${ formatNumber(23423) }` },
         { name: "Total Withdrawal", value: `₹ ${ formatNumber(23423) }` },
-        { name: "Today Deposit", pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_DEPOSIT }` },
-        { name: "Today Withdrawal", pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_WITHDRAWAL }` },
+        { name: "Today Deposit", pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_DEPOSIT }?activeTab=today` },
+        { name: "Today Withdrawal", pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_WITHDRAWAL }?activeTab=today` },
     ],
     "Team Report": [
-        { name: "Today New Registration", value: 234, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_REGISTRATION }` },
-        { name: "Direct Active Members", value: 2342, pathTo: `/profile/team_commission/${ SubSectionsAvailable.DIRECT_MEMBERS }` },
+        { name: "Today New Registration", value: 234, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_REGISTRATION }?activeTab=today` },
+        { name: "Direct Active Members", value: 2342, pathTo: `/profile/team_commission/${ SubSectionsAvailable.DIRECT_MEMBERS }?activeTab=today` },
         { name: "Total Active Members", value: 5234 },
     ]
 }
