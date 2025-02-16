@@ -36,7 +36,7 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <Providers>
             <UserContextProvider>
-              <Box className="flex flex-col mx-auto max-w-screen-sm bg-slate-100 h-screen">
+              <Box className="flex flex-col mx-auto max-w-screen-sm w-screen bg-slate-100 h-screen">
                 <Box className="flex-1 overflow-y-auto">{children}</Box>
                 <Footer />
               </Box>

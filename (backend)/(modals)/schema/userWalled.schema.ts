@@ -6,9 +6,9 @@ const RequiredString = {type: String, required: true};
 
 const WALLET_SCHEMA = new Schema({
     
-    PhoneNumber         : PhoneNumberType,
+    PhoneNumber         : {...PhoneNumberType, unique: false},
     
-    InvitationCode      : InvitationCodeType,  // 8 digit random code (unique);
+    InvitationCode      : {...InvitationCodeType, unique: false},  // 8 digit random code (unique);
     
     AccHolderName       : RequiredString,
 

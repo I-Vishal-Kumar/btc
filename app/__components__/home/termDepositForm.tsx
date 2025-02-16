@@ -1,24 +1,38 @@
+import { OPTIONS, OptionTypes } from "@/__types__/ui_types/fd.types";
 import { formatNumber } from "@/lib/helpers/numberFormatter";
+import { useFdMutation } from "@/lib/hooks/useFdMutation";
 import { Box, Button, Slider, TextField, Typography } from "@mui/material";
 import { useState, ChangeEvent } from "react";
 import { MdOutlineCurrencyRupee } from "react-icons/md";
 
+
 export const TermDepositForm = () => {
 
-    const [value, setValue] = useState<number[]>([200, 0]); // Minimum value is fixed at 200
-    const min = 200;
-    const max = 12000;
+    const min = 500; // minimum value to start creating fd.
+
+    const [selectedPlan, setPlan] = useState<OptionTypes>("15day@2%");
+
+    // fd mutation hook.
+    const { isPending, maxAmount, mutate, setValue, value } = useFdMutation({ selectedPlan, minAmount: min });
+
 
     const handleSliderChange = (_: Event, newValue: number | number[]) => {
-        if (typeof newValue !== "object") return;
+
+        // check if a valid value is provided.
+        if (!Array.isArray(newValue)) return;
+
         setValue(newValue);
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+
         const newValue = [min, Number(event.target.value)];
-        if (newValue[1] <= max) {
+
+        // only update if its less than max amount
+        if (newValue[1] <= maxAmount) {
             setValue(newValue);
         }
+
     };
 
     return (
@@ -50,34 +64,61 @@ export const TermDepositForm = () => {
                 fullWidth
                 placeholder='Amount'
             />
-            <RangeSlider min={min} max={max} value={value[1] < min ? 200 : value[1]} handleSliderChange={handleSliderChange} />
 
-            <Typography variant="caption" color="textDisabled">Period</Typography>
+            {/* slider for selecting any particular range */}
+            <RangeSlider min={min} max={maxAmount} value={value[1] < min ? 500 : value[1]} handleSliderChange={handleSliderChange} />
+
 
             <div className="ring-1 ring-gray-300 rounded-md p-1 bg-slate-200">
-                <Typography textAlign={'center'} fontSize={14}>2 Years@5%</Typography>
+                <div className="flex flex-col items-center gap-2">
+                    <div className="relative w-full">
+                        <div className="p-2 text-gray-800 flex items-center justify-between cursor-pointer">
+                            <span>{selectedPlan ? selectedPlan : "Select a Plan"}</span>
+                        </div>
+                        <select
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            value={selectedPlan}
+                            name="plan"
+                            title="select a plan"
+                            onChange={(e) => setPlan(e.target.value as OptionTypes)}
+                        >
+                            <option value="" disabled>
+                                Select a Plan
+                            </option>
+                            {Object.keys(OPTIONS).map((key) => (
+                                <option key={key} value={key}>
+                                    {key}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
             </div>
 
-            <Button fullWidth sx={{ mt: 3, borderRadius: '100vw', textTransform: 'initial', bgcolor: '#79dcfd' }} variant="contained">
-                Submit
+            <Button onClick={() => mutate()} disabled={isPending} fullWidth sx={{ mt: 3, borderRadius: '100vw', textTransform: 'initial', bgcolor: '#79dcfd' }} variant="contained">
+                {isPending ? "Loading...." : 'Submit'}
             </Button>
         </>
     )
 }
 
-const RangeSlider = ({ min, max, value, handleSliderChange }: {
+type RangeSliderProps = {
     min: number, max: number, value: number,
     handleSliderChange: (e: Event, newValue: number | number[]) => void
-}) => {
+}
 
+const RangeSlider: React.FC<RangeSliderProps> = ({ min, max, value, handleSliderChange }) => {
+
+    // ignore point values 0.1 -> one value precesion is allowed.
     const step = 50;
 
     return (
         <Box mt={2}>
 
             <Box display={'flex'} justifyContent={'space-between'}>
-                <Typography fontSize={12} fontWeight={600}>₹ 200</Typography>
-                <Typography fontSize={12} fontWeight={600}>₹ {formatNumber(123983)}</Typography>
+                <Typography fontSize={12} fontWeight={600}>₹ {min}</Typography>
+                <Typography fontSize={12} fontWeight={600}>₹ {formatNumber(max)}</Typography>
             </Box>
 
             {/* Slider component */}

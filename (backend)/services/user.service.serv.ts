@@ -1,4 +1,5 @@
 "use server"
+
 import { CONNECT } from "@/lib/_db/db.config";
 import { VerifyToken } from "@/lib/auth/verifyToken"
 import { cookies } from "next/headers";
@@ -21,7 +22,7 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
         
         await CONNECT();
 
-        const dbUser = await USER.findOne({PhoneNumber: decoded.PhoneNumber}, {_id : 0, Session: 0});
+        const dbUser = await USER.findOne({PhoneNumber: decoded.PhoneNumber}, {_id : 0, Session: 0, Password: 0, createdAt: 0, updatedAt: 0});
 
         if(!dbUser) return {valid: false};
 
@@ -33,21 +34,3 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
         return {valid: false}
     }
 }
-
-// export class USER_SERVICE_SERV {
-//     static getTest = async () => {
-//         try {
-            
-//             console.log('called')
-//             await new Promise((resolve, rejects) => {
-//                 setTimeout(resolve, 1000);
-//             })
-//             return {valid: true, data: {}};
-
-//         } catch (error) {
-            
-//         }
-//     }
-
-
-// }

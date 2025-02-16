@@ -54,7 +54,7 @@ const extractFormData = <T extends string>(
 // =========== FORGOT PASSWORD
 const FORGOT_PASSWORD = async (credentials: ForgotPasswordDetails) => {
     try {
-        console.log(credentials);
+
         const isResetSuccess = await USER.findOneAndUpdate({
             PhoneNumber: credentials.PhoneNumber,
             Password: credentials.OldPassword
@@ -74,24 +74,18 @@ const FORGOT_PASSWORD = async (credentials: ForgotPasswordDetails) => {
 
 
 // =============== SIGNUP
-const SIGNUP = async (credentials: SignupDetails, session: mongoose.ClientSession | null) => {
+const SIGNUP = async (credentials: SignupDetails) => {
 
     try {
-
-        if (!session) throw new Error('session is required for signup process.');
 
         const sess_token = await generateSessionToken({ PhoneNumber: credentials.PhoneNumber });
 
         // check if invitation code is correct.
-        const validInvitationCode = await USER.findOneAndUpdate(
-            { InvitationCode: credentials.Parent },
-            { $inc: { ReferalCount: 1 } },
-            { session }
-        );
-
-        if (!validInvitationCode) throw new Error("Invalid invitation code provided.");
+        const validInvitationCode = await USER.findOne({ InvitationCode: credentials.Parent });
 
         // invitation code was correct 
+        if (!validInvitationCode) throw new Error("Invalid invitation code provided.");
+
 
         // create a new invitation code for this new user.
         const InvitationCode = getInvitationCode();
@@ -200,7 +194,8 @@ const withRequiredDetails = async (formData: FormData, type: AvailableMutations)
 
     try {
 
-        return await withSession(requiredDetails, type, ['signup'].includes(type));
+        // ['signup'].includes(type)
+        return await withSession(requiredDetails, type);
 
     } catch (error: unknown) {
         if (error instanceof Error)

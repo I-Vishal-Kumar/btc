@@ -3,11 +3,11 @@ import { Schema, model, models } from "mongoose";
 
 const FD_SCHEMA = new Schema({
     
-    PhoneNumber     : PhoneNumberType,
+    PhoneNumber     : {...PhoneNumberType, unique: false},
     
-    InvitationCode  : InvitationCodeType,  // 8 digit random code (unique);
+    InvitationCode  : {...InvitationCodeType, unique: false},  // 8 digit random code (unique);
     
-    Parent          : InvitationCodeType,
+    Parent          : {...InvitationCodeType, unique: false},
     
     FdAmount        : PrecisionNumberType,
     
@@ -15,7 +15,7 @@ const FD_SCHEMA = new Schema({
 
     InterestRate    : Number,
     
-    FdStatus        : {default: FdStatus.PROGRESS, enum: Object.values(FdStatus)},
+    FdStatus        : { type: String, default: FdStatus.PROGRESS, enum: Object.values(FdStatus)},
 
     MaturedOn       : Date,
 

@@ -5,11 +5,11 @@ import { Schema, model, models } from "mongoose";
 
 const USER_SCHEMA = new Schema({
     
-    Parent : InvitationCodeType,
+    Parent          : InvitationCodeType,
     
-    InvitationCode: InvitationCodeType,  // 8 digit random code (unique);
+    InvitationCode  : InvitationCodeType,  // 8 digit random code (unique);
 
-    Name: NameType,
+    Name            : NameType,
 
     Password        : PasswordType,
 
@@ -25,12 +25,14 @@ const USER_SCHEMA = new Schema({
 
     Blocked         : {type: Boolean, default: false},
 
-    HoldingScore    : {type: Boolean, default: false},
+    HoldingScore    : {type: Number, default: 0},
 
     PhoneNumber     : PhoneNumberType,
     
     ReferalCount    : ReferalCountType,  // number of users joined using invitation code of any user.
  
+    lastSpinAt      : { type: Date, default: null },  // Track last spin time
+
     Session         : String
 
 }, { timestamps: true });

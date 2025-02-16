@@ -64,8 +64,6 @@ function RenderUserDetails() {
 
             action={<RenderBalance />}
         />
-
-
     )
 }
 

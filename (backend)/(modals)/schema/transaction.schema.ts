@@ -5,11 +5,11 @@ import { Schema, model, models } from "mongoose";
 
 const TRANSACTION_SCHEMA = new Schema({
     
-    PhoneNumber     : PhoneNumberType,
+    PhoneNumber     : {...PhoneNumberType, unique: false},
     
-    InvitationCode  : InvitationCodeType,  // 8 digit random code (unique);
+    InvitationCode  : {...InvitationCodeType, unique: false},  // 8 digit random code (unique);
     
-    Parent          : InvitationCodeType,
+    Parent          : {...InvitationCodeType, unique: false},
     
     Amount          : PrecisionNumberType,
     

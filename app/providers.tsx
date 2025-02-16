@@ -7,7 +7,9 @@ import {
     QueryClient,
     QueryClientProvider,
 } from '@tanstack/react-query'
-import { ReactNode } from 'react'
+import { forwardRef, ReactNode } from 'react'
+import { CustomContentProps, SnackbarContent, SnackbarProvider } from 'notistack';
+import { Slide } from '@mui/material';
 
 function makeQueryClient() {
     return new QueryClient({
@@ -37,13 +39,59 @@ export function getQueryClient() {
     }
 }
 
+function SlideTransitionRight(props: any) {
+    return <Slide {...props} direction="left" />; // Right to Left Animation
+}
+
+
+const CustomSnackbar = forwardRef<HTMLDivElement, CustomContentProps>(
+    ({ id, message, variant }, ref) => {
+        return (
+            <SnackbarContent
+                ref={ref}
+                className={`shadow-md rounded-lg p-3 text-gray-700 ${ variant === 'success' ? 'bg-green-300' :
+                    variant === 'warning' ? 'bg-yellow-300' :
+                        variant === 'error' ? 'bg-red-300' :
+                            'bg-[#daebff]'
+                    }`}
+            >
+                <span className="flex items-center space-x-2">
+                    {variant === 'success' && <span className='text-xl'>✔️</span>}
+                    {variant === 'warning' && <span className='text-xl'>⚠️</span>}
+                    {variant === 'error' && <span className='text-xl'>❌</span>}
+                    {variant === 'info' && <span className='text-xl'>ℹ️</span>}
+                    <span className='capitalize font-semibold'>{message}</span>
+                </span>
+            </SnackbarContent>
+        );
+    });
 
 export default function Providers({ children }: { children: ReactNode }) {
     // Get or create the query client
     const queryClient = getQueryClient();
     return (
         <QueryClientProvider client={queryClient}>
-            {children}
+            <SnackbarProvider
+                preventDuplicate
+                iconVariant={{
+                    success: <span className="mr-2">✔️</span>,  // Adds margin between icon & text
+                    warning: <span className="mr-2">⚠️</span>,
+                    error: <span className="mr-2">❌</span>,
+                    info: <span className="mr-2">ℹ️</span>,
+                }}
+                Components={{
+                    success: (props) => <CustomSnackbar {...props} />,
+                    warning: (props) => <CustomSnackbar {...props} />,
+                    error: (props) => <CustomSnackbar {...props} />,
+                    info: (props) => <CustomSnackbar {...props} />,
+                }}
+                maxSnack={3}
+                autoHideDuration={2000}
+                TransitionComponent={SlideTransitionRight}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                {children}
+            </SnackbarProvider>
         </QueryClientProvider>
     )
 
