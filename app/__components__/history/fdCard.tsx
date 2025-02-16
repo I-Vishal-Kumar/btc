@@ -1,3 +1,4 @@
+import { claimFD } from "@/(backend)/services/fd.services.serv";
 import { FdStatus } from "@/__types__/db.types";
 import { FD_type } from "@/__types__/fd.types";
 import { calculateFDProfit } from "@/lib/helpers/calcFdProfit";
@@ -6,6 +7,7 @@ import { formatNumber } from "@/lib/helpers/numberFormatter";
 import { Typography, Button, Box } from "@mui/material";
 import { DateTime } from "luxon";
 import Image from "next/image";
+import { ClaimButton } from "./fdClaimButton";
 
 export function TermDepositCard({ fd_detail }: { fd_detail: FD_type }) {
 
@@ -32,9 +34,7 @@ export function TermDepositCard({ fd_detail }: { fd_detail: FD_type }) {
 
             {
                 fd_detail?.FdStatus === FdStatus.MATURED && (
-                    <Box width={'80%'} margin={"0 auto"} py={1} pb={2}>
-                        <Button sx={{ bgcolor: '#98bbffe8', color: 'black', boxShadow: 0 }} fullWidth variant="contained">Claim</Button>
-                    </Box>
+                    <ClaimButton _id={fd_detail._id} fd={fd_detail} />
                 )
             }
 

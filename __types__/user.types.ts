@@ -2,8 +2,8 @@
 
 export type UserType = {
     _id             : string,
-    Parent          : number,
-    InvitationCode  : number,
+    Parent          : string,
+    InvitationCode  : string,
     Name            : string,
     Balance         : number,
     Profit          : number,
