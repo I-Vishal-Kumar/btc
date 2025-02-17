@@ -2,8 +2,13 @@ import LineClamp from "@/lib/helpers/lineClamper"
 import { AccountBalance, AdbOutlined, CardGiftcard, SupportAgent, TextSnippetOutlined } from "@mui/icons-material"
 import { Typography, Box } from "@mui/material"
 import { useRouter } from "next/navigation"
-import { ReactNode } from "react"
+import { ReactNode, useContext, useEffect } from "react"
 import { RenderInvitationLink } from "../_commonComponents/RenderInvitationLink"
+import { USER_CONTEXT } from "@/lib/hooks/user.context"
+import { DateTime } from "luxon"
+import { enqueueSnackbar } from "notistack"
+import { useMutation } from "@tanstack/react-query"
+import { claimGift } from "@/(backend)/services/user.service.serv"
 
 
 const QuickAccess = ({ icon, label, onClick }: { icon: ReactNode, label: string, onClick?: VoidFunction }) => {
@@ -24,14 +29,47 @@ const QuickAccess = ({ icon, label, onClick }: { icon: ReactNode, label: string,
 export const QuickAccessSection = () => {
 
     const router = useRouter();
+    const { setUserInfo, userInfo } = useContext(USER_CONTEXT);
+
+    const { data, isPending, isSuccess, mutate } = useMutation({
+        mutationFn: claimGift
+    })
+
+    const handleGiftClaim = () => {
+        // initially it will be null so if it exists then only check it.
+        if (userInfo.LastSpinAt) {
+            let today = DateTime.now().startOf("day")
+            let lastSpinDate = DateTime.fromJSDate(new Date(userInfo.LastSpinAt)).startOf('day')
+            if (lastSpinDate.get("day") === today.get("day")) {
+                enqueueSnackbar("You can spinn tomorrow", { variant: "warning" });
+                return;
+            }
+        }
+        mutate();
+    }
 
     const quickLinks = [
         { label: "Recharge", icon: <AccountBalance />, onClick: () => { router.push('/profile/recharge') } },
         { label: "PDF", icon: <TextSnippetOutlined /> },
         { label: "Application", icon: <AdbOutlined /> },
-        { label: "Gift", icon: <CardGiftcard /> },
+        { label: "Gift", icon: <CardGiftcard />, onClick: () => handleGiftClaim() },
         { label: "Support", icon: <SupportAgent />, onClick: () => { router.push('/profile/support') } },
     ]
+
+    useEffect(() => {
+        if (isSuccess && data.valid && data.data) {
+            const gift = data.data.GIFT_AMOUNT;
+            setUserInfo(prev => ({
+                ...prev,
+                Profit: prev.Profit + gift,
+                Balance: prev.Balance + gift,
+                LastSpinAt: DateTime.now().toISO()
+            }))
+            enqueueSnackbar(data.msg, { variant: 'success' })
+        } else if (isSuccess) {
+            enqueueSnackbar(data.msg || "something went wrong", { variant: "error" });
+        }
+    }, [isSuccess, isPending, data])
 
     return (
 

@@ -25,7 +25,8 @@ export function ClaimButton({ _id, fd }: { _id: string, fd: FD_type }) {
             setUserInfo(prev => ({
                 ...prev,
                 Balance: prev.Balance + fd.FdAmount + profit,
-                Profit: profit
+                Profit: profit,
+                HoldingScore: prev.HoldingScore + fd.FdDuration * 10
             }))
 
         } else if (isSuccess) {

@@ -1,10 +1,9 @@
-import { claimFD } from "@/(backend)/services/fd.services.serv";
 import { FdStatus } from "@/__types__/db.types";
 import { FD_type } from "@/__types__/fd.types";
 import { calculateFDProfit } from "@/lib/helpers/calcFdProfit";
 import { formatDate } from "@/lib/helpers/formatDate";
 import { formatNumber } from "@/lib/helpers/numberFormatter";
-import { Typography, Button, Box } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import { DateTime } from "luxon";
 import Image from "next/image";
 import { ClaimButton } from "./fdClaimButton";

@@ -31,7 +31,7 @@ const USER_SCHEMA = new Schema({
     
     ReferalCount    : ReferalCountType,  // number of users joined using invitation code of any user.
  
-    lastSpinAt      : { type: Date, default: null },  // Track last spin time
+    LastSpinAt      : { type: Date, default: null },  // Track last spin time
 
     Session         : String
 

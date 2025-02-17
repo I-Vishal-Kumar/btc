@@ -1,7 +1,8 @@
 "use client"
+import { copyToClipboard } from "@/lib/helpers/copyText"
 import { USER_CONTEXT } from "@/lib/hooks/user.context"
 import { ShareOutlined } from "@mui/icons-material"
-import { Box, SxProps, TextField } from "@mui/material"
+import { Box, IconButton, InputAdornment, SxProps, TextField } from "@mui/material"
 import { useContext } from "react"
 import { MdContentCopy } from "react-icons/md"
 
@@ -13,7 +14,7 @@ export const RenderInvitationLink: React.FC<{ sx?: SxProps }> = ({ sx }) => {
             <div className="flex items-center pl-2 justify-center" >
                 <ShareOutlined fontSize="small" />
             </div>
-            <Box flex={1}>
+            <Box flex={1} onClick={() => copyToClipboard(`${ window?.location.origin }/getting-started?type=signup&invitedBy=${ userInfo.InvitationCode }`)}>
                 <TextField
                     value={`${ window?.location.origin }/getting-started?type=signup&invitedBy=${ userInfo.InvitationCode }`}
                     fullWidth
@@ -23,9 +24,11 @@ export const RenderInvitationLink: React.FC<{ sx?: SxProps }> = ({ sx }) => {
                         input: {
                             style: { fontSize: 10 },
                             endAdornment: (
-                                <div className=' bg-inherit pl-3'>
-                                    <MdContentCopy fontSize={15} />
-                                </div>
+                                <InputAdornment position="end">
+                                    <IconButton className=' bg-inherit pl-3'>
+                                        <MdContentCopy fontSize={15} />
+                                    </IconButton>
+                                </InputAdornment>
                             )
                         }
                     }}

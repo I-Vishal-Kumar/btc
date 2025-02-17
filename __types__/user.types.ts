@@ -14,5 +14,5 @@ export type UserType = {
     Level1Withdrawal: number,
     Blocked         : boolean,
     HoldingScore    : number,
-    lastSpinAt      : string
+    LastSpinAt      : string
 }
