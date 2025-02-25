@@ -1,4 +1,4 @@
-import { SectionsAvailable } from "@/__types__/ui_types/profil.types";
+import { SectionsAvailable, WithdrawmethodTabsType } from "@/__types__/ui_types/profil.types";
 import { RechargeHistory } from "@/app/__components__/profile/Sections/RechargeHistory";
 import { SectionWrapper } from "@/app/__components__/profile/Sections/SectionWrapper";
 import { Support } from "@/app/__components__/profile/Sections/Support";
@@ -6,11 +6,17 @@ import { TeamCommission } from "@/app/__components__/profile/Sections/TeamCommis
 import { WithdrawalFunds } from "@/app/__components__/profile/Sections/WithdrawalFunds";
 import { WithdrawalHistory } from "@/app/__components__/profile/Sections/WithdrawalHistory";
 
-type SectionComponentMapping = Partial<Record<SectionsAvailable, React.FC>>;
+type SectionComponentMapping = Partial<Record<SectionsAvailable, React.FC<any>>>;
 
-export default async function ProfileSections({ params }: { params: Promise<{ profile_section: SectionsAvailable }> }) {
+type props = {
+    params: Promise<{ profile_section: SectionsAvailable }>
+    searchParams: Promise<{ activeTab: WithdrawmethodTabsType }>
+}
+
+export default async function ProfileSections({ searchParams, params }: props) {
 
     const { profile_section } = await params;
+    const { activeTab } = await searchParams;
 
     const sectionMapping: SectionComponentMapping = {
         [SectionsAvailable.RECHARGE_HISTORY]: RechargeHistory,
@@ -24,7 +30,12 @@ export default async function ProfileSections({ params }: { params: Promise<{ pr
 
     return (
         <SectionWrapper title={profile_section}>
-            {Section ? <Section /> : <div>Section Not Found</div>}
+            {Section ? (
+                <Section {...(profile_section === SectionsAvailable.WITHDRAWAL_FUNDS && { activeTab })} />
+            ) : (
+                <div>Section Not Found</div>
+            )}
         </SectionWrapper>
     );
+
 }

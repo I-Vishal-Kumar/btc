@@ -75,7 +75,7 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
                     </Typography>
                 </div>
 
-                <Button disabled={isPending} type="submit" fullWidth variant="contained" sx={{ position: 'relative', mt: 5, py: 2, textTransform: 'initial', bgcolor: "#78dafb", color: "black", fontWeight: 700 }}>
+                <Button disabled={isPending} type="submit" fullWidth variant="contained" sx={{ position: 'relative', fontSize: 14, mt: 5, py: 2, textTransform: 'initial', bgcolor: "#78dafb", color: "black", fontWeight: 700 }}>
                     {isPending ? <CircularProgress sx={{ color: 'black' }} size={'1rem'} /> : "Login"}
                 </Button>
 

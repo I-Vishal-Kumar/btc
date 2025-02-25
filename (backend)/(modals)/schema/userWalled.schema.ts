@@ -1,31 +1,35 @@
-import { InvitationCodeType, PhoneNumberType, db_schema } from "@/__types__/db.types";
+import { PhoneNumberType, db_schema } from "@/__types__/db.types";
 import { Schema, model, models } from "mongoose";
 
 
-const RequiredString = {type: String, required: true};
-
 const WALLET_SCHEMA = new Schema({
     
-    PhoneNumber         : {...PhoneNumberType, unique: false},
+    PhoneNumber         : {...PhoneNumberType, unique: true},
+        
+    // USDT Wallet (Optional initially)
+    UsdtAddress         : { type: String, unique: true, sparse: true },
     
-    InvitationCode      : {...InvitationCodeType, unique: false},  // 8 digit random code (unique);
+    AppName             : { type: String },
+
+    // Local Bank (Optional initially)
+    AccHolderName       : { type: String },
     
-    AccHolderName       : RequiredString,
-
-    AccNumber           : {...RequiredString, unique: true},
-
-    IfscCode            : {...RequiredString, unique: true},
+    AccNumber           : { type: String, unique: true, sparse: true },
     
-    BankName            : RequiredString,
+    IfscCode            : { type: String, unique: true, sparse: true },
+    
+    BankName            : { type: String },
+    
+    Branch              : { type: String },
 
-    Branch              : RequiredString,
+    LocalWithdrawPassword    : { type: String },
 
-    WithdrawPassword    : RequiredString,
+    UsdtWithdrawPassword    : { type: String },
     
 }, { timestamps: true });
 
 // indexes ------------------
-    WALLET_SCHEMA.index({ createdAt: -1, PhoneNumber: 1, InvitationCode: 1})
+    WALLET_SCHEMA.index({ createdAt: -1, PhoneNumber: 1 })
 // ------------
 
 export const WALLET = models?.[db_schema.WALLET] || model(db_schema.WALLET, WALLET_SCHEMA)

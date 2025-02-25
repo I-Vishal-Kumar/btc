@@ -23,6 +23,18 @@ const FD_SCHEMA = new Schema({
 
 },{timestamps: true})
 
+FD_SCHEMA.pre("save", function (this: Document & { [key: string]: any }, next) {
+    const precisionFields = ["FdAmount"];
+
+    precisionFields.forEach(field => {
+        if (this[field] !== undefined) {
+            this[field] = Math.round(this[field] * 100) / 100;
+        }
+    });
+
+    next();
+});
+
 // indexes ---------------
 FD_SCHEMA.index({ createdAt: -1, InvitationCode: 1, PhoneNumber: 1})
 // -----------

@@ -37,6 +37,19 @@ const USER_SCHEMA = new Schema({
 
 }, { timestamps: true });
 
+
+USER_SCHEMA.pre("save", function (this: Document & { [key: string]: any }, next) {
+    const precisionFields = ["Balance", "Profit", "Commission", "Level1Deposit", "Level1Withdrawal"];
+
+    precisionFields.forEach(field => {
+        if (this[field] !== undefined) {
+            this[field] = Math.round(this[field] * 100) / 100;
+        }
+    });
+
+    next();
+});
+
 // indexes -------------
 
 USER_SCHEMA.index({ createdAt: -1, InvitationCode: 1, PhoneNumber: 1 })

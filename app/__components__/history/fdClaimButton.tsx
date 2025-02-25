@@ -32,7 +32,7 @@ export function ClaimButton({ _id, fd }: { _id: string, fd: FD_type }) {
         } else if (isSuccess) {
             enqueueSnackbar(data?.msg || 'something went wrong', { variant: 'error' });
         }
-    }, [isPending, isSuccess, data])
+    }, [isPending, isSuccess, data,])
 
     return (
         <Box width={'80%'} margin={"0 auto"} py={1} pb={2}>

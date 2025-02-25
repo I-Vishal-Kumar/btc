@@ -10,9 +10,9 @@ import { SetStateAction, createContext, useEffect, useState } from "react";
 const User: UserType = {
     _id: '',
     Balance: 0,
-    InvitationCode: 0,
+    InvitationCode: '',
     Name: '',
-    Parent: 0,
+    Parent: '',
     PhoneNumber: '',
     Profit: 0,
     ReferalCount: 0,
@@ -21,7 +21,7 @@ const User: UserType = {
     HoldingScore: 0,
     Level1Deposit: 0,
     Level1Withdrawal: 0,
-    lastSpinAt: ''
+    LastSpinAt: ''
 }
 
 type context_type = {

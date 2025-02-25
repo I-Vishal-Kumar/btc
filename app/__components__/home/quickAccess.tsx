@@ -38,8 +38,8 @@ export const QuickAccessSection = () => {
     const handleGiftClaim = () => {
         // initially it will be null so if it exists then only check it.
         if (userInfo.LastSpinAt) {
-            let today = DateTime.now().startOf("day")
-            let lastSpinDate = DateTime.fromJSDate(new Date(userInfo.LastSpinAt)).startOf('day')
+            const today = DateTime.now().startOf("day")
+            const lastSpinDate = DateTime.fromJSDate(new Date(userInfo.LastSpinAt)).startOf('day')
             if (lastSpinDate.get("day") === today.get("day")) {
                 enqueueSnackbar("You can spinn tomorrow", { variant: "warning" });
                 return;
@@ -49,7 +49,7 @@ export const QuickAccessSection = () => {
     }
 
     const quickLinks = [
-        { label: "Recharge", icon: <AccountBalance />, onClick: () => { router.push('/profile/recharge') } },
+        { label: "Recharge", icon: <AccountBalance />, onClick: () => { router.push('/recharge') } },
         { label: "PDF", icon: <TextSnippetOutlined /> },
         { label: "Application", icon: <AdbOutlined /> },
         { label: "Gift", icon: <CardGiftcard />, onClick: () => handleGiftClaim() },

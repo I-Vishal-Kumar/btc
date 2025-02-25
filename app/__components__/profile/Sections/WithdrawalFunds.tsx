@@ -1,12 +1,15 @@
-import { Box, Typography, Button, TextField } from "@mui/material";
+import { Box } from "@mui/material";
 import PaymentCard from "../PaymentCard";
+import { WithdrawMethodToggler } from "./subSections/togle_tabs";
+import { WidthdrawMethodTabs, WithdrawalOperationIdentifier, WithdrawalOperationIdentifierType, WithdrawmethodTabsType } from "@/__types__/ui_types/profil.types";
+import { Section } from "./WithdrawalFundChildSection";
 
 
-export const WithdrawalFunds: React.FC = () => {
+export const WithdrawalFunds: React.FC<{ activeTab?: WithdrawmethodTabsType }> = ({ activeTab }) => {
     return (
         <div className="p-8">
             <PaymentCard />
-            <BankForm />
+            <BankForm activeTab={activeTab} />
         </div>
     )
 }
@@ -15,37 +18,69 @@ export const WithdrawalFunds: React.FC = () => {
 type fields = Record<string, string>
 interface FormSection {
     title: string,
+    _identifier: WithdrawalOperationIdentifierType,
     fields: fields[]
 }
 
-const formSections: FormSection[] = [
+
+const LocalFormSections: FormSection[] = [
     {
         title: "Bank Details",
+        _identifier: WithdrawalOperationIdentifier.LOCAL_BANK_CREATION,
         fields: [
-            { placeholder: "Account Holder Name" },
-            { placeholder: "Account Number" },
-            { placeholder: "IFSC Code" },
-            { placeholder: "Bank Name" },
-            { placeholder: "Withdrawal Password", type: "password" },
+            { placeholder: "Account Holder Name", formFieldName: 'AccHolderName' },
+            { placeholder: "Account Number", formFieldName: 'AccNumber' },
+            { placeholder: "IFSC Code", formFieldName: 'IfscCode' },
+            { placeholder: "Bank Name", formFieldName: 'BankName' },
+            { placeholder: "Withdrawal Password", type: "password", formFieldName: 'LocalWithdrawPassword' },
         ],
     },
     {
         title: "Withdrawal Funds",
+        _identifier: WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER,
         fields: [
-            { placeholder: "Enter Amount" },
-            { placeholder: "Withdrawal Password", type: "password" },
+            { placeholder: "Enter Amount", formFieldName: 'Amount' },
+            { placeholder: "Withdrawal Password", type: "password", formFieldName: 'WithdrawPassword' },
         ],
     },
     {
         title: "Forgot Withdrawal Password",
+        _identifier: WithdrawalOperationIdentifier.LOCAL_BANK_PASS_RESET,
         fields: [
-            { placeholder: "Current Password", type: "password" },
-            { placeholder: "New Password", type: "password" },
+            { placeholder: "Current Password", type: "password", formFieldName: 'CurrWithdrawPassword' },
+            { placeholder: "New Password", type: "password", formFieldName: 'NewWithdrawPassword' },
+        ],
+    },
+];
+const UsdtFormSections: FormSection[] = [
+    {
+        title: "Bank Details",
+        _identifier: WithdrawalOperationIdentifier.USDT_BANK_CREATION,
+        fields: [
+            { placeholder: "USDT Address", formFieldName: 'UsdtAddress' },
+            { placeholder: "App Name", formFieldName: 'AppName' },
+            { placeholder: "Withdrawal Password", type: "password", formFieldName: 'UsdtWithdrawPassword' },
+        ],
+    },
+    {
+        title: "Withdrawal Funds",
+        _identifier: WithdrawalOperationIdentifier.USDT_BANK_TRANSFER,
+        fields: [
+            { placeholder: "Enter Amount", formFieldName: 'Amount' },
+            { placeholder: "Withdrawal Password", type: "password", formFieldName: 'WithdrawPassword' },
+        ],
+    },
+    {
+        title: "Forgot Withdrawal Password",
+        _identifier: WithdrawalOperationIdentifier.USDT_BANK_PASS_RESET,
+        fields: [
+            { placeholder: "Current Password", type: "password", formFieldName: 'CurrWithdrawPassword' },
+            { placeholder: "New Password", type: "password", formFieldName: 'NewWithdrawPassword' },
         ],
     },
 ];
 
-function BankForm() {
+function BankForm({ activeTab = WidthdrawMethodTabs.LOCAL }: { activeTab?: WithdrawmethodTabsType }) {
     return (
         <Box
             sx={{
@@ -57,37 +92,20 @@ function BankForm() {
                 mt: 2
             }}
         >
-            {formSections.map((section, index) => (
-                <Section key={index} title={section.title} fields={section.fields} />
-            ))}
-
-            <Button
-                variant="contained"
-                fullWidth
-                size="small"
-                sx={{
-                    bgcolor: "#89CEFF",
-                    color: "white",
-                    boxShadow: 'none',
-                    fontSize: "16px",
-                    textTransform: "none",
-                    borderRadius: "24px",
-                    mt: 2,
-                    "&:hover": { bgcolor: "#6db9e8" },
-                }}
-            >
-                Submit
-            </Button>
+            <WithdrawMethodToggler tab={activeTab} />
+            {
+                activeTab === WidthdrawMethodTabs.USDT ? (
+                    UsdtFormSections.map((section) => (
+                        <Section key={section.title} _identifier={section._identifier} title={section.title} fields={section.fields} />
+                    ))
+                ) : (
+                    LocalFormSections.map((section) => (
+                        <Section key={section.title} _identifier={section._identifier} title={section.title} fields={section.fields} />
+                    ))
+                )
+            }
         </Box>
     );
 }
 
-const Section = ({ title, fields }: { title: string, fields: fields[] }) => (
-    <Box>
-        <Typography fontWeight={600} mt={2}>{title}</Typography>
-        {fields.map((field, index) => (
-            <TextField label={field.placeholder} key={index} size="small" variant="outlined" placeholder={field.placeholder} fullWidth type={field.type || "text"} sx={{ mt: 1, bgcolor: '#ebebeb' }} />
-        ))}
-    </Box>
-);
 

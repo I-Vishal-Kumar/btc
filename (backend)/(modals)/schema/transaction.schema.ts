@@ -13,14 +13,28 @@ const TRANSACTION_SCHEMA = new Schema({
     
     Amount          : PrecisionNumberType,
     
-    Type            : {enum:  Object.values(TransactionType), required: true},
+    Type            : {type: String, enum:  Object.values(TransactionType), required: true },
+    
+    Method            : {type: String, required: true },
         
     TransactionID   : {type: String, required: true, unique: true},
 
-    Status          : {enum: Object.values(TransactionStatusType), default: TransactionStatusType.PENDING , required: true},  // number of users joined using invitation code of any user.
+    Status          : {type: String, enum: Object.values(TransactionStatusType), default: TransactionStatusType.PENDING , required: true},  // number of users joined using invitation code of any user.
  
     Tax             : Number // % that should be taxed or was taxed during withdrawal.
 }, { timestamps: true });
+
+TRANSACTION_SCHEMA.pre("save", function (this: Document & { [key: string]: any }, next) {
+    const precisionFields = ["Amount"];
+
+    precisionFields.forEach(field => {
+        if (this[field] !== undefined) {
+            this[field] = Math.round(this[field] * 100) / 100;
+        }
+    });
+
+    next();
+});
 
 // indexes ------------
 

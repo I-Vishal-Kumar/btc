@@ -45,7 +45,7 @@ function SlideTransitionRight(props: any) {
 
 
 const CustomSnackbar = forwardRef<HTMLDivElement, CustomContentProps>(
-    ({ id, message, variant }, ref) => {
+    ({ message, variant }, ref) => {
         return (
             <SnackbarContent
                 ref={ref}
@@ -65,6 +65,7 @@ const CustomSnackbar = forwardRef<HTMLDivElement, CustomContentProps>(
             </SnackbarContent>
         );
     });
+CustomSnackbar.displayName = 'CustomSnackbar';
 
 export default function Providers({ children }: { children: ReactNode }) {
     // Get or create the query client

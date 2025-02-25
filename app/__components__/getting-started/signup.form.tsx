@@ -70,7 +70,7 @@ export const SignupForm = ({ setQueryParam }: { setQueryParam: (key: string, val
                     Customer Support
                 </Typography>
 
-                <Button type="submit" fullWidth variant="contained" sx={{ mt: 5, bgcolor: "#78dafb", py: 2, textTransform: 'initial', color: "black", fontWeight: 700 }}>
+                <Button type="submit" fullWidth variant="contained" sx={{ mt: 5, bgcolor: "#78dafb", py: 2, fontSize: 14, textTransform: 'initial', color: "black", fontWeight: 700 }}>
                     {isPending ? <CircularProgress sx={{ color: 'black' }} size={'1rem'} /> : "Sign up"}
                 </Button>
             </motion.form>

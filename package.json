@@ -19,6 +19,7 @@
     "@tanstack/react-query": "^5.65.1",
     "axios": "^1.7.9",
     "framer-motion": "^12.0.6",
+    "imagekit": "^6.0.0",
     "jose": "^5.9.6",
     "luxon": "^3.5.0",
     "mongoose": "^8.9.5",

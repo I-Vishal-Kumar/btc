@@ -10,9 +10,9 @@ import { useState } from "react"
 export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab }) => {
 
     const [expanded, setExpanded] = useState<string | false>(false);
-    const [data, setData] = useState<Record<string, string>>({});
+    // const [data, setData] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState<Record<string, boolean>>({});
-
+    console.log(setLoading, activeTab)
     const handleChange = (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false); // Close others when one is opened
     };

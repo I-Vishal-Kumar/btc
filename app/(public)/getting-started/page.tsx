@@ -25,7 +25,7 @@ function AuthFormContents() {
     const { setQueryParam } = useQueryParams();
 
     return (
-        <Container disableGutters maxWidth="md" sx={{ height: "100vh", overflow: "hidden", width: "100vw", position: "relative" }}>
+        <Container disableGutters maxWidth="md" sx={{ height: "100dvh", overflow: "hidden", width: "100vw", position: "relative" }}>
             <div className="absolute top-0 left-0 w-full h-full">
                 <Image className="absolute top-0 left-0 h-full contrast-50 brightness-110 w-full object-cover" src={"/getting-started/bg.jpg"} alt="background" fill />
                 <div className="absolute inset-0 bg-yellow-100 opacity-80 mix-blend-multiply"></div>

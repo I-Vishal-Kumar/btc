@@ -6,6 +6,6 @@ export const OPTIONS = {
     '365day@7%'     : { max: 200_000 },
     '730day@10%'    : { max: 300_000 },
     '1095day@15%'   : { max: 400_000 },
-}
+} as const;
 
 export type OptionTypes = keyof typeof OPTIONS;

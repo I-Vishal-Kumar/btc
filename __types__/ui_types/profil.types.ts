@@ -20,3 +20,24 @@ export const ActiveTabs = {
 } as const;
 
 export type ActiveTabs = typeof ActiveTabs[ keyof typeof ActiveTabs ];
+
+export const WidthdrawMethodTabs = {
+    LOCAL: 'local',
+    USDT: 'usdt'
+} as const;
+
+export type WithdrawmethodTabsType = typeof WidthdrawMethodTabs[keyof typeof WidthdrawMethodTabs]
+
+
+export const WithdrawalOperationIdentifier = {
+    LOCAL_BANK_CREATION : 'local_bank_creation',
+    LOCAL_BANK_TRANSFER : 'local_bank_transfer',
+    LOCAL_BANK_PASS_RESET : 'local_bank_pass_reset',
+
+    USDT_BANK_CREATION : 'usdt_bank_creation',
+    USDT_BANK_TRANSFER : 'usdt_bank_transfer',
+    USDT_BANK_PASS_RESET : 'usdt_bank_pass_reset',
+    
+} as const;
+
+export type WithdrawalOperationIdentifierType = typeof WithdrawalOperationIdentifier[keyof typeof WithdrawalOperationIdentifier]

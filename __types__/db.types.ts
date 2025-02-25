@@ -42,7 +42,7 @@ export type TransactionStatusType = typeof TransactionStatusType[keyof typeof Tr
 export const GatewayTypes = {
     AUTO_1 : 'AUTO-1',
     AUTO_2 : 'AUTO-2',
-    DEFAULT : 'AUTO-2',
+    DEFAULT : 'BTC',
 } as const;
 
 export type GatewayTypes = typeof GatewayTypes[keyof typeof GatewayTypes]
@@ -73,7 +73,8 @@ export const PasswordType = {
 export const PrecisionNumberType = {
     type: Number,
     default: 0,
-    set : (value: number) => parseFloat(value.toFixed(2))
+    // added pre save hook instead.
+    // set : (value: number) => parseFloat(value.toFixed(2)) // WORKS ONLY FOR SAVE | CREATE (not increment.)
 }
 
 export const PhoneNumberType = {

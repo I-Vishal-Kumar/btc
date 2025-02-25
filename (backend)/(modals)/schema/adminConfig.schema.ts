@@ -11,7 +11,7 @@ const ADMIN_CONFIG_SCHEMA = new Schema({
     
     UpiIds          : Array,
     
-    Gateway         : {enum: Object.values(GatewayTypes), default: GatewayTypes.DEFAULT},
+    Gateway         : { type: String, enum: Object.values(GatewayTypes), default: GatewayTypes.DEFAULT},
     
    });
 
