@@ -6,6 +6,7 @@ import { UserContextProvider } from '@/lib/hooks/user.context';
 import Providers from '../providers';
 import Footer from '../__components__/footer/footer';
 import { Box } from '@mui/material';
+import { WalletContextProvider } from '@/lib/hooks/userWallet.context';
 
 
 const geistSans = Geist({
@@ -36,10 +37,12 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <Providers>
             <UserContextProvider>
-              <Box className="flex flex-col mx-auto max-w-screen-sm w-screen bg-slate-100 h-screen">
-                <Box className="flex-1 overflow-y-auto">{children}</Box>
-                <Footer />
-              </Box>
+              <WalletContextProvider>
+                <Box className="flex flex-col mx-auto max-w-screen-sm w-screen bg-slate-100 h-screen">
+                  <Box className="flex-1 overflow-y-auto">{children}</Box>
+                  <Footer />
+                </Box>
+              </WalletContextProvider>
             </UserContextProvider>
           </Providers>
         </AppRouterCacheProvider>

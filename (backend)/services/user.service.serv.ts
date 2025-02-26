@@ -5,8 +5,9 @@ import { VerifyToken } from "@/lib/auth/verifyToken"
 import { cookies } from "next/headers";
 import { USER } from "@/(backend)/(modals)/schema/user.schema";
 import { ServiceReturnType } from "@/__types__/service.types";
-import { UserType } from "@/__types__/user.types";
+import { UserType, UserWallet } from "@/__types__/user.types";
 import { DateTime } from "luxon";
+import { WALLET } from "../(modals)/schema/userWalled.schema";
 
 
 export const getUserDetails = async (): ServiceReturnType<UserType> => {
@@ -80,3 +81,31 @@ export const claimGift = async (): ServiceReturnType<{GIFT_AMOUNT: number}> =>{
 }
 
 // ====================================
+
+
+
+// GET USER WALLET DETAILS ==============================
+
+export const getWalletDetails = async ():ServiceReturnType<UserWallet> => {
+    try {   
+        
+        const cookie = await cookies();
+        const token = cookie.get('token')?.value || ''
+
+        const {success, decoded} = await VerifyToken(token);
+
+        if(!success || !decoded) return {valid: false, operation: 'LOGOUT'}
+        
+        await CONNECT();
+
+        const walletDetails = await WALLET.findOne({PhoneNumber: decoded.PhoneNumber}, {UsdtWithdrawPassword: 0, LocalWithdrawPassword: 0, _id: 0});
+
+        return {valid: true, data: walletDetails?.toObject() as UserWallet}
+        
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// ===========================================

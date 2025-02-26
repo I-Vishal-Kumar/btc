@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import PaymentCard from "../PaymentCard";
 import { WithdrawMethodToggler } from "./subSections/togle_tabs";
 import { WidthdrawMethodTabs, WithdrawalOperationIdentifier, WithdrawalOperationIdentifierType, WithdrawmethodTabsType } from "@/__types__/ui_types/profil.types";
@@ -93,6 +93,9 @@ function BankForm({ activeTab = WidthdrawMethodTabs.LOCAL }: { activeTab?: Withd
             }}
         >
             <WithdrawMethodToggler tab={activeTab} />
+            {
+                activeTab === WidthdrawMethodTabs.USDT && <Typography textAlign={"end"} fontWeight={500} color="red" >₹ 90 = $ 1</Typography>
+            }
             {
                 activeTab === WidthdrawMethodTabs.USDT ? (
                     UsdtFormSections.map((section) => (

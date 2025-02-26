@@ -16,3 +16,18 @@ export type UserType = {
     HoldingScore    : number,
     LastSpinAt      : string
 }
+
+
+export type UserWallet = {
+    PhoneNumber     : string,
+    
+    UsdtAddress    ?: string,
+    AppName        ?: string,
+
+    AccHolderName  ?: string,
+    AccNumber      ?: string,
+    IfscCode       ?: string,
+    BankName       ?: string,
+    Branch         ?: string,
+    
+}

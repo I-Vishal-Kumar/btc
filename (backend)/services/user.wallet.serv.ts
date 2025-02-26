@@ -192,6 +192,11 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         if(existingTransaction) throw new Error("You have already withdrawn today.");
 
+        // check if user has a bank account.
+        const hasBank = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : { $exists: true, $nin: [null, ""] } })
+        
+        if(!hasBank) throw new Error("You don't have a bank account.");
+
         // check if user has enough balance.
         const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount}});
 
@@ -242,7 +247,6 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         
         await session.abortTransaction();
 
-        console.log(error);
         if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};
         return {valid: false, msg: error?.message || 'something went wrong'}
     
