@@ -13,6 +13,10 @@ const ADMIN_CONFIG_SCHEMA = new Schema({
     
     Gateway         : { type: String, enum: Object.values(GatewayTypes), default: GatewayTypes.DEFAULT},
     
+    Usdt            : { type: Boolean, default: false},
+    
+    UsdtAddress     : { type: String, default : 'TLNpPzXAMhW1rh32TddcRJDhPj5EeD2gH7' },
+    
    });
 
 export const ADMIN_CONFIG = models?.[db_schema.ADMIN_CONFIG] || model(db_schema.ADMIN_CONFIG, ADMIN_CONFIG_SCHEMA)

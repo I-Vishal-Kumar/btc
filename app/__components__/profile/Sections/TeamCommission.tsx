@@ -3,23 +3,35 @@ import { RenderInvitationLink } from "../../_commonComponents/RenderInvitationLi
 import PaymentCard from "../PaymentCard"
 import { Box, Typography } from "@mui/material"
 import { ChildSection } from "./CommissionChildSection"
-import { SubSectionsAvailable } from "@/__types__/ui_types/profil.types"
+import { CommissionPageDetailType, SubSectionsAvailable } from "@/__types__/ui_types/profil.types"
+import { getCommissionPageDetails } from "@/(backend)/services/user.service.serv"
+import AuthForm from "@/app/(public)/getting-started/page"
 
-const Sections = {
-    "Team Transaction": [
-        { name: "Total Deposit", value: `₹ ${ formatNumber(23423) }` },
-        { name: "Total Withdrawal", value: `₹ ${ formatNumber(23423) }` },
-        { name: "Today Deposit", pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_DEPOSIT }?activeTab=today` },
-        { name: "Today Withdrawal", pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_WITHDRAWAL }?activeTab=today` },
-    ],
-    "Team Report": [
-        { name: "Today New Registration", value: 234, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_REGISTRATION }?activeTab=today` },
-        { name: "Direct Active Members", value: 2342, pathTo: `/profile/team_commission/${ SubSectionsAvailable.DIRECT_MEMBERS }?activeTab=today` },
-        { name: "Total Active Members", value: 5234 },
-    ]
+const SectionWithDetails = (data: CommissionPageDetailType) => {
+    return {
+        "Team Transaction": [
+            { name: "Total Deposit", value: `₹ ${ formatNumber(data?.totalDeposit) }` },
+            { name: "Total Withdrawal", value: `₹ ${ formatNumber(data.totalWithdrawal) }` },
+            { name: "Today Deposit", value: `₹ ${ formatNumber(data?.todayDeposit) }`, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_DEPOSIT }?activeTab=today` },
+            { name: "Today Withdrawal", value: `₹ ${ formatNumber(data?.todayWithdrawal) }`, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_WITHDRAWAL }?activeTab=today` },
+        ],
+        "Team Report": [
+            { name: "Today New Registration", value: data.todayNewRegistration, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_REGISTRATION }?activeTab=today` },
+            { name: "Direct Active Members", value: data.directActiveMembers, pathTo: `/profile/team_commission/${ SubSectionsAvailable.DIRECT_MEMBERS }?activeTab=today` },
+            { name: "Total Active Members", value: data.TotalActiveMembers },
+        ]
+    }
 }
 
-export const TeamCommission: React.FC = () => {
+
+export const TeamCommission: React.FC = async () => {
+
+    const { valid, data } = await getCommissionPageDetails();
+
+    if (!valid || !data) return <AuthForm />
+
+    const Sections = SectionWithDetails(data);
+
     return (
         <div className="p-8">
 

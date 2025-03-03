@@ -25,6 +25,8 @@ const USER_SCHEMA = new Schema({
 
     Blocked         : {type: Boolean, default: false},
 
+    Deposited       : {type: Boolean, default: false},
+
     HoldingScore    : {type: Number, default: 0},
 
     PhoneNumber     : PhoneNumberType,

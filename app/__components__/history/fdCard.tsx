@@ -13,6 +13,8 @@ export function TermDepositCard({ fd_detail }: { fd_detail: FD_type }) {
     const expiry_date = DateTime.fromJSDate(new Date(fd_detail.createdAt), { zone: 'UTC' }).plus({ days: fd_detail.FdDuration }).toISO()?.toString() || ""
     const profit = calculateFDProfit(fd_detail.FdAmount, fd_detail.FdDuration, fd_detail.InterestRate);
 
+    const isClaimAvailable = fd_detail.FdStatus === FdStatus.MATURED || !fd_detail.LastClaimedOn || !(DateTime.fromJSDate(new Date(fd_detail.LastClaimedOn)).startOf('day').equals(DateTime.now().startOf('day')))
+    const plainFD = JSON.parse(JSON.stringify(fd_detail));
     return (
         <div className="rounded-xl overflow-hidden ring-1 bg-[#f3f3f3] ring-slate-300">
             <div className="bg-yellow-200 py-2">
@@ -32,8 +34,8 @@ export function TermDepositCard({ fd_detail }: { fd_detail: FD_type }) {
             </Box>
 
             {
-                fd_detail?.FdStatus === FdStatus.MATURED && (
-                    <ClaimButton _id={fd_detail._id} fd={fd_detail} />
+                isClaimAvailable && (
+                    <ClaimButton _id={plainFD._id} fd={plainFD} />
                 )
             }
 

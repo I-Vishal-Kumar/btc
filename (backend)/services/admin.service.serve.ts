@@ -8,6 +8,29 @@ import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { AdminConfigType } from "@/__types__/admin.types";
 
 
+// VERIFY ADMIN PASS ===============================
+
+export const verifyAdminPass = async (Password: string):ServiceReturnType => {
+    try {
+        
+        
+        if(!Password) throw new Error("Incorrect password");
+        
+        await CONNECT();
+        
+        const isCorrectPass = await ADMIN_CONFIG.findOne({Password});
+        
+        if(isCorrectPass) return {valid: true, msg: 'Logged in successfully'}
+        
+        return {valid: false, msg: 'Incorrect Password.'}
+
+    } catch (error) {
+        return {valid: false, msg: 'Incorrect password.'}
+    }
+}
+
+// ==========================
+
 export const getAdminConfig = async (): ServiceReturnType<AdminConfigType> => {
     try {
 

@@ -1,21 +1,54 @@
-
 "use client"
 
+import { getTodayDepositWithdrawalUsers } from "@/(backend)/services/user.service.serv"
+import { TransactionType } from "@/__types__/db.types"
+import { TransactionObjType } from "@/__types__/transaction.types"
 import { ActiveTabs } from "@/__types__/ui_types/profil.types"
 import { formatNumber } from "@/lib/helpers/numberFormatter"
 import { ExpandMore } from "@mui/icons-material"
-import { Accordion, AccordionDetails, AccordionSummary, Box, CircularProgress, Typography } from "@mui/material"
-import { useState } from "react"
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress, Typography } from "@mui/material"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { Fragment, useEffect, useState } from "react"
 
 export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab }) => {
 
     const [expanded, setExpanded] = useState<string | false>(false);
     // const [data, setData] = useState<Record<string, string>>({});
-    const [loading, setLoading] = useState<Record<string, boolean>>({});
-    console.log(setLoading, activeTab)
+    const [hasMore, setHasMore] = useState<Record<string, boolean>>({});
+
     const handleChange = (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false); // Close others when one is opened
     };
+
+    // Extract level number from `expanded` state using Regex
+    const level = expanded ? parseInt(expanded.match(/\d+/)?.[0] || "1", 10) : 1;
+
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isLoading,
+        isFetchingNextPage
+    } = useInfiniteQuery({
+        queryKey: ["deposits", activeTab, level],
+        initialPageParam: 1,
+        queryFn: ({ pageParam = 1 }) => getTodayDepositWithdrawalUsers(TransactionType.WITHDRAWAL, activeTab, pageParam, level),
+        getNextPageParam: (lastPage) => (lastPage?.pagination?.currentPage || 0) + 1 || undefined,
+        enabled: !!expanded,
+        staleTime: 60 * 1000,  // Data stays fresh for 1 minute (prevents refetching)
+    });
+
+    useEffect(() => {
+        if (data?.pages) {
+            const latestdata = data.pages.pop();
+            if (!latestdata || !latestdata.data?.length) {
+                setHasMore(prev => ({
+                    ...prev,
+                    [`level-${ latestdata?.pagination?.level }`]: false
+                }));
+            }
+        }
+    }, [data?.pages]);
 
     return (
         <Box p={2} display={'grid'} rowGap={2}>
@@ -27,20 +60,34 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
                     </AccordionSummary>
 
                     <AccordionDetails sx={{ maxHeight: '50vh', overflow: 'auto' }}>
-                        {loading[`Level${ index }`] ? (
+                        {isLoading ? (
                             <CircularProgress size={24} />
                         ) : (
                             <div className="divide-y-8">
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
-                                <RenderDepositDetail />
+                                {data?.pages.map((group, pageIndex) => (
+                                    <Fragment key={pageIndex}>
+                                        {(group?.data || []).map((transaction) => (
+                                            <RenderWithdrawalDetail key={transaction.TransactionID} transaction={transaction} />
+                                        ))}
+                                    </Fragment>
+                                ))}
+
+                                {isFetchingNextPage && <CircularProgress size={24} sx={{ display: "block", mx: "auto", mt: 2 }} />}
+
+                                {hasNextPage && hasMore[`level-${ index }`] && (
+                                    <Button
+                                        onClick={() => fetchNextPage()}
+                                        disabled={isFetchingNextPage}
+                                        fullWidth
+                                        sx={{ mt: 2 }}
+                                    >
+                                        {isFetchingNextPage ? "Loading..." : "Load More"}
+                                    </Button>
+                                )}
+
+                                {
+                                    !hasMore[`level-${ index }`] && <Typography textAlign={"center"}>No more data available.</Typography>
+                                }
                             </div>
                         )}
                     </AccordionDetails>
@@ -51,7 +98,7 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
     )
 }
 
-function RenderDepositDetail() {
+function RenderWithdrawalDetail({ transaction }: { transaction: TransactionObjType }) {
     return (
         <div className="ring-1 ring-slate-300 rounded-md p-2 flex justify-between items-center">
             <div>

@@ -4,11 +4,13 @@ import { USER_CONTEXT } from "@/lib/hooks/user.context"
 import { Avatar, Button, Typography } from "@mui/material"
 import { useContext } from "react"
 import { RenderBalance } from "../_commonComponents/RenderBalance"
+import { useRouter } from "next/navigation"
 
 
 
 export function HeroSection() {
     const { userInfo } = useContext(USER_CONTEXT)
+    const router = useRouter();
 
     return (
         <div className="relative jc grid pt-10" >
@@ -27,7 +29,7 @@ export function HeroSection() {
 
                 <Typography variant="caption" fontSize={12} fontWeight={600} color="textDisabled" >+91 {userInfo.PhoneNumber}</Typography>
 
-                <Button variant="contained" sx={{ boxShadow: 'none', display: 'block', mt: 2, textTransform: 'initial', bgcolor: '#73d1f0', borderRadius: '100vw' }} >Recharge</Button>
+                <Button onClick={() => router.push('/recharge')} variant="contained" sx={{ boxShadow: 'none', display: 'block', mt: 2, textTransform: 'initial', bgcolor: '#73d1f0', borderRadius: '100vw' }} >Recharge</Button>
             </div>
 
 

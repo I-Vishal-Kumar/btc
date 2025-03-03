@@ -19,6 +19,8 @@ const FD_SCHEMA = new Schema({
 
     MaturedOn       : Date,
 
+    LastClaimedOn   : Date, 
+    
     Claimed         : {type: Boolean, default: false}
 
 },{timestamps: true})

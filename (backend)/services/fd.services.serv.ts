@@ -11,7 +11,6 @@ import { USER } from "../(modals)/schema/user.schema";
 import { FD_type } from "@/__types__/fd.types";
 import { DateTime } from "luxon";
 import { FdStatus } from "@/__types__/db.types";
-import { calculateFDProfit } from "@/lib/helpers/calcFdProfit";
 
 function extractNumbers(plan: string): { days: number; profit: number } | null {
     const match = plan.match(/^(\d+)day@([\d.]+)%$/);
@@ -63,6 +62,7 @@ export const createFD = async ({FD_amount, duration}: requiredTypes) : ServiceRe
             FdAmount      : FD_amount,
             FdDuration    : days,
             InterestRate  : profit,
+            LastClaimedOn : ''
         }], {session});
 
         if(!fd) throw new Error('Something went wrong');
@@ -102,7 +102,7 @@ export const getFD = async () : ServiceReturnType<FD_type[]> => {
         if(!success || !decoded) throw new Error("Something went wrong");
 
         // get all FDs for the user.
-        const fds : FD_type[] = await FD.find({PhoneNumber: decoded.PhoneNumber});
+        const fds = await FD.find({PhoneNumber: decoded.PhoneNumber}).sort({createdAt: -1}).lean() as unknown as FD_type[]; 
 
         if(!fds) throw new Error("Could not able to get FD this time.");
 
@@ -138,6 +138,7 @@ export const getFD = async () : ServiceReturnType<FD_type[]> => {
     }
 }
 
+// CLAIM PER DAY FD.
 export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
 
     try {
@@ -149,6 +150,8 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
 
         if(!success || !decoded) throw new Error("Something went wrong");
         
+        await CONNECT();
+
         const fd : FD_type | null = await FD.findOne({_id});
 
         if(!fd) throw new Error('Could not claim this time try again.');
@@ -157,12 +160,24 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         const createdAt = DateTime.fromJSDate( new Date(fd.createdAt) ).startOf("day"); // FD creation date
         const maturityDate = createdAt.plus({ days: fd.FdDuration }); // Maturity date
         
-        if (today < maturityDate || fd.Claimed || fd.FdStatus !== FdStatus.MATURED ) {
-           console.error('Tried to claim by', {today, user: decoded.PhoneNumber})
-           throw new Error('Invalid request made.');
-        }
+        // check if user has claimed today or not.
+        const shouldClaimToday = !fd.LastClaimedOn || DateTime.fromJSDate(new Date(fd.LastClaimedOn)).startOf('day').equals(today);
 
+        if(!shouldClaimToday || fd.Claimed) throw new Error('You have already claimed for this fd.');
+
+        // process the profits.
         const isSuccess = await _processFDclaim(fd);
+
+        if(!isSuccess) throw new Error("something went wrong while claim.");
+
+        // check if fd has matured. 
+        if(fd.FdStatus === FdStatus.MATURED && maturityDate.startOf('day').equals(today)){
+            // update the user balance with total amount
+            await USER.findOneAndUpdate(
+                {PhoneNumber: fd.PhoneNumber},
+                {$inc: {Balance: fd.FdAmount}}
+            );   
+        }
 
         if(isSuccess) return {valid: true, msg: 'FD claimed successfully'};
         return {valid: false, msg: 'Something went wrong while claiming fd contact admin'};
@@ -175,6 +190,7 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
 }
 
 
+// Only update the profit 
 async function _processFDclaim(fd: FD_type){
 
     let session = await startSession();
@@ -188,7 +204,8 @@ async function _processFDclaim(fd: FD_type){
 
         let update_user_arr = [];
         
-        const profit = calculateFDProfit(fd.FdAmount, fd.FdDuration, fd.InterestRate); 
+        // calculate one day profit.
+        const profit =  (fd.InterestRate/100) * Number(fd.FdAmount); 
 
         while(parent && processingLevel <= 6){
 
@@ -218,9 +235,9 @@ async function _processFDclaim(fd: FD_type){
                 filter: {PhoneNumber: fd.PhoneNumber},
                 update: {
                     $inc : {
-                        Balance     : fd.FdAmount + profit,
+                        Balance     : profit,
                         Profit      : profit,
-                        HoldingScore: fd.FdDuration * 10 
+                        HoldingScore: 10 
                     }
                 }
             }
@@ -235,7 +252,7 @@ async function _processFDclaim(fd: FD_type){
         }
 
         const isUpdated = await FD.findOneAndUpdate({_id: fd._id}, {
-            $set: {Claimed: true}
+            $set: {LastClaimedOn: new Date().toISOString()}
         }, {session, new: true})
 
         if(!isUpdated) throw new Error("FD update failed try again.");
@@ -251,7 +268,6 @@ async function _processFDclaim(fd: FD_type){
     }finally{
 
         session.endSession();
-        return false;
     
     }
 

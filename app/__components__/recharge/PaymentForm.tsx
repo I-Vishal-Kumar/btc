@@ -6,6 +6,7 @@ import { enqueueSnackbar } from "notistack";
 import { ChangeEvent, useState } from "react";
 import { DefaultGateway } from "./defaultGatewayPage";
 import { AdminConfigType } from "@/__types__/admin.types";
+import { UsdtGateway } from "./usdtGatewayPage";
 
 export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminConfigType }> = ({ gatewayType, config }) => {
 
@@ -13,6 +14,8 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const [amount, setAmount] = useState<number | string>("");
     const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
     const [isDefaultGateway, setDefaultGateway] = useState<boolean>(false);
+    const [isUsdtGateway, setUsdtGateway] = useState<boolean>(false);
+    const [channelSelected, setChannel] = useState<'local' | 'usdt'>('local');
 
     const predefinedAmounts = [1000, 10000, 50000, 100000];
 
@@ -30,6 +33,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
 
         // validate minimum amount.
         if (Number(amount) < 500) return enqueueSnackbar("Minimum deposit amount is 500", { variant: 'warning' })
+        if (channelSelected === 'usdt') return setUsdtGateway(true);
 
         const fn = ({
             [GatewayTypes.DEFAULT]: () => setDefaultGateway(true),
@@ -41,6 +45,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     };
 
     if (isDefaultGateway) return <DefaultGateway amount={Number(amount)} config={config} />
+    if (isUsdtGateway) return <UsdtGateway amount={Number(amount)} config={config} />
 
     return (
         <Box className="flex flex-col items-center p-6 mx-auto">
@@ -82,10 +87,18 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
             />
 
             {/* Payment Method */}
-            <div className="flex justify-between w-full my-3 rounded-md ring-1 ring-slate-300 items-center py-2 px-2 bg-slate-200">
+            <div onClick={() => setChannel('local')} className="flex justify-between w-full my-3 rounded-md ring-1 ring-slate-300 items-center py-2 px-2 bg-slate-200">
                 <p>Payment Channel {gatewayType}</p>
-                <input type="radio" onChange={() => null} checked={true} aria-label="none" />
+                <input type="radio" onChange={() => { }} checked={channelSelected === 'local'} aria-label="none" />
             </div>
+            {
+                true && (
+                    <div onClick={() => setChannel('usdt')} className="flex justify-between w-full my-3 rounded-md ring-1 ring-slate-300 items-center py-2 px-2 bg-slate-200">
+                        <p>Payment Channel USDT</p>
+                        <input type="radio" onChange={() => { }} checked={channelSelected === 'usdt'} aria-label="none" />
+                    </div>
+                )
+            }
 
             {/* Submit Button */}
             <Button

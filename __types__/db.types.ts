@@ -12,6 +12,7 @@ export const FdStatus = {
     PROGRESS: "PROGRESS",
     MATURED: "MATURED",
     HALTED: "HALTED",
+    CLAIMED: "CLAIMED"
 } as const; // HALTED -> if admin want to pause this users fd.
 
 

@@ -4,41 +4,93 @@ import { claimFD } from "@/(backend)/services/fd.services.serv"
 import { FD_type } from "@/__types__/fd.types"
 import { calculateFDProfit } from "@/lib/helpers/calcFdProfit"
 import { USER_CONTEXT } from "@/lib/hooks/user.context"
-import { Box, Button, CircularProgress } from "@mui/material"
+import { Box, Button, CircularProgress, Modal, Typography } from "@mui/material"
 import { useMutation } from "@tanstack/react-query"
 import { enqueueSnackbar } from "notistack"
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, useState } from "react"
 
-export function ClaimButton({ _id, fd }: { _id: string, fd: FD_type }) {
+// Stages mapped to countdown values
+const loadingStages: Record<number, string> = {
+    110: "🔍 Preparing resources...",
+    90: "⛏️ Loading tools...",
+    70: "⚙️ Configuring system...",
+    50: "⚡ Boosting efficiency...",
+    30: "⚒️ Mining in progress...",
+    15: "💰 Finalizing rewards...",
+    5: "🚀 Wrapping up...",
+};
 
+export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     const { mutate, isSuccess, isPending, data } = useMutation({
         mutationFn: async () => claimFD({ _id }),
     })
 
     const { setUserInfo } = useContext(USER_CONTEXT);
 
+    // Countdown state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [countdown, setCountdown] = useState(120); // 2 minutes
+    const [loadingStage, setLoadingStage] = useState("🪄 Starting...");
+
+    // Handle countdown and stage updates
+    useEffect(() => {
+        if (isModalOpen && countdown > 0) {
+            const timer = setInterval(() => {
+                setCountdown((prev) => prev - 1);
+                if (loadingStages[countdown]) setLoadingStage(loadingStages[countdown]);
+            }, 1000);
+
+            return () => clearInterval(timer);
+        } else if (countdown === 0) {
+            setIsModalOpen(false);
+            mutate();
+        }
+    }, [isModalOpen, countdown]);
+
+    // Handle successful claim
     useEffect(() => {
         if (isSuccess && data.valid) {
-            enqueueSnackbar(data.msg, { variant: 'success' });
+            enqueueSnackbar(data.msg, { variant: "success" });
             const profit = calculateFDProfit(fd.FdAmount, fd.FdDuration, fd.InterestRate);
 
-            setUserInfo(prev => ({
+            setUserInfo((prev) => ({
                 ...prev,
-                Balance: prev.Balance + fd.FdAmount + profit,
-                Profit: profit,
-                HoldingScore: prev.HoldingScore + fd.FdDuration * 10
-            }))
-
+                Balance: prev.Balance + profit / fd.FdDuration,
+                Profit: profit / fd.FdDuration,
+                HoldingScore: prev.HoldingScore + 10,
+            }));
         } else if (isSuccess) {
-            enqueueSnackbar(data?.msg || 'something went wrong', { variant: 'error' });
+            enqueueSnackbar(data?.msg || "Something went wrong", { variant: "error" });
         }
-    }, [isPending, isSuccess, data,])
+    }, [isSuccess, data]);
 
     return (
-        <Box width={'80%'} margin={"0 auto"} py={1} pb={2}>
-            <Button onClick={() => mutate()} disabled={isPending} sx={{ bgcolor: '#98bbffe8', color: 'black', boxShadow: 0 }} fullWidth variant="contained">
-                {isPending ? <CircularProgress size={"small"} /> : "claim"}
+        <Box width={"80%"} margin={"0 auto"} py={1} pb={2}>
+            <Button
+                onClick={() => {
+                    mutate()
+                    // setIsModalOpen(true);
+                    // setCountdown(120);
+                    // setLoadingStage("🪄 Starting...");
+                }}
+                disabled={isPending}
+                sx={{ bgcolor: "#98bbffe8", color: "black", boxShadow: 0 }}
+                fullWidth
+                variant="contained"
+            >
+                {isPending ? <CircularProgress size={"small"} /> : "Claim"}
             </Button>
+            <Modal open={isModalOpen} onClose={() => { }}>
+                <div className="bg-slate-50 h-full w-full flex flex-col justify-center items-center">
+                    <Typography variant="h6" fontWeight="bold">{loadingStage}</Typography>
+                    <Typography variant="h4" fontWeight="bold" mt={2}>
+                        {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, "0")}
+                    </Typography>
+                    <Typography variant="body1" color="error" mt={4} fontWeight="bold">
+                        Please do not close or refresh the page while mining is in progress.
+                    </Typography>
+                </div>
+            </Modal>
         </Box>
-    )
+    );
 }

@@ -8,6 +8,10 @@ import { ServiceReturnType } from "@/__types__/service.types";
 import { UserType, UserWallet } from "@/__types__/user.types";
 import { DateTime } from "luxon";
 import { WALLET } from "../(modals)/schema/userWalled.schema";
+import { TRANSACTION } from "../(modals)/schema/transaction.schema";
+import { TransactionType } from "@/__types__/db.types";
+import { ActiveTabs, CommissionPageDetailType } from "@/__types__/ui_types/profil.types";
+import { TransactionObjType } from "@/__types__/transaction.types";
 
 
 export const getUserDetails = async (): ServiceReturnType<UserType> => {
@@ -36,6 +40,35 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 }
 
 
+// GET USER WITHDRAWAL DETAILS =========================
+
+export const getUserWithdrawalDetails = async ():ServiceReturnType<TransactionObjType[]> => {
+    try {
+        const cookie = await cookies();
+        const token = cookie.get('token')?.value || ''
+
+        const {success, decoded} = await VerifyToken(token);
+
+        if(!success || !decoded) return {valid: false, operation: 'LOGOUT'}
+        
+        await CONNECT();
+
+        const transactions = await TRANSACTION.find({PhoneNumber: decoded.PhoneNumber, Type: TransactionType.WITHDRAWAL}).sort({createdAt: -1}).lean() as unknown as TransactionObjType[];
+
+        return {valid: true, data: transactions || []}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// ==================================
+
+
+
+
+
 // CLAIM PER DAY GIFT ===================================
 
 export const claimGift = async (): ServiceReturnType<{GIFT_AMOUNT: number}> =>{
@@ -59,8 +92,8 @@ export const claimGift = async (): ServiceReturnType<{GIFT_AMOUNT: number}> =>{
 
         if(lastSpinDate && lastSpinDate === today) return {valid: false, msg: 'You can now claim tomorrow.'};
 
-        // generate a random gift amount between 1 - 50
-        const GIFT_AMOUNT = Number((Math.random() * (1 - 50) + 50).toFixed(2))
+        // generate a random gift amount between 1 - 10
+        const GIFT_AMOUNT = Number((Math.random() * (1 - 10) + 10).toFixed(2))
         
         await USER.findOneAndUpdate({PhoneNumber: decoded.PhoneNumber}, {
             $inc : {
@@ -109,3 +142,261 @@ export const getWalletDetails = async ():ServiceReturnType<UserWallet> => {
 }
 
 // ===========================================
+
+
+
+
+// GET USER TEAM COMMISION PAGE DETAILS ======================
+export const getCommissionPageDetails = async (): ServiceReturnType<CommissionPageDetailType> => {
+    try {
+       
+        const cookie = await cookies();
+        const token = cookie.get('token')?.value || ''
+
+        const {success, decoded} = await VerifyToken(token);
+
+        if(!success || !decoded) return {valid: false, operation: 'LOGOUT'}
+        
+        await CONNECT();
+
+        const userDetails: UserType | null = await USER.findOne({PhoneNumber: decoded.PhoneNumber});
+
+        if(!userDetails) throw new Error('Could not find the user');
+        
+        // get total deposit and withdrawal data up to 6 level's 
+        const details = await getTotalDetails(userDetails.InvitationCode);
+        
+        if(!details) throw new Error('Something went wrong');
+
+        // get today new registrations.
+        const memberDetails = await getMemberDetails(userDetails.InvitationCode);
+        
+        if(!memberDetails) throw new Error("Something went wrong");
+
+        return {valid: true, data: {...details, ...memberDetails}};
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+async function getTotalDetails(invitationCode: string) {
+    try {
+        const today = DateTime.now().startOf("day"); // Get today's start time
+
+        // Object to store totals (passed recursively to avoid extra iteration)
+        let totals = { todayDeposit: 0, todayWithdrawal: 0, totalDeposit: 0, totalWithdrawal: 0 };
+
+        async function fetchTransactions(invCodes: string[], level: number) {
+            if (level > 6 || invCodes.length === 0) return;
+
+            // Fetch transactions at this level
+            const transactions = await TRANSACTION.find(
+                { 
+                    Parent: { $in: invCodes }, 
+                    Type: { $in: [TransactionType.DEPOSIT, TransactionType.WITHDRAWAL] }
+                },
+                { Amount: 1, Type: 1, InvitationCode: 1, createdAt: 1 }
+            );
+
+            if (!transactions.length) return;
+
+            // Prepare next level invitation codes
+            const nextLevelInvites: string[] = [];
+
+            // Process transactions and update totals
+            transactions.forEach(tx => {
+                const isToday = DateTime.fromJSDate(tx.createdAt) >= today;
+
+                if (tx.Type === TransactionType.DEPOSIT) {
+                    totals.totalDeposit += tx.Amount;
+                    if (isToday) totals.todayDeposit += tx.Amount;
+                } else if (tx.Type === TransactionType.WITHDRAWAL) {
+                    totals.totalWithdrawal += tx.Amount;
+                    if (isToday) totals.todayWithdrawal += tx.Amount;
+                }
+
+                nextLevelInvites.push(tx.InvitationCode);
+            });
+
+            // Recursively fetch the next level
+            await fetchTransactions(nextLevelInvites, level + 1);
+        }
+
+        // Start recursion from Level 1
+        await fetchTransactions([invitationCode], 1);
+
+        return totals;
+
+    } catch (error) {
+        console.error("Error fetching transactions:", error);
+        return null;
+    }
+}
+
+async function getMemberDetails(invitationCode: string){
+    try {
+        
+        const details = {todayNewRegistration: 0, directActiveMembers: 0, TotalActiveMembers : 0 };
+        const today = DateTime.now().startOf("day"); // Get today's start time
+
+        async function getDetails (invitationCodes:string[], level: number){
+
+            if(level > 6 || !invitationCodes.length) return;
+
+            const users = await USER.find({Parent : {$in: invitationCodes}}, {createdAt: 1, InvitationCode: 1});
+
+            if(!users || !users.length) return;
+
+            const nextLevelInvites: string[] = [];
+
+            for(const user of users){
+                const isToday = DateTime.fromJSDate(user.createdAt) >= today;
+                
+                if (isToday) details.todayNewRegistration++;
+                if(level === 1 && user.Deposited) details.directActiveMembers++;
+                if(user.Deposited) details.TotalActiveMembers++;
+
+                nextLevelInvites.push(user.InvitationCode);
+            }
+
+            getDetails(nextLevelInvites, level + 1);
+
+        }
+
+        await getDetails([invitationCode], 1);
+        return details;
+
+    } catch (error) {
+        console.log("Error while getting member details", error);
+        return null;
+    }
+}
+// =======================================
+
+
+
+
+
+// Get today deposit | withdrawal user details ==================
+
+export const getTodayDepositWithdrawalUsers = async (Type: TransactionType, tab: ActiveTabs , page: number = 1, level: number = 1): ServiceReturnType<TransactionObjType[]> => {
+    try {
+        const cookie = await cookies();
+        const token = cookie.get('token')?.value || ''
+
+        const {success, decoded} = await VerifyToken(token);
+
+        if(!success || !decoded) return {valid: false, operation: 'LOGOUT'}
+        
+        await CONNECT();
+
+        const userDetails: UserType | null = await USER.findOne({PhoneNumber: decoded.PhoneNumber});
+
+        if(!userDetails) throw new Error('Could not find the user');
+
+        const pageSize = 10; // Number of records per page
+        const skip = (page - 1) * pageSize;
+
+        const startOfDay = DateTime.utc().startOf('day');
+        const endOfDay = DateTime.utc().endOf('day');
+
+
+        let invitationCodes = [userDetails.InvitationCode];
+
+        // Recursively get users at the specified level
+        for (let i = 1; i < level; i++) {
+            const users = await USER.find({ Parent: { $in: invitationCodes } }, { InvitationCode: 1 });
+            if (!users.length) return { valid: true, data: [] }; // If no users found at this level, return empty
+
+            invitationCodes = users.map(user => user.InvitationCode);
+        }
+
+        const details : TransactionObjType[] | null = await TRANSACTION.find({
+            Type, 
+            Parent: { $in: invitationCodes },
+            ...(tab === ActiveTabs.TODAY && { createdAt : { $gte : startOfDay, $lte: endOfDay }})
+        }, {
+            PhoneNumber: 1, 
+            createdAt: 1,
+            Amount : 1,
+            TransactionID: 1
+        }).sort({createdAt: -1}).skip(skip).limit(pageSize);
+
+        if(!details) throw new Error('failed to get details');
+
+        return {valid: true, data: details, pagination: {
+            currentPage: page,
+            level 
+        }}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// ===================================
+
+
+
+
+
+// GET REGISTRATION DETAILS ===================================
+
+export const getRegistrationDetails = async ( tab: ActiveTabs , page: number = 1, level: number = 1): ServiceReturnType<UserType[]> => {
+    try {
+        const cookie = await cookies();
+        const token = cookie.get('token')?.value || ''
+
+        const {success, decoded} = await VerifyToken(token);
+
+        if(!success || !decoded) return {valid: false, operation: 'LOGOUT'}
+        
+        await CONNECT();
+
+        const userDetails: UserType | null = await USER.findOne({PhoneNumber: decoded.PhoneNumber});
+
+        if(!userDetails) throw new Error('Could not find the user');
+
+        const pageSize = 10; // Number of records per page
+        const skip = (page - 1) * pageSize;
+
+        const startOfDay = DateTime.utc().startOf('day');
+        const endOfDay = DateTime.utc().endOf('day');
+
+
+        let invitationCodes = [userDetails.InvitationCode];
+
+        // Recursively get users at the specified level
+        for (let i = 1; i < level; i++) {
+            const users = await USER.find({ Parent: { $in: invitationCodes } }, { InvitationCode: 1 });
+            if (!users.length) return { valid: true, data: [] }; // If no users found at this level, return empty
+
+            invitationCodes = users.map(user => user.InvitationCode);
+        }
+
+        const details : UserType[] | null = await USER.find({
+            Parent: { $in: invitationCodes },
+            ...(tab === ActiveTabs.TODAY && { createdAt : { $gte : startOfDay, $lte: endOfDay }})
+        }, {
+            PhoneNumber: 1, 
+            createdAt: 1,
+            Balance: 1
+        }).sort({createdAt: -1}).skip(skip).limit(pageSize);
+
+        if(!details) throw new Error('failed to get details');
+
+        return {valid: true, data: details, pagination: {
+            currentPage: page,
+            level 
+        }}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// =======================================

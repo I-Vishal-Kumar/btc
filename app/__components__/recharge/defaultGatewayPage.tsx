@@ -13,7 +13,7 @@ import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 
-const UploadFile = async (file: File | null, PhoneNumber: string) => {
+export const UploadFile = async (file: File | null, PhoneNumber: string) => {
     if (!file) return;
     try {
 

@@ -2,10 +2,12 @@
 
 import { _walletOperation } from "@/(backend)/services/user.wallet.serv";
 import { WithdrawalOperationIdentifierType } from "@/__types__/ui_types/profil.types";
+import { UserWallet } from "@/__types__/user.types";
+import { WALLET_CONTEXT } from "@/lib/hooks/userWallet.context";
 import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 
 type fields = Record<string, string>
 
@@ -18,7 +20,8 @@ export const Section: React.FC<{
 }> = ({ title, _identifier, fields }) => {
 
     const formRef = useRef<HTMLFormElement>(null);
-
+    const { wallet } = useContext(WALLET_CONTEXT);
+    console.log(fields);
     const { data, isPending, isSuccess, mutate } = useMutation({
         mutationFn: _walletOperation,
     })
@@ -50,8 +53,8 @@ export const Section: React.FC<{
     return (
         <Box component={'form'} ref={formRef} onSubmit={handleSubmit} >
             <Typography fontWeight={600} mt={2}>{title}</Typography>
-            {fields.map((field, index) => (
-                <TextField label={field.placeholder} required name={field.formFieldName} key={index} size="small" variant="outlined" placeholder={field.placeholder} fullWidth type={field.type || "text"} sx={{ mt: 1, bgcolor: '#ebebeb' }} />
+            {fields.map((field) => (
+                <TextField defaultValue={wallet[field.formFieldName as keyof UserWallet]} required name={field.formFieldName} key={field.formFieldName} size="small" variant="outlined" placeholder={field.placeholder} fullWidth type={field.type || "text"} sx={{ mt: 1, bgcolor: '#ebebeb' }} />
             ))}
             <Button
                 variant="contained"

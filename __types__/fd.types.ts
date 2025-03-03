@@ -13,6 +13,7 @@ export interface FD_type  {
     FdStatus        : FdStatusType,
     MaturedOn       ?: string,
     Claimed         : boolean,
+    LastClaimedOn   : string,
     createdAt       : string,
     updatedAt       : string
 }

@@ -41,3 +41,14 @@ export const WithdrawalOperationIdentifier = {
 } as const;
 
 export type WithdrawalOperationIdentifierType = typeof WithdrawalOperationIdentifier[keyof typeof WithdrawalOperationIdentifier]
+
+
+export type CommissionPageDetailType = {
+    todayDeposit: number;
+    todayWithdrawal: number;
+    totalDeposit: number;
+    totalWithdrawal: number;
+    todayNewRegistration: number;
+    directActiveMembers: number;
+    TotalActiveMembers : number;
+}
