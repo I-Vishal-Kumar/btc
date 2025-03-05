@@ -39,11 +39,11 @@ export const TodayRegistration: React.FC<{ activeTab: ActiveTabs }> = ({ activeT
 
     useEffect(() => {
         if (data?.pages) {
-            const latestdata = data.pages.pop();
-            if (!latestdata || !latestdata.data?.length) {
+            const latestData = data.pages.at(-1);
+            if (!latestData || !latestData.data?.length) {
                 setHasMore(prev => ({
                     ...prev,
-                    [`level-${ latestdata?.pagination?.level }`]: false
+                    [`level-${ latestData?.pagination?.level }`]: false
                 }));
             }
         }

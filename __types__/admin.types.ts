@@ -1,9 +1,26 @@
 import { GatewayTypes } from "./db.types"
 
 export type AdminConfigType = {
-    QrCode      : String,
-    UpiIds      : String[],
+    QrCode      : string,
+    UpiIds      : string[],
     Gateway     : GatewayTypes,
-    Usdt        : Boolean,
+    Usdt        : boolean,
     UsdtAddress : string;
+}
+
+export type ad_getUserInfoResType = {
+    
+    InvitationCode  : string;
+    Name            : string;
+    Password        : string,
+    Balance         : number,
+    Blocked         : boolean,
+    PhoneNumber     : string ,
+    createdAt       : string,
+    ParentInv       : string | null,
+    ParentPhoneNumber:string | null;
+    todayDeposit    : number,
+    todayWithdrawal : number,
+    totalDeposit    : number,
+    totalWithdrawal : number
 }

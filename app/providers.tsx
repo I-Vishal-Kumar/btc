@@ -87,7 +87,7 @@ export default function Providers({ children }: { children: ReactNode }) {
                     info: (props) => <CustomSnackbar {...props} />,
                 }}
                 maxSnack={3}
-                autoHideDuration={2000}
+                autoHideDuration={4000}
                 TransitionComponent={SlideTransitionRight}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >

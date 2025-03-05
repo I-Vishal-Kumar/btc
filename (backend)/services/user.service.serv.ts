@@ -181,7 +181,7 @@ export const getCommissionPageDetails = async (): ServiceReturnType<CommissionPa
     }
 }
 
-async function getTotalDetails(invitationCode: string) {
+export async function getTotalDetails(invitationCode: string) {
     try {
         const today = DateTime.now().startOf("day"); // Get today's start time
 
