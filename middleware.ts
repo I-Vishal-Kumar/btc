@@ -21,8 +21,8 @@ export async function middleware(req: NextRequest) {
       // clear the table if more than 400 records are present.
       if(ipRequests.size > 400) ipRequests.clear();
 
-      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]|| "unknown";
-      console.log("Headers:", JSON.stringify(Object.fromEntries(req.headers.entries()), null, 2));
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || 'unknown';
+
       if(ip !== 'unknown'){
         
         const currTime = Date.now();
