@@ -1,11 +1,12 @@
 import { Button, CircularProgress, Typography } from "@mui/material";
 import { motion } from "framer-motion";
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import { CustomInput } from "./customInput";
 import { validateInput } from "@/lib/helpers/validateForm";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { init_user_auth_mutation } from "@/sActions/userLoginSignupMutation";
+import { enqueueSnackbar } from "notistack";
 
 /* ====================== LOGIN FORM ====================== */
 export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, value: string) => void }) => {
@@ -21,10 +22,15 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
     });
 
     const router = useRouter();
-    if (isSuccess && data.success) {
-        router.push('/')
-        return <>Redirecting...</>;
-    }
+
+    useEffect(() => {
+        if (!isPending && data?.msg) {
+            if (data.success) {
+                router.push('/')
+            }
+            enqueueSnackbar(data.msg, { variant: data.success ? "success" : 'error' })
+        }
+    }, [isSuccess, isPending]);
 
     return (
         <>
@@ -38,9 +44,6 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
                     Create New
                 </Typography>
             </div>
-
-            {!data?.success && <Typography mt={2} fontWeight={500} color="red">{data?.msg}</Typography>}
-            {data?.success && <Typography mt={2} fontWeight={500} color="green">{data?.msg}</Typography>}
 
             <motion.form onSubmit={(e) => {
                 e.preventDefault();

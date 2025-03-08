@@ -4,6 +4,7 @@ import { getTodayDepositWithdrawalUsers } from "@/(backend)/services/user.servic
 import { TransactionType } from "@/__types__/db.types"
 import { TransactionObjType } from "@/__types__/transaction.types"
 import { ActiveTabs } from "@/__types__/ui_types/profil.types"
+import { formatDate } from "@/lib/helpers/formatDate"
 import { formatNumber } from "@/lib/helpers/numberFormatter"
 import { ExpandMore } from "@mui/icons-material"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress, Typography } from "@mui/material"
@@ -67,7 +68,7 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
                                 {data?.pages.map((group, pageIndex) => (
                                     <Fragment key={pageIndex}>
                                         {(group?.data || []).map((transaction) => (
-                                            <RenderWithdrawalDetail key={transaction.TransactionID} transaction={transaction} />
+                                            <RenderDepositDetail key={transaction.TransactionID} transaction={transaction} />
                                         ))}
                                     </Fragment>
                                 ))}
@@ -98,15 +99,15 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
     )
 }
 
-function RenderWithdrawalDetail({ transaction }: { transaction: TransactionObjType }) {
+function RenderDepositDetail({ transaction }: { transaction: TransactionObjType }) {
     return (
         <div className="ring-1 ring-slate-300 rounded-md p-2 flex justify-between items-center">
             <div>
-                <Typography fontSize={10} fontWeight={550} >11/12/1232</Typography>
-                <Typography fontSize={10} fontWeight={500} >Phone Number - 29387492387</Typography>
+                <Typography fontSize={10} fontWeight={550} >{formatDate(new Date(transaction.createdAt), 'dd MMM yyyy hh:ss a')}</Typography>
+                <Typography fontSize={10} fontWeight={500} >Phone Number - {transaction.PhoneNumber}</Typography>
             </div>
             <div>
-                <Typography fontSize={10} fontWeight={600} >₹ {formatNumber(123423)}</Typography>
+                <Typography fontSize={10} fontWeight={600} >₹ {formatNumber(transaction.Amount)}</Typography>
             </div>
         </div>
     )

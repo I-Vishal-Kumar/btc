@@ -5,6 +5,7 @@ import { History as HistoryIcon, Logout } from "@mui/icons-material";
 import { ReactNode } from "react";
 import { SectionsAvailable } from "@/__types__/ui_types/profil.types";
 import { useRouter } from "next/navigation";
+import { Router } from "next/router";
 
 type ButtonType = {
     key: SectionsAvailable,
@@ -12,7 +13,7 @@ type ButtonType = {
     startIcon: ReactNode,
     endIcon?: ReactNode,
     label: string,
-    onClick?: VoidFunction,
+    onClick?: (router: Router) => void,
 }
 
 type Sections = Record<string, ButtonType[]>
@@ -51,7 +52,7 @@ const sections: Sections = {
             startIcon: <Logout />,
             label: "Log Out",
             sx: { color: 'red' },
-            onClick: () => { console.log("logout") }
+            onClick: (router) => { router.push("/getting-started?type=login") }
         },
     ]
 }
@@ -86,7 +87,8 @@ const CustomList = (
             <List sx={{ outline: 1, outlineColor: '#d6d6d6', borderRadius: 3, bgcolor: '#f3f3f3' }}>
                 {childButtons.map((item, index) => (
                     <ListItem
-                        onClick={item?.onClick ? item.onClick : () => {
+                        // @ts-expect-error since on click can be undefined its safer to check it but our data is hard coded.
+                        onClick={item?.onClick ? () => item.onClick(router) : () => {
                             router.push(`profile/${ item.key }`)
                         }}
                         sx={{ ...item?.sx }}

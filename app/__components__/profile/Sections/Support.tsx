@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material"
 export const Support: React.FC = () => {
     return (
         <div>
-            <div className="h-[30vh] w-full bg-red-300">
+            <div className="h-[30vh] w-full bg-[url(/assets/support_bg.jpg)] bg-cover bg-bottom bg-no-repeat">
             </div>
             <Box px={4} mt={4}>
                 <Typography fontWeight={600} mt={2}>Support & Contact Number</Typography>

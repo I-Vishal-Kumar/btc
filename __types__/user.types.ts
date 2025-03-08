@@ -2,6 +2,7 @@
 
 export type UserType = {
     _id             : string,
+    Password        : string,
     Parent          : string,
     InvitationCode  : string,
     Name            : string,
@@ -14,11 +15,13 @@ export type UserType = {
     Level1Withdrawal: number,
     Blocked         : boolean,
     HoldingScore    : number,
-    LastSpinAt      : string
+    LastSpinAt      : string,   
+    createdAt       ?: string
 }
 
 
 export type UserWallet = {
+    _id             : string,
     PhoneNumber     : string,
     
     UsdtAddress    ?: string,

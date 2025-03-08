@@ -4,6 +4,7 @@
 import { getRegistrationDetails } from "@/(backend)/services/user.service.serv";
 import { ActiveTabs } from "@/__types__/ui_types/profil.types"
 import { UserType } from "@/__types__/user.types";
+import { formatDate } from "@/lib/helpers/formatDate";
 import { formatNumber } from "@/lib/helpers/numberFormatter";
 import { ExpandMore } from "@mui/icons-material";
 import { Accordion, Box, AccordionSummary, Typography, AccordionDetails, CircularProgress, Button } from "@mui/material";
@@ -101,11 +102,11 @@ function RenderRegisteredUserDetail({ user }: { user: UserType }) {
     return (
         <div className="ring-1 ring-slate-300 rounded-md p-2 flex justify-between items-center">
             <div>
-                <Typography fontSize={10} fontWeight={550} >11/12/1232</Typography>
-                <Typography fontSize={10} fontWeight={500} >Phone Number - 29387492387</Typography>
+                <Typography fontSize={10} fontWeight={550} >{formatDate(new Date(user?.createdAt || ""), 'dd-MM-yyyy hh:MM a')}</Typography>
+                <Typography fontSize={10} fontWeight={500} >Phone Number - {user.PhoneNumber}</Typography>
             </div>
             <div>
-                <Typography fontSize={10} fontWeight={600} >₹ {formatNumber(123423)}</Typography>
+                <Typography fontSize={10} fontWeight={600} >₹ {formatNumber(user.Balance)}</Typography>
             </div>
         </div>
     )

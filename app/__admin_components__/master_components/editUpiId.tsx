@@ -46,7 +46,7 @@ export function EditUpiIdSection() {
             </Button>
 
             <Box mt={3}>
-                <Typography fontSize={12} fontWeight={500}>Uploaded UPI ID's</Typography>
+                <Typography fontSize={12} fontWeight={500}>Uploaded UPI ID&apos;s</Typography>
                 <Stack spacing={1} mt={1} >
                     {
                         admin_config?.UpiIds.map(upi_id => (

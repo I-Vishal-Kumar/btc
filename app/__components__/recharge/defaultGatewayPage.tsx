@@ -111,7 +111,7 @@ export const DefaultGateway: React.FC<{ amount: number, config: AdminConfigType 
                     priority
                     quality={50}
                     alt="payment url"
-                    src={'https://ik.imagekit.io/77htx0vcw/9162871357_irenekredenetsKStSiM1UvPwunsplash_pQxZSMYNl.jpg'} />
+                    src={config.QrCode} />
             </Box>
 
             {/* UPI ID Copy Section */}

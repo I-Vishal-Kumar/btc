@@ -1,4 +1,5 @@
 import { TransactionStatusType, TransactionType } from "./db.types"
+import { UserWallet } from "./user.types"
 
 export type TransactionObjType = {
     _id             : string,
@@ -14,3 +15,6 @@ export type TransactionObjType = {
     createdAt       : string,
     updatedAt       : string,
 }
+
+
+export type adminWithdrawalRespType = TransactionObjType&{walletDetails : UserWallet}

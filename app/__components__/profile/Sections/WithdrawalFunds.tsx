@@ -32,6 +32,7 @@ const LocalFormSections: FormSection[] = [
             { placeholder: "Account Number", formFieldName: 'AccNumber' },
             { placeholder: "IFSC Code", formFieldName: 'IfscCode' },
             { placeholder: "Bank Name", formFieldName: 'BankName' },
+            { placeholder: "Branch", formFieldName: 'Branch' },
             { placeholder: "Withdrawal Password", type: "password", formFieldName: 'LocalWithdrawPassword' },
         ],
     },

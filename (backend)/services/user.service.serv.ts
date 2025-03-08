@@ -55,7 +55,7 @@ export const getUserWithdrawalDetails = async ():ServiceReturnType<TransactionOb
 
         const transactions = await TRANSACTION.find({PhoneNumber: decoded.PhoneNumber, Type: TransactionType.WITHDRAWAL}).sort({createdAt: -1}).lean() as unknown as TransactionObjType[];
 
-        return {valid: true, data: transactions || []}
+        return {valid: true, data: JSON.parse(JSON.stringify(transactions)) || []}
 
     } catch (error) {
         if(error instanceof Error) return {valid: false, msg: error.message}

@@ -10,6 +10,7 @@ import { SetStateAction, createContext, useEffect, useState } from "react";
 const User: UserType = {
     _id: '',
     Balance: 0,
+    Password: '',
     InvitationCode: '',
     Name: '',
     Parent: '',

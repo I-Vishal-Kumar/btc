@@ -46,11 +46,16 @@ function RechargeCard({ detail }: { detail: TransactionObjType }) {
             <div className="flex justify-between items-center mt-2">
                 <div className=" max-w-[60%] overflow-clip">
                     <LineClamp maxLines={1}>
-                        <Typography fontSize={11}>Transaction Id - {detail.TransactionID}</Typography>
-                    </LineClamp>
-                    <LineClamp maxLines={1}>
                         <Typography fontSize={11}>Recharge Method - {detail?.Method || "BTC"}</Typography>
                     </LineClamp>
+                    <div className=" text-sm flex justify-center items-center">
+                        <span className="whitespace-nowrap">
+                            Transaction Id -
+                        </span>
+                        <LineClamp maxLines={1}>
+                            <span>{detail.TransactionID}</span>
+                        </LineClamp>
+                    </div>
                 </div>
                 <Chip label={detail.Status} size={"small"} sx={{ bgcolor: Color[detail.Status], letterSpacing: 1, color: 'white', fontWeight: 600, fontSize: 9 }} />
             </div>

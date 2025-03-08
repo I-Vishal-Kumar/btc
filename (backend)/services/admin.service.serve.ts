@@ -9,9 +9,12 @@ import { AdminConfigType, ad_getUserInfoResType } from "@/__types__/admin.types"
 import { USER } from "../(modals)/schema/user.schema";
 import { TransactionStatusType, TransactionType, db_schema } from "@/__types__/db.types";
 import { getTotalDetails } from "./user.service.serv";
-import { TransactionObjType } from "@/__types__/transaction.types";
+import { TransactionObjType, adminWithdrawalRespType } from "@/__types__/transaction.types";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 import { startSession } from "mongoose";
+import { UserType, UserWallet } from "@/__types__/user.types";
+import { WALLET } from "../(modals)/schema/userWalled.schema";
+import { randomBytes } from "crypto";
 
 
 // VERIFY ADMIN PASS ===============================
@@ -298,3 +301,348 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
 }
 
 // ===========================================
+
+
+
+
+
+// GET WITHDRAWAL TRANSACTIONS ========================================================
+
+export const ad_getWithdrawalTransactions = async ({ TransactionID='' , page = 1}): ServiceReturnType<adminWithdrawalRespType[]> => {
+    try {
+        
+        await CONNECT();
+   
+        if(TransactionID){
+            const details : adminWithdrawalRespType[] | null = await TRANSACTION.aggregate([
+                {
+                    $match : {
+                        Type: TransactionType.WITHDRAWAL,
+                        TransactionID
+                    }
+                },
+                {
+                    $lookup : {
+                        from: db_schema.WALLET,
+                        localField : "PhoneNumber",
+                        foreignField: "PhoneNumber",
+                        as : "walletDetails"
+                    }
+                },
+                {
+                    $set: { 
+                        walletDetails: { 
+                            $arrayElemAt: [{ $ifNull: ["$walletDetails", []] }, 0] 
+                        } 
+                    }
+                },
+                {
+                    $project : {
+                        updatedAt : 0,
+                        "walletDetails.createdAt" : 0,
+                        "walletDetails.updatedAt" : 0,
+                        "walletDetails._id" : 0,
+                        "walletDetails.PhoneNumber" : 0,
+                    }
+                }
+            ]);
+    
+            return {valid: true, data: JSON.parse(JSON.stringify(details))}
+        }
+
+        const pageSize = 10; // Number of records per page
+        const skip = (page - 1) * pageSize;
+
+        const details : adminWithdrawalRespType[] | null = await TRANSACTION.aggregate([
+            {
+                $match : {
+                    Type: TransactionType.WITHDRAWAL,
+                    Status: {$in : [TransactionStatusType.FAILED, TransactionStatusType.PENDING]}
+                }
+            },
+            {
+                $lookup : {
+                    from: db_schema.WALLET,
+                    localField : "PhoneNumber",
+                    foreignField: "PhoneNumber",
+                    as : "walletDetails"
+                }
+            },
+            {
+                $set: { 
+                    walletDetails: { 
+                        $arrayElemAt: [{ $ifNull: ["$walletDetails", []] }, 0] 
+                    } 
+                }
+            },
+            {
+                $project : {
+                    updatedAt : 0,
+                    "walletDetails.createdAt" : 0,
+                    "walletDetails.updatedAt" : 0,
+                    "walletDetails._id" : 0,
+                    "walletDetails.PhoneNumber" : 0,
+                }
+            }
+        ]).sort({createdAt: -1}).skip(skip).limit(pageSize)
+
+        if(!details) throw new Error('failed to get details');
+
+        return {valid: true, data: JSON.parse(JSON.stringify(details)), pagination: {
+            currentPage: page,
+        }}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// ==========================================
+
+// SETTLE WITHDRAWAL TRANSACTIONS =====================================================
+
+export const ad_settleWithdrawal = async (editedDetails : TransactionObjType): ServiceReturnType => {
+    
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        
+        if(editedDetails.Status === TransactionStatusType.PENDING) throw new Error('Please choose correct type.');
+
+        const isTransactionUpdated = await TRANSACTION.findByIdAndUpdate(editedDetails._id, {
+            Amount : editedDetails.Amount,
+            Method : editedDetails.Method,
+            TransactionID : editedDetails.TransactionID,
+            Status : editedDetails.Status
+        }, {session});
+
+        if(!isTransactionUpdated) throw new Error("Failed to update transaction.");
+
+        if(editedDetails.Status === TransactionStatusType.FAILED) {
+            // reupdate the user's balance and return.
+            const isUpdated = await USER.findOneAndUpdate(
+                {PhoneNumber: editedDetails.PhoneNumber},
+                {$inc : {Balance : editedDetails.Amount}}, 
+                {session}
+            );
+            
+            if(!isUpdated) throw new Error("Somthing went wrong");
+            
+            await session.commitTransaction();
+            return {valid: true, msg: 'Updated'}
+        }
+
+        // check if first deposit.
+        const user = await USER.findOne({PhoneNumber: editedDetails.PhoneNumber});
+
+        if(user.Parent){
+            // this is the first deposit of this user.
+            // update the parent
+            const isPrentUpdated = await USER.findOneAndUpdate(
+                {InvitationCode: user.Parent},
+                {$inc : {Level1Withdrawal : editedDetails.Amount}},
+                {session}
+            );
+            if(!isPrentUpdated) throw new Error("Failed to update parent.");
+        }
+
+        // Commit transaction
+        await session.commitTransaction();
+        return { valid: true, msg: 'Transaction settled successfully.' };
+
+
+    } catch (error) {
+        await session.abortTransaction();
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// ===========================================
+
+
+// GET USER WALLET =====================================================================
+
+export const ad_getUserWallet = async ({ PhoneNumber }:{PhoneNumber : string}): ServiceReturnType<UserWallet> => {
+    try {
+        
+        await CONNECT();
+
+        const details : UserWallet[] | null = await WALLET.findOne({PhoneNumber}, {updatedAt: 0});
+    
+        if(!details) throw new Error('failed to get details');
+
+        return {valid: true, data: JSON.parse(JSON.stringify(details))}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+export const ad_editUserWallet = async (editedDetails : UserWallet): ServiceReturnType => {
+    try {
+        
+        await CONNECT();
+        
+        const isUpdated : UserWallet[] | null = await WALLET.findOneAndUpdate({PhoneNumber: editedDetails.PhoneNumber}, 
+            {
+                $set: {
+                    ...editedDetails
+                }
+            }
+        );
+    
+        if(!isUpdated) throw new Error('failed to get details');
+
+        return {valid: true, msg: 'updated'}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// ==============================================================
+
+
+
+// GET USER PASSWORD INFO =================================================================
+
+export const ad_getUserPassInfo = async ({ PhoneNumber }:{PhoneNumber : string}): ServiceReturnType<UserType> => {
+    try {
+        
+        await CONNECT();
+
+        const details : UserType | null = await USER.findOne({PhoneNumber}, {PhoneNumber: 1, Password: 1, Name: 1, Blocked : 1});
+    
+        if(!details) throw new Error('failed to get details');
+
+        return {valid: true, data: JSON.parse(JSON.stringify(details))}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+
+export const ad_editPassword = async (editedDetails : UserType): ServiceReturnType => {
+    try {
+        
+        await CONNECT();
+        
+        const isUpdated : UserWallet[] | null = await USER.findOneAndUpdate({PhoneNumber: editedDetails.PhoneNumber}, 
+            {
+                $set: {Password: editedDetails.Password}
+            }
+        );
+    
+        if(!isUpdated) throw new Error('failed to get details');
+
+        return {valid: true, msg: 'updated'}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// =============================================
+
+
+// ADD BONUS ===============================================================
+
+type BonusDetailsType = {
+    PhoneNumber: string,
+    Amount: number,
+}
+
+export const ad_addBonus = async (editedDetails : BonusDetailsType) => {
+    const session = await startSession();
+    session.startTransaction();
+    
+    try {
+        
+        await CONNECT();
+        
+        // try finding the user.
+
+        const user = await USER.findOne({PhoneNumber: editedDetails.PhoneNumber});
+
+        if(!user) throw new Error("Invalid phone number");
+
+        const isCreated = await TRANSACTION.create([{
+            ...editedDetails,
+            Parent : user.Parent,
+            InvitationCode : user.InvitationCode,
+            Type : TransactionType.GIFT,
+            Method : 'AD-TRANSFER',
+            TransactionID : randomBytes(16).toString('hex'),
+            Status : TransactionStatusType.SUCCESS
+        }], {session});
+
+
+        if(!isCreated) throw new Error("failed to send gifts");
+
+        const isUpdated : UserWallet[] | null = await USER.findOneAndUpdate({PhoneNumber: editedDetails.PhoneNumber}, 
+            {$inc: {Balance: editedDetails.Amount}},
+            {session}
+        );
+    
+        if(!isUpdated) throw new Error('failed to get details');
+        
+        await session.commitTransaction();
+        return {valid: true, msg: 'updated'}
+
+    } catch (error) {
+        await session.abortTransaction();
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// =============================================
+
+// BLOCK UNBLOCK USER =====================================================
+
+export const ad_getBlockedUsers = async (): ServiceReturnType<UserType[]> => {
+    try {
+        
+        await CONNECT();
+        
+        const details : UserType[] | null = await USER.find({Blocked: true}, {PhoneNumber: 1, Name: 1, Blocked: 1});
+    
+        if(!details) throw new Error('failed to get details');
+
+        return {valid: true, data : JSON.parse(JSON.stringify(details))}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+export const ad_blockUnblock = async (editedDetails : UserType): ServiceReturnType => {
+    try {
+        
+        await CONNECT();
+        
+        const isUpdated : UserWallet[] | null = await USER.findOneAndUpdate({PhoneNumber: editedDetails.PhoneNumber}, 
+            {
+                $set: {Blocked : editedDetails.Blocked}
+            }
+        );
+    
+        if(!isUpdated) throw new Error('failed to get details');
+
+        return {valid: true, msg: 'updated'}
+
+    } catch (error) {
+        if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
+        return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// =============================================

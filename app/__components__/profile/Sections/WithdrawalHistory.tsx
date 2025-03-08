@@ -43,6 +43,7 @@ function WithdrawalCard({ transaction }: { transaction: TransactionObjType }) {
         [TransactionStatusType.PENDING]: '#ffd04b',
         [TransactionStatusType.FAILED]: '#ff5c4b'
     }
+    console.log('hey')
     return (
         <div className="p-2 rounded-md ring-1 bg-gray-100 ring-gray-300">
             <Typography variant="caption" fontWeight={600} fontSize={12}>Withdrawal</Typography>
@@ -55,13 +56,19 @@ function WithdrawalCard({ transaction }: { transaction: TransactionObjType }) {
                 </Typography>
             </div>
             <div className="flex justify-between items-center mt-2">
-                <div className=" max-w-[60%] overflow-clip">
-                    <LineClamp maxLines={1}>
-                        <Typography fontSize={11}>Transaction Id - {transaction.TransactionID}</Typography>
-                    </LineClamp>
+                <div className="w-[70%] ">
+                    <Typography fontSize={11}>Method - {transaction.Method}</Typography>
                     <LineClamp maxLines={1}>
                         <Typography fontSize={11}>Transaction fee - {transaction.Tax}</Typography>
                     </LineClamp>
+                    <div className=" text-sm flex justify-center items-center">
+                        <span className="whitespace-nowrap">
+                            Transaction Id -
+                        </span>
+                        <LineClamp maxLines={1}>
+                            <span>{transaction.TransactionID}</span>
+                        </LineClamp>
+                    </div>
                 </div>
                 <Chip label={transaction.Status} size="small" sx={{ bgcolor: Color[transaction.Status], color: 'white', fontWeight: 600, fontSize: 11, py: 0.1 }} />
             </div>

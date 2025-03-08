@@ -31,9 +31,9 @@ function AuthFormContents() {
                 <div className="absolute inset-0 bg-yellow-100 opacity-80 mix-blend-multiply"></div>
             </div>
 
-            <div className="absolute bottom-0 w-full px-12 pb-20">
+            <div className="absolute bottom-10 w-full px-12 pb-20">
                 <div className="w-[50%] h-20 relative">
-                    <Image alt="logo" className="aspect-video" fill src={"/getting-started/logo_full.png"} />
+                    <Image alt="logo" width={100} height={50} className="h-full" src={"/getting-started/logo_full.png"} />
                 </div>
 
                 <Box>

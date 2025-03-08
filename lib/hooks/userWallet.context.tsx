@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { SetStateAction, createContext, useEffect, useState } from "react";
 
 const User: UserWallet = {
+    _id: '',
     PhoneNumber: '',
 }
 

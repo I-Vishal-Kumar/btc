@@ -160,8 +160,9 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         const createdAt = DateTime.fromJSDate( new Date(fd.createdAt) ).startOf("day"); // FD creation date
         const maturityDate = createdAt.plus({ days: fd.FdDuration }); // Maturity date
         
-        // check if user has claimed today or not.
-        const shouldClaimToday = !fd.LastClaimedOn || DateTime.fromJSDate(new Date(fd.LastClaimedOn)).startOf('day').equals(today);
+        // check if user has claimed today or not.        
+        const lastClaimedDate = fd.LastClaimedOn ? DateTime.fromJSDate(new Date(fd.LastClaimedOn)).startOf("day") : null;
+        const shouldClaimToday = !lastClaimedDate || lastClaimedDate < today;
 
         if(!shouldClaimToday || fd.Claimed) throw new Error('You have already claimed for this fd.');
 

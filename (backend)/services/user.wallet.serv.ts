@@ -11,6 +11,7 @@ import { startSession } from "mongoose";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 import { TransactionType } from "@/__types__/db.types";
 import { DateTime } from "luxon";
+import { randomBytes } from "crypto";
 
 
 const requiredDetails = {
@@ -19,6 +20,7 @@ const requiredDetails = {
         AccNumber       : { required: true, validation: /^[0-9]{9,18}$/ }, // 9-18 digit number
         IfscCode        : { required: true, validation: /^[A-Z]{4}0[A-Z0-9]{6}$/ }, // IFSC format
         BankName        : { required: true, validation: /^[a-zA-Z\s]{3,}$/ },
+        Branch        : { required: true, validation: /^.{2,}$/ },
         LocalWithdrawPassword: { required: true, validation: /^.{6,}$/ }, // At least 6 characters
     },
     [WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER]: {
@@ -82,13 +84,13 @@ const createBank = async (identifier: WithdrawalOperationIdentifierType, PhoneNu
         // check if this account number | wallet already exists.
         if(identifier === WithdrawalOperationIdentifier.LOCAL_BANK_CREATION){
             
-            const AccNoExists = await WALLET.findOne({AccNumber: data.AccNumber});
+            const AccNoExists = await WALLET.findOne({AccNumber: data.AccNumber, PhoneNumber : {$ne : PhoneNumber}});
             
             if (AccNoExists) throw new Error('This account is already registered with another user.');
 
         }else{
             // check for usdt address;
-            const UsdtAddressExists = await WALLET.findOne({UsdtAddress: data.UsdtAddress});
+            const UsdtAddressExists = await WALLET.findOne({UsdtAddress: data.UsdtAddress, PhoneNumber : {$ne : PhoneNumber}});
 
             if(UsdtAddressExists) throw new Error("This USDT address is already registered with another user.");
         }
@@ -169,7 +171,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         if(isSunday || !isBetween9and12) throw new Error("Withdrawal time is over.");
 
-        let Amount = 0;
+        let Amount = Number(data.Amount);
         if(METHOD === 'USDT'){
             // change db key for usdt;
             DbWithdrawalPassKey = 'UsdtWithdrawPassword';
@@ -218,17 +220,21 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         if(!isDeducted) throw new Error("Could not process withdrawal this time.");
 
         // 2. increment parent level1 withdrawal.
-        const isIncremented = await USER.findOneAndUpdate({InvitationCode: isDeducted.Parent}, {
-            $inc : {Level1Withdrawal: Amount}
-        }, {session});
+        if(isSufficientBalance.Parent){
 
-        if(!isIncremented) throw new Error('Could not process withdrawal this time.');
+            const isIncremented = await USER.findOneAndUpdate({InvitationCode: isDeducted.Parent}, {
+                $inc : {Level1Withdrawal: Amount}
+            }, {session});
+            
+            if(!isIncremented) throw new Error('Could not process withdrawal this time.');
+        
+        }
 
         // 3. Create new withdrawal
         const isCreated = await TRANSACTION.create([{
             PhoneNumber,
             Method          : METHOD,
-            TransactionID   : '',
+            TransactionID   : randomBytes(16).toString('hex'),
             Amount          : Amount,
             Parent          : isDeducted.Parent,
             Type            : TransactionType.WITHDRAWAL,
@@ -244,7 +250,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         return {valid: true, msg: 'Your Withdrawal is in processing.'}
 
     } catch (error) {
-        
+        console.log(error);
         await session.abortTransaction();
 
         if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};

@@ -61,14 +61,12 @@ export const MasterPage: React.FC = () => {
                 {/* other links */}
                 <Stack spacing={1} justifyContent={'center'} mt={4} direction={'row'} flexWrap={'wrap'} useFlexGap rowGap={1} >
                     <Button role="a" href="/nimda__/deposit-transaction" variant="outlined">Deposit</Button>
-                    <Button role="a" href="/somelink/" variant="outlined">Withdrawal</Button>
-                    <Button role="a" href="/somelink/" variant="outlined">Bank edit</Button>
-                    <Button role="a" href="/somelink/" variant="outlined">Deposit Trans.</Button>
-                    <Button role="a" href="/somelink/" variant="outlined">Withdrawal Trans.</Button>
-                    <Button role="a" href="/somelink/" variant="outlined">Id Password</Button>
-                    <Button role="a" href="/somelink/" variant="outlined">Add Bonus</Button>
-                    <Button role="a" href="/somelink/" variant="outlined">Block Account</Button>
-                    <Button role="a" href="/somelink/" variant="outlined">Manual Withdrawal</Button>
+                    <Button role="a" href="/nimda__/withdrawal-transaction" variant="outlined">Withdrawal</Button>
+                    <Button role="a" href="/nimda__/bank-edit" variant="outlined">Bank edit</Button>
+                    <Button role="a" href="/nimda__/edit-password" variant="outlined">Id Password</Button>
+                    <Button role="a" href="/nimda__/add-bonus" variant="outlined">Add Bonus</Button>
+                    <Button role="a" href="/nimda__/block-account" variant="outlined">Block Account</Button>
+                    <Button role="a" href="/nimda__/manual-withdrawal" variant="outlined">Manual Withdrawal</Button>
                 </Stack>
 
 
