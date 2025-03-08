@@ -5,7 +5,7 @@ import { Schema, model, models } from "mongoose";
 
 const USER_SCHEMA = new Schema({
     
-    Parent          : InvitationCodeType,
+    Parent          : {...InvitationCodeType, unique: false},
     
     InvitationCode  : InvitationCodeType,  // 8 digit random code (unique);
 

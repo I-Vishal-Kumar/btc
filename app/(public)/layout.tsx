@@ -33,7 +33,7 @@ export default function PublicLayout({
                     content="width=device-width, initial-scale=1.0"
                 />
                 <title>
-                    C.B football - Live Football Betting on Every League Worldwide
+                    BTC - platform where you can invest and earn daily rewards.
                 </title>
                 <meta
                     name="description"
