@@ -112,6 +112,8 @@ const LOGIN = async (credentials: LoginDetails) => {
 
         let res = await USER.findOne(credentials);
 
+        if (res.Blocked) throw new Error("You have been BLOCKED");
+
         if (!res) throw new Error('Wrong password or username.');
 
         // update user in db;
@@ -125,9 +127,9 @@ const LOGIN = async (credentials: LoginDetails) => {
     } catch (error) {
 
         if (error instanceof Error)
-            return { success: false, message: error?.message || 'Error while login please try again.' };
+            return { success: false, msg: error?.message || 'Error while login please try again.' };
         else
-            return { success: false, message: 'Error while login please try again.' };
+            return { success: false, msg: 'Error while login please try again.' };
 
     }
 }

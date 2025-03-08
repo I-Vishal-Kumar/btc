@@ -28,7 +28,7 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
         
         await CONNECT();
 
-        const dbUser = await USER.findOne({PhoneNumber: decoded.PhoneNumber}, {_id : 0, Session: 0, Password: 0, createdAt: 0, updatedAt: 0});
+        const dbUser = await USER.findOne({PhoneNumber: decoded.PhoneNumber, Blocked : false}, {_id : 0, Session: 0, Password: 0, createdAt: 0, updatedAt: 0});
 
         if(!dbUser) return {valid: false};
 

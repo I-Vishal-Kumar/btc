@@ -52,7 +52,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
 
     if (isPending) return <SkeletonDashboard />;
 
-    if (isError || !data || !data.valid) {
+    if (isError || !data || !data.valid || data?.operation === 'LOGOUT') {
         router.push('/getting-started');
         return;
     };

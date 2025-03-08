@@ -12,7 +12,7 @@ export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
     // check for public path
-    const isPublic = pathname.startsWith("/getting-started") || pathname.startsWith("/api/admin");
+    const isPublic = pathname.startsWith("/getting-started") || pathname.startsWith("/nimda__");
 
     if (isPublic) return NextResponse.next();
 
