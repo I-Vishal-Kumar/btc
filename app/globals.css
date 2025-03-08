@@ -2,7 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100..900&family=Raleway:wght@100..900&family=Shadows+Into+Light&display=swap');
+
 :root {
+  --font-geist-sans: 'Geist', sans-serif;
+  --font-geist-mono: 'Geist Mono', monospace;
   --background: #ffffff;
   --foreground: #171717;
 }

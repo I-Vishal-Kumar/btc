@@ -1,6 +1,5 @@
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { UserContextProvider } from '@/lib/hooks/user.context';
 import Providers from '../providers';
@@ -8,16 +7,6 @@ import Footer from '../__components__/footer/footer';
 import { Box } from '@mui/material';
 import { WalletContextProvider } from '@/lib/hooks/userWallet.context';
 
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -90,7 +79,7 @@ export default function RootLayout({
         <meta name="robots" content="index, follow" />
       </head>
       <body
-        className={`${ geistSans.variable } ${ geistMono.variable } bg-emerald-500 antialiased`}
+        className={`font-geistSans max-w-screen-sm bg-emerald-500 antialiased`}
       >
         <AppRouterCacheProvider>
           <Providers>
