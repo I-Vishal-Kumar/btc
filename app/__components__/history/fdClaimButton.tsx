@@ -68,10 +68,9 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
         <Box width={"80%"} margin={"0 auto"} py={1} pb={2}>
             <Button
                 onClick={() => {
-                    mutate()
-                    // setIsModalOpen(true);
-                    // setCountdown(120);
-                    // setLoadingStage("🪄 Starting...");
+                    setIsModalOpen(true);
+                    setCountdown(120);
+                    setLoadingStage("🪄 Starting...");
                 }}
                 disabled={isPending}
                 sx={{ bgcolor: "#98bbffe8", color: "black", boxShadow: 0 }}
