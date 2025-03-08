@@ -22,7 +22,7 @@ export async function middleware(req: NextRequest) {
       if(ipRequests.size > 400) ipRequests.clear();
 
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0]|| "unknown";
-      console.log(ip);
+      console.log(req.headers);
       if(ip !== 'unknown'){
         
         const currTime = Date.now();
