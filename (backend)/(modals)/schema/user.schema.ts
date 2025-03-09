@@ -45,7 +45,7 @@ USER_SCHEMA.pre("save", function (this: Document & { [key: string]: any }, next)
 
     precisionFields.forEach(field => {
         if (this[field] !== undefined) {
-            this[field] = Math.round(this[field] * 100) / 100;
+            this[field] = Math.round(Number(this[field]) * 100) / 100;
         }
     });
 

@@ -121,7 +121,6 @@ const LOGIN = async (credentials: LoginDetails) => {
 
         // set session token in response header with expiry of oneDay and mark httpOnly.
         await SetCookie(sess_token);
-
         return { success: true };
 
     } catch (error) {

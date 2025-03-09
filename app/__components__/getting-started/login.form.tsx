@@ -34,13 +34,12 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
 
     return (
         <>
-
             <div className="flex gap-x-1 text-black mt-2">
-                <Typography fontSize={12} fontWeight={700} onClick={() => setQueryParam("type", "login")} style={{ cursor: "pointer" }}>
+                <Typography fontSize={12} fontFamily={'serif'} fontWeight={800} onClick={() => setQueryParam("type", "login")}>
                     I Am A Old User
                 </Typography>
                 <Typography fontSize={12}>/</Typography>
-                <Typography fontSize={12} fontWeight={500} onClick={() => setQueryParam("type", "signup")} style={{ cursor: "pointer" }}>
+                <Typography fontSize={12} fontWeight={500} onClick={() => setQueryParam("type", "signup")}>
                     Create New
                 </Typography>
             </div>

@@ -7,7 +7,7 @@ import { USER_CONTEXT } from "@/lib/hooks/user.context"
 import { Box, Button, CircularProgress, Modal, Typography } from "@mui/material"
 import { useMutation } from "@tanstack/react-query"
 import { enqueueSnackbar } from "notistack"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 
 // Stages mapped to countdown values
 const loadingStages: Record<number, string> = {
@@ -31,21 +31,30 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [countdown, setCountdown] = useState(120); // 2 minutes
     const [loadingStage, setLoadingStage] = useState("🪄 Starting...");
+    const mutationRef = useRef(false);
 
     // Handle countdown and stage updates
     useEffect(() => {
-        if (isModalOpen && countdown > 0) {
+        if (isModalOpen && countdown > 0 && !mutationRef.current) {
+            mutationRef.current = true;
             const timer = setInterval(() => {
                 setCountdown((prev) => prev - 1);
                 if (loadingStages[countdown]) setLoadingStage(loadingStages[countdown]);
             }, 1000);
 
-            return () => clearInterval(timer);
-        } else if (countdown === 0) {
-            setIsModalOpen(false);
-            mutate();
+            return () => {
+                mutationRef.current = false;
+                clearInterval(timer)
+            };
         }
     }, [isModalOpen, countdown]);
+
+    useEffect(() => {
+        if (countdown === 0 && !isPending) {
+            mutate();
+            setIsModalOpen(false);
+        }
+    }, [countdown])
 
     // Handle successful claim
     useEffect(() => {

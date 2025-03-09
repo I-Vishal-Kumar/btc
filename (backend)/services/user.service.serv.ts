@@ -28,13 +28,14 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
         
         await CONNECT();
 
-        const dbUser = await USER.findOne({PhoneNumber: decoded.PhoneNumber, Blocked : false}, {_id : 0, Session: 0, Password: 0, createdAt: 0, updatedAt: 0});
+        const dbUser = await USER.findOne({PhoneNumber: decoded.PhoneNumber, Blocked : false, Session : token}, {_id : 0, Session: 0, Password: 0, createdAt: 0, updatedAt: 0});
 
         if(!dbUser) return {valid: false};
 
         return {valid: true, data: dbUser?.toObject()};
 
     } catch (error) {
+        console.log(error);
         return {valid: false, operation: 'LOGOUT'}
     }
 }
@@ -388,7 +389,7 @@ export const getRegistrationDetails = async ( tab: ActiveTabs , page: number = 1
 
         if(!details) throw new Error('failed to get details');
 
-        return {valid: true, data: details, pagination: {
+        return {valid: true, data: JSON.parse(JSON.stringify(details)), pagination: {
             currentPage: page,
             level 
         }}

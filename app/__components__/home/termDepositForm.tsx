@@ -8,13 +8,10 @@ import { MdOutlineCurrencyRupee } from "react-icons/md";
 
 export const TermDepositForm = () => {
 
-    const min = 500; // minimum value to start creating fd.
-
-    const [selectedPlan, setPlan] = useState<OptionTypes>("15day@2%");
+    const [selectedPlan, setPlan] = useState<OptionTypes>("3day@2%");
 
     // fd mutation hook.
-    const { isPending, maxAmount, mutate, setValue, value } = useFdMutation({ selectedPlan, minAmount: min });
-
+    const { isPending, maxAmount, minAmount: min, mutate, setValue, value } = useFdMutation({ selectedPlan });
 
     const handleSliderChange = (_: Event, newValue: number | number[]) => {
 

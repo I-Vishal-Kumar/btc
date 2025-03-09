@@ -37,7 +37,7 @@ function AuthFormContents() {
                 </div>
 
                 <Box>
-                    <Typography fontWeight={800} fontSize={28} color="black">
+                    <Typography fontWeight={800} fontFamily={'serif'} fontSize={28} color="black">
                         {type === "signup" ? "Create Account" : type === "forgot-password" ? "Forgot Password!" : "Login Now!"}
                     </Typography>
                 </Box>

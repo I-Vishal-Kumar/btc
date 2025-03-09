@@ -20,8 +20,8 @@ export function HeroSection() {
             </div>
 
             <div className="text-center grid justify-center">
-                <Avatar sx={{ height: 100, justifySelf: 'center', width: 100, bgcolor: '#b9ebc3' }}>
-                    A
+                <Avatar sx={{ height: 90, justifySelf: 'center', width: 90, bgcolor: '#b9ebc3' }}>
+                    {userInfo.Name[0]}
                 </Avatar>
                 <LineClamp maxLines={1}>
                     <Typography maxWidth={200} mt={1} fontWeight={700} textTransform={'capitalize'} fontSize={15}>{userInfo.Name}</Typography>

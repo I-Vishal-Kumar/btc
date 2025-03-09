@@ -43,7 +43,7 @@ function WithdrawalCard({ transaction }: { transaction: TransactionObjType }) {
         [TransactionStatusType.PENDING]: '#ffd04b',
         [TransactionStatusType.FAILED]: '#ff5c4b'
     }
-    console.log('hey')
+
     return (
         <div className="p-2 rounded-md ring-1 bg-gray-100 ring-gray-300">
             <Typography variant="caption" fontWeight={600} fontSize={12}>Withdrawal</Typography>

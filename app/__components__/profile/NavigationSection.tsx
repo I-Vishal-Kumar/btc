@@ -59,7 +59,7 @@ const sections: Sections = {
 
 export const NavigationSection: React.FC = () => {
     return (
-        <div className="w-full">
+        <div className="w-full mt-5">
             {
                 Object.entries(sections).map(([title, childButtons]) => (
                     <CustomList title={title} key={title} childButtons={childButtons} />
@@ -84,7 +84,7 @@ const CustomList = (
             <Typography variant="caption" sx={{ pl: 2, color: "text.secondary", fontWeight: 500, fontSize: 14 }}>
                 {title}
             </Typography>
-            <List sx={{ outline: 1, outlineColor: '#d6d6d6', borderRadius: 3, bgcolor: '#f3f3f3' }}>
+            <List sx={{ outline: 1, outlineColor: '#d6d6d6', borderRadius: 3, bgcolor: '#f9f9f9' }}>
                 {childButtons.map((item, index) => (
                     <ListItem
                         // @ts-expect-error since on click can be undefined its safer to check it but our data is hard coded.

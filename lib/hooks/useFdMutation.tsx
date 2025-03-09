@@ -7,26 +7,30 @@ import { createFD } from "@/(backend)/services/fd.services.serv";
 
 type UseFdMutationProps = {
     selectedPlan: OptionTypes;
-    minAmount: number;
 };
 
 
 // creates fd -----------------------------
 
-export const useFdMutation = ({ selectedPlan, minAmount }: UseFdMutationProps) => {
+export const useFdMutation = ({ selectedPlan }: UseFdMutationProps) => {
 
     const { setUserInfo } = useContext(USER_CONTEXT);
+    const details = OPTIONS[selectedPlan];
+    const maxAmount = details?.max || -1;
+    const minAmount = details?.min || -1;
 
     const [value, setValue] = useState<number[]>([minAmount, 0]);
 
-    const maxAmount = OPTIONS[selectedPlan]?.max || minAmount;
 
     const { isSuccess, isError, isPending, data, mutate } = useMutation({
         mutationFn: async () => {
-            if (OPTIONS[selectedPlan] && Math.max(value[0], value[1]) > minAmount) {
-                return createFD({ FD_amount: Math.max(value[0], value[1]), duration: selectedPlan });
+            const fdAmount = Math.max(value[0], value[1]);
+            if (OPTIONS[selectedPlan] && fdAmount >= minAmount) {
+                return createFD({ FD_amount: fdAmount, duration: selectedPlan });
+            } else {
+                return Promise.resolve({ valid: false, msg: "Wrong amount selected" });
             }
-        },
+        }
     });
 
     useEffect(() => {
@@ -52,5 +56,5 @@ export const useFdMutation = ({ selectedPlan, minAmount }: UseFdMutationProps) =
         }
     }, [selectedPlan]);
 
-    return { isPending, mutate, value, setValue, maxAmount };
+    return { isPending, mutate, value, setValue, maxAmount, minAmount };
 };

@@ -16,16 +16,10 @@ export default function PublicLayout({
     return (
         <html lang="en">
             <head>
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" />
                 <link
                     rel="shortcut icon"
                     href="/getting-started/logo_short.png"
                     type="image/x-icon"
-                />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&family=Shadows+Into+Light&display=swap"
-                    rel="stylesheet"
                 />
                 <meta charSet="UTF-8" />
                 <meta
@@ -73,9 +67,7 @@ export default function PublicLayout({
 
                 <meta name="robots" content="index, follow" />
             </head>
-            <body
-                className={`font-geistSans max-w-screen-sm antialiased`}
-            >
+            <body className={`max-w-screen-sm`}>
                 <Providers>
                     {children}
                 </Providers>

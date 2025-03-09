@@ -15,7 +15,7 @@ export default function PaymentCard({ client = 'funds' }: { client?: 'commission
     const { userInfo } = useContext(USER_CONTEXT);
 
     return (
-        <div className="relative grid pt-8 gap-y-4 items-end z-0 w-full rounded-2xl">
+        <div className="relative grid pt-5 gap-y-1 items-end z-0 w-full rounded-2xl">
             <Avatar src="/assets/man.png" sx={{ margin: '0 auto', height: { xs: 90, md: 100 }, width: { xs: 90, md: 100 }, bgcolor: '#b9ebc3', mt: 1 }} >A</Avatar>
             <div className="flex flex-col justify-center ">
                 <Typography fontWeight={600} fontFamily={'serif'} sx={{ color: 'black', textAlign: 'center' }}>{userInfo.Name}</Typography>

@@ -29,7 +29,7 @@ TRANSACTION_SCHEMA.pre("save", function (this: Document & { [key: string]: any }
 
     precisionFields.forEach(field => {
         if (this[field] !== undefined) {
-            this[field] = Math.round(this[field] * 100) / 100;
+            this[field] = Math.round(Number(this[field]) * 100) / 100;
         }
     });
 

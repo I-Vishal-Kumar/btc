@@ -164,6 +164,7 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         const lastClaimedDate = fd.LastClaimedOn ? DateTime.fromJSDate(new Date(fd.LastClaimedOn)).startOf("day") : null;
         const shouldClaimToday = !lastClaimedDate || lastClaimedDate < today;
 
+        console.log(lastClaimedDate?.toFormat('yyyy LLL dd HH:MM:SS a'), " todya -", today.toFormat('yyyy LLL dd HH:MM:SS a'), 'last claimed date', fd.LastClaimedOn)
         if(!shouldClaimToday || fd.Claimed) throw new Error('You have already claimed for this fd.');
 
         // process the profits.

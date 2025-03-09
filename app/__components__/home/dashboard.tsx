@@ -18,7 +18,7 @@ const TermDepositDashboard = () => {
                 <RenderUserDetails />
 
                 <Box height={'50%'} width={'90%'} position={'relative'} margin={'0 auto'} overflow={'hidden'} boxShadow={4} borderRadius={5}>
-                    <video autoPlay loop style={{ position: 'absolute', top: 0, left: 0 }} height={'100%'} width={"100%"} muted src="/assets/home_video.mp4"></video>
+                    <video controls loop style={{ position: 'absolute', top: 0, left: 0 }} height={'100%'} width={"100%"} muted src="/assets/home_video.mp4"></video>
                 </Box>
 
                 <QuickAccessSection />

@@ -33,7 +33,7 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
     } = useInfiniteQuery({
         queryKey: ["deposits", activeTab, level],
         initialPageParam: 1,
-        queryFn: ({ pageParam = 1 }) => getTodayDepositWithdrawalUsers(TransactionType.WITHDRAWAL, activeTab, pageParam, level),
+        queryFn: ({ pageParam = 1 }) => getTodayDepositWithdrawalUsers(TransactionType.DEPOSIT, activeTab, pageParam, level),
         getNextPageParam: (lastPage) => (lastPage?.pagination?.currentPage || 0) + 1 || undefined,
         enabled: !!expanded,
         staleTime: 60 * 1000,  // Data stays fresh for 1 minute (prevents refetching)
@@ -54,7 +54,7 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
     return (
         <Box p={2} display={'grid'} rowGap={2}>
             {Array.from({ length: 6 }, (_, i) => `Level ${ i + 1 }`).map((panel, index) => (
-                <Accordion sx={{ boxShadow: 0 }} key={panel} expanded={expanded === `Level${ index }`} onChange={handleChange(`Level${ index }`)}>
+                <Accordion sx={{ boxShadow: 0 }} key={panel} expanded={expanded === `Level${ index + 1 }`} onChange={handleChange(`Level${ index + 1 }`)}>
 
                     <AccordionSummary expandIcon={<ExpandMore />}>
                         <Typography>{panel}</Typography>
@@ -75,7 +75,7 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
 
                                 {isFetchingNextPage && <CircularProgress size={24} sx={{ display: "block", mx: "auto", mt: 2 }} />}
 
-                                {hasNextPage && hasMore[`level-${ index }`] && (
+                                {hasNextPage && hasMore[`level-${ index + 1 }`] && (
                                     <Button
                                         onClick={() => fetchNextPage()}
                                         disabled={isFetchingNextPage}
@@ -87,7 +87,7 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
                                 )}
 
                                 {
-                                    !hasMore[`level-${ index }`] && <Typography textAlign={"center"}>No more data available.</Typography>
+                                    !hasMore[`level-${ index + 1 }`] && <Typography textAlign={"center"}>No more data available.</Typography>
                                 }
                             </div>
                         )}
