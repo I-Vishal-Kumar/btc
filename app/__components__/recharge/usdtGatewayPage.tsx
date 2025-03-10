@@ -95,7 +95,7 @@ export const UsdtGateway: React.FC<{ amount: number, config: AdminConfigType }> 
                             alt="barCode"
                             width={100}
                             height={100}
-                            className="object-cover  h-[95%] w-[95%]  "
+                            className="object-contain w-auto h-[95%]  "
                         />
                     </div>
 

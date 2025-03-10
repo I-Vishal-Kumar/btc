@@ -2,7 +2,7 @@ import LineClamp from "@/lib/helpers/lineClamper"
 import { AccountBalance, AdbOutlined, CardGiftcard, SupportAgent, TextSnippetOutlined } from "@mui/icons-material"
 import { Typography, Box } from "@mui/material"
 import { useRouter } from "next/navigation"
-import { ReactNode, useContext, useEffect } from "react"
+import { ReactNode, useContext, useEffect, useRef } from "react"
 import { RenderInvitationLink } from "../_commonComponents/RenderInvitationLink"
 import { USER_CONTEXT } from "@/lib/hooks/user.context"
 import { DateTime } from "luxon"
@@ -30,7 +30,7 @@ export const QuickAccessSection = () => {
 
     const router = useRouter();
     const { setUserInfo, userInfo } = useContext(USER_CONTEXT);
-
+    const pdfRef = useRef<HTMLAnchorElement>(null);
     const { data, isPending, isSuccess, mutate } = useMutation({
         mutationFn: claimGift
     })
@@ -50,7 +50,7 @@ export const QuickAccessSection = () => {
 
     const quickLinks = [
         { label: "Recharge", icon: <AccountBalance />, onClick: () => { router.push('/recharge') } },
-        { label: "PDF", icon: <TextSnippetOutlined /> },
+        { label: "PDF", icon: <TextSnippetOutlined />, onClick: () => { if (pdfRef?.current) pdfRef.current.click() } },
         { label: "Application", icon: <AdbOutlined /> },
         { label: "Gift", icon: <CardGiftcard />, onClick: () => handleGiftClaim() },
         { label: "Support", icon: <SupportAgent />, onClick: () => { router.push('/profile/support') } },
@@ -80,7 +80,7 @@ export const QuickAccessSection = () => {
             <Box display={'grid'} gridTemplateColumns={'repeat(5, 1fr)'} sx={{ placeContent: 'center' }} mt={1}>
                 {quickLinks.map(details => <QuickAccess key={details.label} label={details.label} icon={details.icon} {...(details.onClick ? { onClick: details.onClick } : {})} />)}
             </Box>
-
+            <a ref={pdfRef} hidden href="/assets/btcindia_pdf.pdf" download={'btcIndia'} />
             <RenderInvitationLink />
         </div>
 

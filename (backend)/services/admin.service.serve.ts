@@ -242,6 +242,7 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
         if(!isTransactionUpdated) throw new Error("Failed to update transaction.");
 
         if(editedDetails.Status === TransactionStatusType.FAILED) {
+            session.commitTransaction();
             return {valid: true, msg: 'Updated'}
         }
 
@@ -297,6 +298,8 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
         await session.abortTransaction();
         if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
         return {valid: false, msg: 'Something went wrong.'}
+    } finally {
+        session.endSession();
     }
 }
 

@@ -60,7 +60,7 @@ const FORGOT_PASSWORD = async (credentials: ForgotPasswordDetails) => {
             Password: credentials.OldPassword
         }, { Password: credentials.NewPassword });
 
-        if (isResetSuccess) throw new Error("Wrong old password or phone number.");
+        if (!isResetSuccess) throw new Error("Wrong old password or phone number.");
         return { success: true, msg: 'Password reset successfull LOGIN NOW. ' }
 
     } catch (error) {
@@ -112,9 +112,9 @@ const LOGIN = async (credentials: LoginDetails) => {
 
         let res = await USER.findOne(credentials);
 
-        if (res.Blocked) throw new Error("You have been BLOCKED");
-
         if (!res) throw new Error('Wrong password or username.');
+
+        if (res.Blocked) throw new Error("You have been BLOCKED");
 
         // update user in db;
         await USER.findOneAndUpdate(credentials, { Session: sess_token });
