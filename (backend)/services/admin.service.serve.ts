@@ -242,7 +242,7 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
         if(!isTransactionUpdated) throw new Error("Failed to update transaction.");
 
         if(editedDetails.Status === TransactionStatusType.FAILED) {
-            session.commitTransaction();
+            await session.commitTransaction();
             return {valid: true, msg: 'Updated'}
         }
 

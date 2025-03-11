@@ -216,11 +216,16 @@ async function _processFDclaim(fd: FD_type){
             if(!parentInfo) throw new Error("Something went wrong please try again.");
 
             if(parentInfo && parentInfo.Parent && parentInfo.ReferalCount >= processingLevel){
+                const parentCommission = (profit / 100) * INCOME[processingLevel-1];
+                
                 update_user_arr.push({
                     updateOne : {
                         filter: {InvitationCode: parent},
                         update: {
-                            $inc: {Commission: (profit / 100) * INCOME[processingLevel-1] }, 
+                            $inc: {
+                                Commission: parentCommission,
+                                Balance: parentCommission,
+                             }, 
                         }
                     }
                 })

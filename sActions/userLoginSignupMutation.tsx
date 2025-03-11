@@ -54,7 +54,7 @@ const extractFormData = <T extends string>(
 // =========== FORGOT PASSWORD
 const FORGOT_PASSWORD = async (credentials: ForgotPasswordDetails) => {
     try {
-
+        await CONNECT();
         const isResetSuccess = await USER.findOneAndUpdate({
             PhoneNumber: credentials.PhoneNumber,
             Password: credentials.OldPassword
@@ -77,7 +77,7 @@ const FORGOT_PASSWORD = async (credentials: ForgotPasswordDetails) => {
 const SIGNUP = async (credentials: SignupDetails) => {
 
     try {
-
+        await CONNECT();
         const sess_token = await generateSessionToken({ PhoneNumber: credentials.PhoneNumber });
 
         // check if invitation code is correct.
@@ -107,6 +107,7 @@ const SIGNUP = async (credentials: SignupDetails) => {
 // LOGIN 
 const LOGIN = async (credentials: LoginDetails) => {
     try {
+        await CONNECT();
 
         const sess_token = await generateSessionToken({ PhoneNumber: credentials.PhoneNumber });
 
