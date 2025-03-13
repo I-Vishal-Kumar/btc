@@ -17,6 +17,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
     const [isDefaultGateway, setDefaultGateway] = useState<boolean>(false);
     const [isUsdtGateway, setUsdtGateway] = useState<boolean>(false);
+    const [disabled, setDisabled] = useState<boolean>(false);
     const [channelSelected, setChannel] = useState<'local' | 'usdt'>('local');
 
     const predefinedAmounts = [1000, 10000, 50000, 100000];
@@ -39,6 +40,8 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
         if (Number(amount) < 100) return enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' })
         if (channelSelected === 'usdt') return setUsdtGateway(true);
 
+        setDisabled(true);
+
         const fn = ({
             [GatewayTypes.DEFAULT]: () => setDefaultGateway(true),
             [GatewayTypes.AUTO_1]: () => _initiate_auto_1(Number(amount)),
@@ -46,6 +49,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
         })[gatewayType]
 
         fn()
+        setDisabled(false);
     };
 
     if (isDefaultGateway) return <DefaultGateway amount={Number(amount)} config={config} />
@@ -108,6 +112,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
             <Button
                 variant="contained"
                 fullWidth
+                disabled={disabled}
                 sx={{ mt: 2, bgcolor: '#79dcfd', boxShadow: 0, borderRadius: '100vw' }}
                 onClick={handleSubmit}
             >
