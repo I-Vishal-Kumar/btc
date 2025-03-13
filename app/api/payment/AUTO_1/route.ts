@@ -62,5 +62,7 @@ export async function POST(request: NextRequest) {
 
     return new NextResponse('failure', {status: 400 });
 
+  }finally{
+    Session.endSession();
   }
 }

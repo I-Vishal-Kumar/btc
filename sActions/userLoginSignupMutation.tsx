@@ -175,7 +175,7 @@ const withSession = async (credentials: LoginDetails | SignupDetails, type: Avai
         if (startSession && session) await session.abortTransaction();
         throw error; // Re-throw the error to be handled upstream
     } finally {
-        if (startSession && session) session.endSession();
+        if (startSession && session) await session.endSession();
     }
 };
 

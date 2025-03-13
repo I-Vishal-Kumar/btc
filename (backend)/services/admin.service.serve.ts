@@ -299,7 +299,7 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
         if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
         return {valid: false, msg: 'Something went wrong.'}
     } finally {
-        session.endSession();
+        await session.endSession();
     }
 }
 
@@ -460,6 +460,8 @@ export const ad_settleWithdrawal = async (editedDetails : TransactionObjType): S
         await session.abortTransaction();
         if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
         return {valid: false, msg: 'Something went wrong.'}
+    }finally{
+        await session.endSession();
     }
 }
 
@@ -604,6 +606,8 @@ export const ad_addBonus = async (editedDetails : BonusDetailsType) => {
         await session.abortTransaction();
         if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
         return {valid: false, msg: 'Something went wrong.'}
+    }finally{
+        session.endSession();
     }
 }
 

@@ -252,14 +252,14 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         return {valid: true, msg: 'Your Withdrawal is in processing.'}
 
     } catch (error) {
-        console.log(error);
+        console.log("Error while withdrawal", error);
         await session.abortTransaction();
 
         if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};
         return {valid: false, msg: error?.message || 'something went wrong'}
     
     }  finally {
-        session.endSession();
+        await session.endSession();
 
     }
 }

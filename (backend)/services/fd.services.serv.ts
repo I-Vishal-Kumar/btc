@@ -10,7 +10,7 @@ import { FD } from "../(modals)/schema/fixedDeposit.schema";
 import { USER } from "../(modals)/schema/user.schema";
 import { FD_type } from "@/__types__/fd.types";
 import { DateTime } from "luxon";
-import { FdStatus } from "@/__types__/db.types";
+import { FdStatus, FdStatusType } from "@/__types__/db.types";
 
 function extractNumbers(plan: string): { days: number; profit: number } | null {
     const match = plan.match(/^(\d+)day@([\d.]+)%$/);
@@ -114,7 +114,7 @@ export const getFD = async () : ServiceReturnType<FD_type[]> => {
 
         // Process FDs
         for (const fd of fds) {
-            const createdAt = DateTime.fromJSDate( new Date(fd.createdAt)).startOf("day"); // FD creation date
+            const createdAt = DateTime.fromJSDate(fd.createdAt as unknown as Date).toUTC().startOf("day"); // FD creation date
             const maturityDate = createdAt.plus({ days: fd.FdDuration }); // Maturity date
 
             // Check if FD has matured
@@ -126,7 +126,7 @@ export const getFD = async () : ServiceReturnType<FD_type[]> => {
         }
 
         // process all fds at once.
-        Promise.all(maturedFDs.map(fd => handleMaturedFD(fd)));
+        await Promise.all(maturedFDs.map(fd => handleMaturedFD(fd)));
 
         return {valid: true, data: fds}
 
@@ -157,12 +157,12 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         if(!fd) throw new Error('Could not claim this time try again.');
 
         const today = DateTime.utc().startOf("day");
-        const createdAt = DateTime.fromJSDate( new Date(fd.createdAt) ).startOf("day"); // FD creation date
+        const createdAt = DateTime.fromJSDate(fd.createdAt as unknown as Date).toUTC().startOf("day"); // FD creation date
         const maturityDate = createdAt.plus({ days: fd.FdDuration }); // Maturity date
         
         // check if user has claimed today or not.        
-        const lastClaimedDate = fd.LastClaimedOn ? DateTime.fromJSDate(new Date(fd.LastClaimedOn)).startOf("day") : null;
-        const shouldClaimToday = !lastClaimedDate || lastClaimedDate < today;
+        const lastClaimedDate = fd.LastClaimedOn ? DateTime.fromJSDate(fd.LastClaimedOn as unknown as Date).toUTC().startOf("day") : null;
+        const shouldClaimToday = (!lastClaimedDate || lastClaimedDate < today ) && (([FdStatus.CLAIMED, FdStatus.HALTED] as string[]).includes(fd.FdStatus as FdStatusType));
 
         console.log(lastClaimedDate?.toFormat('yyyy LLL dd HH:MM:SS a'), " todya -", today.toFormat('yyyy LLL dd HH:MM:SS a'), 'last claimed date', fd.LastClaimedOn)
         if(!shouldClaimToday || fd.Claimed) throw new Error('You have already claimed for this fd.');
@@ -173,7 +173,7 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         if(!isSuccess) throw new Error("something went wrong while claim.");
 
         // check if fd has matured. 
-        if(fd.FdStatus === FdStatus.MATURED && maturityDate.startOf('day').equals(today)){
+        if(fd.FdStatus === FdStatus.MATURED && maturityDate <= today){
             // update the user balance with total amount
             await USER.findOneAndUpdate(
                 {PhoneNumber: fd.PhoneNumber},
@@ -259,7 +259,14 @@ async function _processFDclaim(fd: FD_type){
         }
 
         const isUpdated = await FD.findOneAndUpdate({_id: fd._id}, {
-            $set: {LastClaimedOn: new Date().toISOString()}
+            $set: {
+                LastClaimedOn: DateTime.utc().toJSDate(),
+                ...(fd.FdStatus === FdStatus.MATURED && {
+                    Claimed : true,
+                    FdStatus : FdStatus.CLAIMED,
+                    MaturedOn: DateTime.utc().toJSDate(),
+                })
+            }
         }, {session, new: true})
 
         if(!isUpdated) throw new Error("FD update failed try again.");
@@ -274,7 +281,7 @@ async function _processFDclaim(fd: FD_type){
     
     }finally{
 
-        session.endSession();
+        await session.endSession();
     
     }
 
