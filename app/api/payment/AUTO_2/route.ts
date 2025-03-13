@@ -1,0 +1,132 @@
+import { TRANSACTION } from "@/(backend)/(modals)/schema/transaction.schema";
+import { USER } from "@/(backend)/(modals)/schema/user.schema";
+import { ad_settleDeposit } from "@/(backend)/services/admin.service.serve";
+import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
+import { TransactionObjType } from "@/__types__/transaction.types";
+import { CONNECT } from "@/lib/_db/db.config";
+import mongoose from "mongoose";
+import { NextRequest, NextResponse } from "next/server";
+
+
+/**
+ * {
+	"status": "SUCCESS",
+	"order_id": "TXN00743264723",
+	"message": "Transaction Successfully",
+	"result":
+	{
+		"txnStatus": "COMPLETED",
+		"resultInfo": "Transaction Success",
+		"orderId": "TXN00743264723",
+		"amount": 100,
+		"date": "2021-01-01 12:00:00",
+		"utr": 435644746487,
+		"customer_mobile": 9876543210,
+		"remark1": "your-customer@gmail.com",
+		"remark2": "Your Data"
+	}
+}
+    form encoded.
+ */
+
+type body = {
+	status: TransactionStatusType,
+	order_id: string,
+	message: string,
+	result:
+	{
+		txnStatus: "COMPLETED" | 'FAILED',
+		resultInfo: string,
+		orderId: string,
+		amount: number,
+		date: string,
+		utr: number,
+		customer_mobile: number,
+	}
+}
+
+export async function POST(request: NextRequest) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+  
+    try {
+        const rawBody = await request.text();
+        const params = new URLSearchParams(rawBody);
+        const parsedBody = Object.fromEntries(params);
+
+        const result = {
+            txnStatus: parsedBody["result[txnStatus]"] as "COMPLETED" | "FAILED",
+            resultInfo: parsedBody["resultInfo"],
+            orderId: parsedBody["orderId"],
+            amount: Number(parsedBody["amount"]), // Convert to number
+            date: parsedBody["date"],
+            utr: Number(parsedBody["utr"]), // Convert to number
+            customer_mobile: Number(parsedBody["customer_mobile"]), // Convert to number
+            remark1: parsedBody["remark1"],
+            remark2: parsedBody["remark2"]
+        };
+
+        // Explicitly type-cast parsed values
+        const body: body = {
+                status: parsedBody["status"] as TransactionStatusType,
+                order_id: parsedBody["order_id"],
+                message: parsedBody["message"],
+                result: result
+        };
+
+        console.log("Parsed Body AUTO_2:", body);
+
+        // Validate the request body
+        if (body.status !== TransactionStatusType.SUCCESS) throw new Error("Transaction Failed");
+
+        const amount = body.result.amount;
+        if (amount < 100) throw new Error("Wrong amount submitted.");
+
+        // Connect to DB
+        await CONNECT();
+        const user = await USER.findOne({ PhoneNumber: body.result.customer_mobile });
+
+        if (!user) throw new Error("Tampered request body");
+
+        // Create the transaction entry
+        const transaction : TransactionObjType[] = await TRANSACTION.create(
+            [
+                {
+                    PhoneNumber: body.result.customer_mobile,
+                    InvitationCode: user.InvitationCode,
+                    Amount: amount,
+                    Method: 'AUTO_2',
+                    Type: TransactionType.DEPOSIT,
+                    Status: TransactionStatusType.SUCCESS,
+                    OrderId: body.result.orderId,
+                    UTR: body.result.utr,
+                }
+            ],
+            { session }
+        );
+
+        if (!transaction || transaction.length === 0) {
+            throw new Error("Transaction creation failed");
+        }
+
+        const { valid, data, msg } = await ad_settleDeposit(transaction[0]);
+
+        if (!valid) {
+            throw new Error(`Settlement failed: ${msg} data ${data}`);
+        }
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return new NextResponse('success', { status: 200 });
+
+    } catch (error: any) {
+        console.error("AUTO_2 Error:", error.message, error);
+        await session.abortTransaction();
+        session.endSession();
+        
+        return new NextResponse(`Error: ${error.message}`, { status: 400 });
+    }finally{
+        await session.endSession();
+    }
+};

@@ -8,6 +8,7 @@ import { DefaultGateway } from "./defaultGatewayPage";
 import { AdminConfigType } from "@/__types__/admin.types";
 import { UsdtGateway } from "./usdtGatewayPage";
 import { useAuto_1 } from "@/lib/hooks/auto_1.gateway";
+import { useAuto_2 } from "@/lib/hooks/auto_2.gateway";
 
 export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminConfigType }> = ({ gatewayType, config }) => {
 
@@ -19,8 +20,9 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const [channelSelected, setChannel] = useState<'local' | 'usdt'>('local');
 
     const predefinedAmounts = [1000, 10000, 50000, 100000];
-    const { _initiate } = useAuto_1()
 
+    const { _initiate: _initiate_auto_1 } = useAuto_1()
+    const { _initiate: _initiate_auto_2 } = useAuto_2();
     const handleAmountClick = (value: number) => {
         setSelectedAmount(value);
         setAmount(value);
@@ -34,13 +36,13 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const handleSubmit = () => {
 
         // validate minimum amount.
-        if (Number(amount) < 500) return enqueueSnackbar("Minimum deposit amount is 500", { variant: 'warning' })
+        if (Number(amount) < 100) return enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' })
         if (channelSelected === 'usdt') return setUsdtGateway(true);
 
         const fn = ({
             [GatewayTypes.DEFAULT]: () => setDefaultGateway(true),
-            [GatewayTypes.AUTO_1]: () => _initiate(Number(amount)),
-            [GatewayTypes.AUTO_2]: () => _initiate(Number(amount)) // same for some time.
+            [GatewayTypes.AUTO_1]: () => _initiate_auto_1(Number(amount)),
+            [GatewayTypes.AUTO_2]: () => _initiate_auto_2(Number(amount))
         })[gatewayType]
 
         fn()

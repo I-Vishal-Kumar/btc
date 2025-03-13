@@ -172,12 +172,14 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         if(isSunday || !isBetween9and12) throw new Error("Withdrawal time is over.");
 
         let Amount = Number(data.Amount);
+        if(Amount < 200) throw new Error("Minimum withdrawal amount is 200");
+        
         if(METHOD === 'USDT'){
             // change db key for usdt;
             DbWithdrawalPassKey = 'UsdtWithdrawPassword';
 
             // convert to inr.
-            Amount = parseFloat((90 * parseFloat(data.Amount)).toFixed(2));
+            Amount = parseFloat((80 * parseFloat(data.Amount)).toFixed(2));
         }
 
         // check if already withdrawan today.

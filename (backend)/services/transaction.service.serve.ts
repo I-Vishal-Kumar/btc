@@ -28,7 +28,7 @@ export const BTC = async (amount: number, TransactionID: string, method: string)
 
         if(!success || !decoded) return {valid: false}
 
-        if(amount < 500) throw new Error("Minimum amount is 500.")
+        if(amount < 100) throw new Error("Minimum amount is 100.")
         
         await CONNECT();
 
@@ -70,7 +70,7 @@ export const USDT = async (amount: number, TransactionID: string, method: string
 
         if(!success || !decoded) return {valid: false}
 
-        if(amount < 500) throw new Error(`Minimum amount is $${(500/90).toFixed(2)}.`)
+        if(amount < 100) throw new Error(`Minimum amount is $${(100/89).toFixed(2)}.`)
         
         await CONNECT();
 
@@ -111,7 +111,7 @@ export const AUTO_1 = async (amount: number, TransactionID: string): ServiceRetu
 
         if(!success || !decoded) return {valid: false}
 
-        if(amount < 500) throw new Error("Minimum amount is 500.")
+        if(amount < 100) throw new Error("Minimum amount is 100.")
         
         await CONNECT();
 

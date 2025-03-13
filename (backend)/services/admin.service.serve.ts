@@ -273,7 +273,7 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
             updateOne : {
                 filter : {PhoneNumber : editedDetails.PhoneNumber},
                 update : {
-                    $set : {Deposited : true},
+                   ...( !user.Deposited ?  {$set : {Deposited : true}} : {}),
                     $inc : {
                         Balance : editedDetails.Amount + (!user.Deposited ? editedDetails.Amount * FIRST_DEPOSIT_BONUS_PERCENT : 0)
                     }

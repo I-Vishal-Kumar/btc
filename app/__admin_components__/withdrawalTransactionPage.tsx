@@ -176,6 +176,10 @@ function RenderWithdrawalTransaction({ index, details }: { index: string, detail
         }
     }, [isSuccess, isPending])
 
+    const taxAmount = (Number(editedData.Amount || 0) * Number(editedData.Tax)) / 100;
+    const amountAfterTaxLocal = Number(editedData.Amount || 0) - taxAmount;
+    const amountAfterTaxUsdt = amountAfterTaxLocal / 80;
+
     return (
         <Box
             sx={{
@@ -221,11 +225,31 @@ function RenderWithdrawalTransaction({ index, details }: { index: string, detail
                     disabled={!isEditing}
                 />
 
+                {/* Amount after tax */}
+                <TextField
+                    label="Amount"
+                    value={editedData.Method === 'USDT' ? amountAfterTaxUsdt : amountAfterTaxLocal}
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Typography>
+                                        {editedData.Method === 'USDT' ? '$' : '₹'}
+                                    </Typography>
+                                </InputAdornment>
+                            )
+                        }
+                    }}
+                    size="small"
+                    fullWidth
+                    disabled
+                />
+
                 {/* method */}
                 <TextField
                     label="Method"
                     value={editedData?.Method}
-                    onChange={(e) => handleChange('Method', Number(e.target.value))}
+                    onChange={(e) => handleChange('Method', e.target.value)}
                     size="small"
                     fullWidth
                     disabled={!isEditing}

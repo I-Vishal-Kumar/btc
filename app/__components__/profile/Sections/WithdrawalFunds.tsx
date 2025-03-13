@@ -95,7 +95,7 @@ function BankForm({ activeTab = WidthdrawMethodTabs.LOCAL }: { activeTab?: Withd
         >
             <WithdrawMethodToggler tab={activeTab} />
             {
-                activeTab === WidthdrawMethodTabs.USDT && <Typography textAlign={"end"} fontWeight={500} color="red" >₹ 90 = $ 1</Typography>
+                activeTab === WidthdrawMethodTabs.USDT && <Typography textAlign={"end"} fontWeight={500} color="red" >₹ 80 = $ 1</Typography>
             }
             {
                 activeTab === WidthdrawMethodTabs.USDT ? (

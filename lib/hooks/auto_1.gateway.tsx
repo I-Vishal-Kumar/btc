@@ -30,9 +30,9 @@ export const useAuto_1 = () => {
 
         const merchant_key = process.env.NEXT_PUBLIC_MERCHANT_KEY; // Set in .env file
         const reqUrl = process.env.NEXT_PUBLIC_REQUEST_URL;
-        const page_url = 'https://cb-football.com/';
+        const page_url = 'https://btcindia.bond/';
         const order_date = formatDate(new Date());
-        const notify_url = `https://cb-football.com/api/payment/AUTO_1`;
+        const notify_url = `https://btcindia.bond/api/payment/AUTO_1`;
         const pay_type = 151;
         const trade_amount = amount;
         const goods_name = 'PAYMENT'
