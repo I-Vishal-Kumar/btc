@@ -162,7 +162,7 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         
         // check if user has claimed today or not.        
         const lastClaimedDate = fd.LastClaimedOn ? DateTime.fromJSDate(fd.LastClaimedOn as unknown as Date).toUTC().startOf("day") : null;
-        const shouldClaimToday = (!lastClaimedDate || lastClaimedDate < today ) && (([FdStatus.CLAIMED, FdStatus.HALTED] as string[]).includes(fd.FdStatus as FdStatusType));
+        const shouldClaimToday = (!lastClaimedDate || lastClaimedDate < today ) && !(([FdStatus.CLAIMED, FdStatus.HALTED] as string[]).includes(fd.FdStatus as FdStatusType));
 
         console.log(lastClaimedDate?.toFormat('yyyy LLL dd HH:MM:SS a'), " todya -", today.toFormat('yyyy LLL dd HH:MM:SS a'), 'last claimed date', fd.LastClaimedOn)
         if(!shouldClaimToday || fd.Claimed) throw new Error('You have already claimed for this fd.');
