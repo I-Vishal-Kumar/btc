@@ -60,13 +60,12 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
             <p className="text-gray-700 w-full text-start font-medium mb-4">Choose Amount Or Enter Amount</p>
 
             {/* Predefined Amount Buttons */}
-            <div className="flex justify-evenly w-full mb-4">
+            <div className="flex justify-evenly gap-2 flex-wrap w-full mb-4">
                 {predefinedAmounts.map((amt) => (
                     <button
                         type="button"
                         key={amt}
-                        className={`px-4 py-1 border rounded-full ${ selectedAmount === amt ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
-                            }`}
+                        className={`px-4 text-xs py-1 border rounded-full ${ selectedAmount === amt ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700" }`}
                         onClick={() => handleAmountClick(amt)}
                     >
                         {amt.toLocaleString()}

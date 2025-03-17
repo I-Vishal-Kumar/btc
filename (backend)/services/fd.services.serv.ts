@@ -294,7 +294,7 @@ async function handleMaturedFD(fd: FD_type){
         await FD.findOneAndUpdate({_id: fd._id}, {
             $set: {
                 FdStatus: FdStatus.MATURED,
-                MaturedOn: DateTime.now().toISO()
+                MaturedOn: DateTime.utc().toJSDate()
             }
         })
     } catch (error) {

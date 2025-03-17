@@ -174,6 +174,17 @@ function RenderDepositTransaction({ index, details }: { index: string, details: 
                     label="Amount"
                     value={editedData.Amount}
                     onChange={(e) => handleChange('Amount', Number(e.target.value))}
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Typography>
+                                        {editedData.Method === 'USDT' ? '$' : '₹'}
+                                    </Typography>
+                                </InputAdornment>
+                            )
+                        }
+                    }}
                     size="small"
                     fullWidth
                     disabled={!isEditing}

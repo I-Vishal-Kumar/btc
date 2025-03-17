@@ -84,7 +84,7 @@ export const USDT = async (amount: number, TransactionID: string, method: string
         await TRANSACTION.create({
             PhoneNumber : decoded.PhoneNumber,
             InvitationCode : userDetails.InvitationCode,
-            Amount: (amount/90).toFixed(2),
+            Amount: (amount/89).toFixed(2),
             Method: method,
             Type : TransactionType.DEPOSIT,
             Status: TransactionStatusType.PENDING,

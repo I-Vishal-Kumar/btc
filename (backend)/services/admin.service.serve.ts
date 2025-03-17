@@ -232,8 +232,14 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
         
         if(editedDetails.Status === TransactionStatusType.PENDING) throw new Error('Please choose correct type.');
 
+        let amount = editedDetails.Amount;
+
+        if(editedDetails.Method === 'USDT'){
+            amount *= 89;
+        }
+
         const isTransactionUpdated = await TRANSACTION.findByIdAndUpdate(editedDetails._id, {
-            Amount : editedDetails.Amount,
+            Amount : amount,
             Method : editedDetails.Method,
             TransactionID : editedDetails.TransactionID,
             Status : editedDetails.Status
@@ -259,10 +265,10 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
                     filter : {InvitationCode: user.Parent},
                     update : {
                         $inc : {
-                            Level1Deposit : editedDetails.Amount,
+                            Level1Deposit : amount,
                             ReferalCount : 1,
-                            Balance : REFERAL_PERCENT * editedDetails.Amount,
-                            Profit : REFERAL_PERCENT * editedDetails.Amount,
+                            Balance : REFERAL_PERCENT * amount,
+                            Profit : REFERAL_PERCENT * amount,
                         }
                     } 
                 }
@@ -275,7 +281,7 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
                 update : {
                    ...( !user.Deposited ?  {$set : {Deposited : true}} : {}),
                     $inc : {
-                        Balance : editedDetails.Amount + (!user.Deposited ? editedDetails.Amount * FIRST_DEPOSIT_BONUS_PERCENT : 0)
+                        Balance : amount + (!user.Deposited ? amount * FIRST_DEPOSIT_BONUS_PERCENT : 0)
                     }
                 }
             }
