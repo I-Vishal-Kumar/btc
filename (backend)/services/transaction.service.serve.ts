@@ -141,7 +141,7 @@ export const AUTO_1 = async (amount: number, TransactionID: string): ServiceRetu
 
 }
 
-export const getTransactionDetails = async (type: TransactionType ): ServiceReturnType<TransactionObjType[]> => {
+export const getTransactionDetails = async (type: TransactionType[] ): ServiceReturnType<TransactionObjType[]> => {
     try {
 
         const cookie = await cookies();
@@ -153,7 +153,7 @@ export const getTransactionDetails = async (type: TransactionType ): ServiceRetu
 
         if(!success || !decoded) return {valid: false}
 
-        const depositDetails = await TRANSACTION.find({PhoneNumber: decoded.PhoneNumber, Type: type}, {Parent: 0, InvitationCode: 0, PhoneNumber: 0}).sort({createdAt: -1}).limit(50)
+        const depositDetails = await TRANSACTION.find({PhoneNumber: decoded.PhoneNumber, Type: {$in : [...type]}}, {Parent: 0, InvitationCode: 0, PhoneNumber: 0}).sort({createdAt: -1}).limit(50)
 
         return {valid: true, data: depositDetails || []}
 

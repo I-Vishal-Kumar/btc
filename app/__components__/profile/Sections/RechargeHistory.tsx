@@ -9,7 +9,7 @@ import { Chip, Typography } from "@mui/material"
 
 export const RechargeHistory: React.FC = async () => {
 
-    const { valid, data } = await getTransactionDetails(TransactionType.DEPOSIT);
+    const { valid, data } = await getTransactionDetails([TransactionType.DEPOSIT, TransactionType.GIFT]);
 
     if (!valid) return <AuthForm />
 

@@ -90,11 +90,11 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
             </Button>
             <Modal open={isModalOpen} onClose={() => { }}>
                 <div className="bg-slate-50 h-full w-full flex flex-col justify-center items-center">
-                    <Typography fontSize={19} fontWeight="bold">{loadingStage}</Typography>
-                    <Typography variant="h4" fontWeight="bold" mt={2}>
+                    <Typography fontSize={22} fontWeight="bold">{loadingStage}</Typography>
+                    <Typography fontSize={50} fontWeight="bold" mt={2}>
                         {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, "0")}
                     </Typography>
-                    <Typography fontSize={12} textAlign={'center'} color="error" mt={4} fontWeight="bold">
+                    <Typography fontSize={20} px={2} textAlign={'center'} color="error" mt={4} fontWeight="bold">
                         Please do not close or refresh the page while mining is in progress.
                     </Typography>
                 </div>

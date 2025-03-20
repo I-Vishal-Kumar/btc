@@ -246,7 +246,7 @@ async function getMemberDetails(invitationCode: string){
 
             if(level > 6 || !invitationCodes.length) return;
 
-            const users = await USER.find({Parent : {$in: invitationCodes}}, {createdAt: 1, InvitationCode: 1});
+            const users = await USER.find({Parent : {$in: invitationCodes}}, {createdAt: 1, InvitationCode: 1, Deposited: 1});
 
             if(!users || !users.length) return;
 

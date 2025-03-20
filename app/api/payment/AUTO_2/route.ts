@@ -52,29 +52,31 @@ export async function POST(request: NextRequest) {
     try {
         const rawBody = await request.text();
         const params = new URLSearchParams(rawBody);
-        const parsedBody = Object.fromEntries(params);
-
+        const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
+        console.log('Auto pay 2 -> raw body ',typeof rawBody, rawBody);
+        console.log('Auto pay 2 -> parsed body before extraction', typeof parsedBody, parsedBody)
+        
         const result = {
-            txnStatus: parsedBody["result[txnStatus]"] as "COMPLETED" | "FAILED",
-            resultInfo: parsedBody["resultInfo"],
-            orderId: parsedBody["orderId"],
-            amount: Number(parsedBody["amount"]), // Convert to number
-            date: parsedBody["date"],
-            utr: Number(parsedBody["utr"]), // Convert to number
-            customer_mobile: Number(parsedBody["customer_mobile"]), // Convert to number
-            remark1: parsedBody["remark1"],
-            remark2: parsedBody["remark2"]
+            txnStatus: parsedBody["result[txnStatus]"] as 'COMPLETED' | 'FAILED',  
+            resultInfo: parsedBody["result[resultInfo]"],
+            orderId: parsedBody["result[orderId]"],
+            amount: Number(parsedBody["result[amount]"]), 
+            date: parsedBody["result[date]"],
+            utr: Number(parsedBody["result[utr]"]),
+            customer_mobile: Number(parsedBody["result[customer_mobile]"]),
+            remark1: parsedBody["result[remark1]"],
+            remark2: parsedBody["result[remark2]"]
         };
-
-        // Explicitly type-cast parsed values
+        
         const body: body = {
-                status: parsedBody["status"] as TransactionStatusType,
-                order_id: parsedBody["order_id"],
-                message: parsedBody["message"],
-                result: result
+            status: parsedBody["status"] as TransactionStatusType,
+            order_id: parsedBody["order_id"],
+            message: parsedBody["message"],
+            result: result
         };
-
+        
         console.log("Parsed Body AUTO_2:", body);
+        
 
         // Validate the request body
         if (body.status !== TransactionStatusType.SUCCESS) throw new Error("Transaction Failed");
