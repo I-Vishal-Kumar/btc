@@ -75,7 +75,7 @@ export default function RootLayout({
       <body
         className={` bg-emerald-500`}
       >
-        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+        <AppRouterCacheProvider >
           <Providers>
             <UserContextProvider>
               <WalletContextProvider>
