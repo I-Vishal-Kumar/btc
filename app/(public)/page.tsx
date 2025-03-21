@@ -89,17 +89,17 @@ const Home: React.FC = () => {
                         <p className="text-gray-300">
 
                             <a href="/terms-condition" className="text-blue-400 hover:underline">
-                                Terms & conditaion:{" "}
+                                Terms & conditaion:
                             </a>
                         </p>
                         <p className="text-gray-300">
-                            📧 Email:{" "}
+                            📧 Email:
                             <a href="mailto:info@btc.com" className="text-blue-400 hover:underline">
                                 btcdeveloper37@gmail.com
                             </a>
                         </p>
                         <p className="text-gray-300">
-                            📞 Phone:{" "}
+                            📞 Phone:
                             <a href="tel:+1234567890" className="text-blue-400 hover:underline">
                                 +91 87579 93223
                             </a>

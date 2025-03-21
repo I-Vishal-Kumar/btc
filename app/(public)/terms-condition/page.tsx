@@ -13,9 +13,9 @@ const Terms = () => {
 
             <div className="space-y-6 text-gray-700">
                 <p>
-                    Welcome to the BT Construction, Inc. mobile application (the "App"),
-                    which is provided by BT Construction, Inc. ("BTC," "we," "us," or
-                    "our"). Please read these Terms and Conditions ("Terms") carefully
+                    Welcome to the BT Construction, Inc. mobile application (the &quot;App&quot;),
+                    which is provided by BT Construction, Inc. (&quot;BTC,&quot; &quot;we,&quot; &quot;us,&quot; or
+                    &quot;our&quot;). Please read these Terms and Conditions (&quot;Terms&quot;) carefully
                     before using the App. By downloading, installing, or using the App,
                     you agree to be bound by these Terms.
                 </p>
@@ -23,7 +23,7 @@ const Terms = () => {
                 <h3 className="text-xl font-semibold text-gray-800">1. Purpose of the Application</h3>
                 <p>
                     The BT Construction, Inc. App is intended solely for educational purposes.
-                    It provides information about BTC’s construction services, trenchless
+                    It provides information about BTC&apos;s construction services, trenchless
                     technologies, and related content. The App is designed to enhance the
                     learning experience related to construction, utility, and trenchless
                     technologies. It is not intended for commercial use.
@@ -100,7 +100,7 @@ const Terms = () => {
                 <div className="bg-white p-4 rounded-md shadow-sm">
                     <p className="font-semibold">BT Construction, Inc.</p>
                     <p>
-                        📧 Email:{" "}
+                        📧 Email:
                         <a
                             href="mailto:btcdeveloper37@gmail.com"
                             className="text-blue-500 hover:underline"
