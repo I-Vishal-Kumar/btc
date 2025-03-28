@@ -53,7 +53,6 @@ export async function POST(request: NextRequest) {
         const rawBody = await request.text();
         const params = new URLSearchParams(rawBody);
         const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
-        console.log('Auto pay 2 -> raw body ',typeof rawBody, rawBody);
         console.log('Auto pay 2 -> parsed body before extraction', typeof parsedBody, parsedBody)
         
         const result = {
@@ -82,7 +81,7 @@ export async function POST(request: NextRequest) {
         if (body.status !== TransactionStatusType.SUCCESS) throw new Error("Transaction Failed");
 
         const amount = body.result.amount;
-        if (amount < 100) throw new Error("Wrong amount submitted.");
+        if (amount < 1) throw new Error("Wrong amount submitted.");
 
         // Connect to DB
         await CONNECT();
@@ -101,7 +100,7 @@ export async function POST(request: NextRequest) {
                     Type: TransactionType.DEPOSIT,
                     Status: TransactionStatusType.SUCCESS,
                     OrderId: body.result.orderId,
-                    UTR: body.result.utr,
+                    TransactionID: body.result.utr,
                 }
             ],
             { session }
@@ -111,14 +110,14 @@ export async function POST(request: NextRequest) {
             throw new Error("Transaction creation failed");
         }
 
+        await session.commitTransaction();
+        session.endSession();
+
         const { valid, data, msg } = await ad_settleDeposit(transaction[0]);
 
         if (!valid) {
             throw new Error(`Settlement failed: ${msg} data ${data}`);
         }
-
-        await session.commitTransaction();
-        session.endSession();
 
         return new NextResponse('success', { status: 200 });
 
