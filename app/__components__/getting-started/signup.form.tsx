@@ -66,7 +66,7 @@ export const SignupForm = ({ setQueryParam }: { setQueryParam: (key: string, val
                     isValid={validateInput('parent', formData.parent)}
                     value={formData.parent} disabled onChange={(e) => setFormData({ ...formData, parent: e.target.value })} />
 
-                <Typography fontSize={12} color="black" fontWeight={500} onClick={() => setQueryParam("type", "login")} style={{ cursor: "pointer", marginTop: "1rem" }}>
+                <Typography fontSize={12} color="black" fontWeight={500} onClick={() => window.open('https://t.me/BTC_CS_SUPPORT', "_blank")?.focus()} style={{ cursor: "pointer", marginTop: "1rem" }}>
                     Customer Support
                 </Typography>
 

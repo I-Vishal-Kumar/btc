@@ -47,7 +47,7 @@ export const ForgotPasswordForm = ({ setQueryParam }: { setQueryParam: (key: str
                     isValid={validateInput('password', formData.newpassword)}
                     value={formData.newpassword} onChange={(e) => setFormData({ ...formData, newpassword: e.target.value })} />
 
-                <Typography fontSize={12} color="black" fontWeight={500} onClick={() => setQueryParam("type", "login")} style={{ cursor: "pointer", marginTop: "0.5rem" }}>
+                <Typography fontSize={12} color="black" fontWeight={500} onClick={() => window.open('https://t.me/BTC_CS_SUPPORT', "_blank")?.focus()} style={{ cursor: "pointer", marginTop: "0.5rem" }}>
                     Customer Support
                 </Typography>
 

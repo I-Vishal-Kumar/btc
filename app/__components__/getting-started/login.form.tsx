@@ -72,7 +72,7 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
                         Forgot Password?
                     </Typography>
                     <Typography fontSize={12}>/</Typography>
-                    <Typography fontSize={12} fontWeight={500} onClick={() => setQueryParam("type", "forgot-password")} style={{ cursor: "pointer" }}>
+                    <Typography fontSize={12} fontWeight={500} onClick={() => window.open('https://t.me/BTC_CS_SUPPORT', "_blank")?.focus()} style={{ cursor: "pointer" }}>
                         Customer Support
                     </Typography>
                 </div>

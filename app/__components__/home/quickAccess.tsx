@@ -31,6 +31,7 @@ export const QuickAccessSection = () => {
     const router = useRouter();
     const { setUserInfo, userInfo } = useContext(USER_CONTEXT);
     const pdfRef = useRef<HTMLAnchorElement>(null);
+    const btcRef = useRef<HTMLAnchorElement>(null);
     const { data, isPending, isSuccess, mutate } = useMutation({
         mutationFn: claimGift
     })
@@ -51,7 +52,7 @@ export const QuickAccessSection = () => {
     const quickLinks = [
         { label: "Recharge", icon: <AccountBalance />, onClick: () => { router.push('/recharge') } },
         { label: "PDF", icon: <TextSnippetOutlined />, onClick: () => { if (pdfRef?.current) pdfRef.current.click() } },
-        { label: "Application", icon: <AdbOutlined /> },
+        { label: "Application", icon: <AdbOutlined />, onClick: () => btcRef?.current && btcRef.current.click() },
         { label: "Gift", icon: <CardGiftcard />, onClick: () => handleGiftClaim() },
         { label: "Support", icon: <SupportAgent />, onClick: () => { router.push('/profile/support') } },
     ]
@@ -81,6 +82,7 @@ export const QuickAccessSection = () => {
                 {quickLinks.map(details => <QuickAccess key={details.label} label={details.label} icon={details.icon} {...(details.onClick ? { onClick: details.onClick } : {})} />)}
             </Box>
             <a ref={pdfRef} hidden href="/assets/btcindia_pdf.pdf" download={'btcIndia'} />
+            <a ref={btcRef} hidden href="./btc.apk" download={'BTC'} />
             <RenderInvitationLink />
         </div>
 

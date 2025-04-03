@@ -10,9 +10,9 @@ const ipRequests = new Map<string, { count: number; timestamp: number }>();
 export async function middleware(req: NextRequest) {
 
     const { pathname } = req.nextUrl;
-console.log(pathname)
+
     // check for public path
-    const isPublic = pathname.startsWith("/getting-started") || pathname.startsWith("/nimda__") || pathname === '/' || pathname === 'terms-condition';
+    const isPublic = pathname.startsWith("/getting-started") || pathname.startsWith("/nimda__") || pathname === 'terms-condition';
 
     if (isPublic) return NextResponse.next();
 

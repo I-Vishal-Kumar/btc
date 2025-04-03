@@ -53,7 +53,6 @@ export async function POST(request: NextRequest) {
         const rawBody = await request.text();
         const params = new URLSearchParams(rawBody);
         const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
-        console.log('Auto pay 2 -> parsed body before extraction', typeof parsedBody, parsedBody)
         
         const result = {
             txnStatus: parsedBody["result[txnStatus]"] as 'COMPLETED' | 'FAILED',  
@@ -74,7 +73,6 @@ export async function POST(request: NextRequest) {
             result: result
         };
         
-        console.log("Parsed Body AUTO_2:", body);
         
 
         // Validate the request body
@@ -123,8 +121,10 @@ export async function POST(request: NextRequest) {
 
     } catch (error: any) {
         console.error("AUTO_2 Error:", error.message, error);
-        await session.abortTransaction();
-        session.endSession();
+        if(session.inTransaction()){
+            await session.abortTransaction();
+            session.endSession();
+        }
         
         return new NextResponse(`Error: ${error.message}`, { status: 400 });
     }finally{

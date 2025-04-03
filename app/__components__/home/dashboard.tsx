@@ -1,12 +1,13 @@
 "use client"
 
-import { Box, Typography, Container, CardHeader } from '@mui/material';
+import { Box, Typography, Container, CardHeader, Stack } from '@mui/material';
 import LineClamp from '@/lib/helpers/lineClamper';
 import { TermDepositForm } from './termDepositForm';
 import { QuickAccessSection } from './quickAccess';
 import { USER_CONTEXT } from '@/lib/hooks/user.context';
 import { memo, useContext } from 'react';
 import { RenderBalance } from '../_commonComponents/RenderBalance';
+import Image from 'next/image';
 
 
 const MemoizedVideo = memo(Video);
@@ -26,13 +27,22 @@ const TermDepositDashboard = () => {
                 height: '50%',
                 bgcolor: 'whitesmoke',
                 p: 6,
-                overflowY: 'auto',
                 borderTopRightRadius: 40,
                 borderTopLeftRadius: 40
             }}>
                 <Typography variant='body2' fontWeight={600}>Create New Term Deposit</Typography>
                 <TermDepositForm />
             </Box>
+            <Stack spacing={1}>
+                <Image height={400} width={500}
+                    alt='btc certificate' src={'/assets/certificate.jpg'} />
+                <Image height={400} width={500}
+                    alt='btc certificate' src={'/assets/newspaper_cutout.jpg'} />
+                <Image height={400} width={500}
+                    alt='btc certificate' src={'/assets/magazine.jpg'} />
+                <Image height={400} width={500}
+                    alt='btc certificate' src={'/assets/supporters.jpg'} />
+            </Stack>
         </Container>
     );
 };
