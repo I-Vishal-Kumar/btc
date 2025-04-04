@@ -51,12 +51,14 @@ function AuthFormContents() {
                 <p className="mt-1 font-bold text-white">Customer support</p>
                 <div className=" flex justify-between">
                     <Button
+                        onClick={() => window.open("https://t.me/BTC_CS_SUPPORT")?.focus()}
                         sx={{ textTransform: 'initial', color: 'white' }}
                         startIcon={<div className="w-10 h-10 flex justify-center items-center bg-white rounded-full">
                             <Telegram color="primary" />
                         </div>}
                     >Telegram</Button>
                     <Button
+                        onClick={() => window.open("https://wa.me/919102206912")?.focus()}
                         sx={{ textTransform: 'initial', color: 'white' }}
                         startIcon={<div className="w-10 h-10 flex justify-center items-center bg-white rounded-full">
                             <WhatsApp color="success" />

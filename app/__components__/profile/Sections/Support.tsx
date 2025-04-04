@@ -13,7 +13,7 @@ export const Support: React.FC = () => {
                         Telegram Group
                     </div>
                 </Link>
-                <Link href="https://t.me/+IzSkZkmM6sMxYTJl" target="_blank">
+                <Link href="https://t.me/BTC_CS_SUPPORT" target="_blank">
                     <div className="bg-slate-200 rounded-md p-3 mt-6 ring-1 ring-slate-300 cursor-pointer">
                         Telegram Agent
                     </div>
