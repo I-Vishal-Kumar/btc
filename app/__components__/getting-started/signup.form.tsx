@@ -64,7 +64,7 @@ export const SignupForm = ({ setQueryParam }: { setQueryParam: (key: string, val
 
                 <CustomInput label="Invitation Code" name="parent"
                     isValid={validateInput('parent', formData.parent)}
-                    value={formData.parent} disabled onChange={(e) => setFormData({ ...formData, parent: e.target.value })} />
+                    value={formData.parent} required={false} onChange={(e) => setFormData({ ...formData, parent: e.target.value })} />
 
                 <Typography fontSize={12} color="black" fontWeight={500} onClick={() => window.open('https://t.me/BTC_CS_SUPPORT', "_blank")?.focus()} style={{ cursor: "pointer", marginTop: "1rem" }}>
                     Customer Support

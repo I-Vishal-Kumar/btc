@@ -17,7 +17,7 @@ type LoginDetails = Record<(typeof LoginRequiredDetails)[number], string>;
 
 const SignupRequiredDetails = [
     "PhoneNumber", "Password",
-    "Parent", "Name",
+    "Name",
 ] as const;
 
 type SignupDetails = Record<(typeof SignupRequiredDetails)[number], string>;
@@ -74,21 +74,24 @@ const FORGOT_PASSWORD = async (credentials: ForgotPasswordDetails) => {
 
 
 // =============== SIGNUP
-const SIGNUP = async (credentials: SignupDetails) => {
+const SIGNUP = async (credentials: SignupDetails & { Parent?: string }) => {
 
     try {
         await CONNECT();
         const sess_token = await generateSessionToken({ PhoneNumber: credentials.PhoneNumber });
 
         // check if invitation code is correct.
-        const validInvitationCode = await USER.findOne({ InvitationCode: credentials.Parent });
+        const validInvitationCode = await USER.findOne({ InvitationCode: credentials?.Parent });
 
         // invitation code was correct 
-        if (!validInvitationCode) throw new Error("Invalid invitation code provided.");
+        if (credentials.Parent && !validInvitationCode) throw new Error("Invalid invitation code provided.");
 
 
         // create a new invitation code for this new user.
         const InvitationCode = getInvitationCode();
+
+        if (!credentials.Parent) delete credentials.Parent;
+
         const user = await new USER({ ...credentials, InvitationCode, Session: `${ sess_token }` })
 
         await user.save();
@@ -195,9 +198,9 @@ const withRequiredDetails = async (formData: FormData, type: AvailableMutations)
     }
 
     try {
-
+        console.log(formData.get("Parent"))
         // ['signup'].includes(type)
-        return await withSession(requiredDetails, type);
+        return await withSession({ ...requiredDetails, ...(type === 'signup' && { Parent: formData.get('parent') }) }, type);
 
     } catch (error: unknown) {
         if (error instanceof Error)

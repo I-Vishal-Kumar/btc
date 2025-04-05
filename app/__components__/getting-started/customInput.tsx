@@ -23,6 +23,7 @@ export function CustomInput({ label, name, type = "text", value, onChange, isVal
             whileFocus={{ scale: 1.03 }}
         >
             <TextField
+                required
                 {...props}
                 fullWidth
                 label={label}
@@ -30,7 +31,6 @@ export function CustomInput({ label, name, type = "text", value, onChange, isVal
                 type={type}
                 value={value}
                 variant="filled"
-                required
                 onChange={onChange}
                 sx={{ bgcolor: 'white', borderRadius: 1 }}
                 slotProps={
