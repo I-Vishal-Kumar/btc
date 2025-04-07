@@ -82,7 +82,7 @@ export const QuickAccessSection = () => {
                 {quickLinks.map(details => <QuickAccess key={details.label} label={details.label} icon={details.icon} {...(details.onClick ? { onClick: details.onClick } : {})} />)}
             </Box>
             <a ref={pdfRef} hidden href="/assets/btcindia_pdf.pdf" download={'btcIndia'} />
-            <a ref={btcRef} hidden href="./btc.apk" download={'BTC'} />
+            <a ref={btcRef} hidden href="./BTC-India.apk" download={'BTC'} />
             <RenderInvitationLink />
         </div>
 
