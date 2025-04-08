@@ -1,8 +1,12 @@
 import { TRANSACTION } from "@/(backend)/(modals)/schema/transaction.schema";
 import { USER } from "@/(backend)/(modals)/schema/user.schema"
 import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
+import { CONNECT } from "@/lib/_db/db.config";
+
+export const revalidate = 60; // seconds
 
 const SuperAdmin: React.FC = async () => {
+    await CONNECT();
     const count = await USER.countDocuments();
 
     const deposits = await TRANSACTION.aggregate([
