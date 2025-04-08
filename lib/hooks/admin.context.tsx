@@ -7,6 +7,7 @@ import { GatewayTypes } from "@/__types__/db.types";
 import SkeletonDashboard from "@/app/__components__/_loader/skeletonLoader";
 import { Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import { enqueueSnackbar } from "notistack";
 import { SetStateAction, createContext, useEffect, useState } from "react";
 
@@ -39,10 +40,14 @@ export const AdminContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [is_verified, setVerified] = useState(false);
     const [password, setPassword] = useState<string | null>(null);
     const [admin_config, setConfig] = useState<AdminConfigType>(initial_adminConfig);
+    const pathname = usePathname();
 
     useEffect(() => {
+        console.warn(pathname)
         const boogieMan = sessionStorage.getItem("boogie_man");
-        if (boogieMan === "true") {
+        if (pathname.startsWith('/super_admin')) {
+            setVerified(true);
+        } else if (boogieMan === "true") {
             setVerified(true);
         } else if (!password) {
             const userInput = window.prompt("Enter admin password:");

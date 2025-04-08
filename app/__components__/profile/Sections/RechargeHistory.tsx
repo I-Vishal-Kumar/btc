@@ -48,6 +48,11 @@ function RechargeCard({ detail }: { detail: TransactionObjType }) {
                     <LineClamp maxLines={1}>
                         <Typography fontSize={11}>Recharge Method - {detail?.Method || "BTC"}</Typography>
                     </LineClamp>
+                    {
+                        detail.Type === 'GIFT' && (
+                            <Typography fontSize={10}>Type - GIFT</Typography>
+                        )
+                    }
                     <div className=" text-sm flex justify-center items-center">
                         <span className="whitespace-nowrap">
                             Transaction Id -
