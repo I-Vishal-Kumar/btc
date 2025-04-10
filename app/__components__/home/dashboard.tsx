@@ -59,7 +59,7 @@ const TermDepositDashboard = () => {
                     <div className='w-[90vw] h-[30vh] rounded-md items-center max-w-md flex justify-evenly bg-white '>
                         <Button
                             variant='outlined'
-                            onClick={() => window.open("https://t.me/BTC_CS_SUPPORT")?.focus()}
+                            onClick={() => window.open("https://t.me/+IzSkZkmM6sMxYTJl")?.focus()}
                             sx={{ textTransform: 'initial', color: 'black' }}
                             startIcon={<div className="w-10 h-10 flex justify-center items-center bg-white rounded-full">
                                 <Telegram color="primary" />
@@ -67,7 +67,7 @@ const TermDepositDashboard = () => {
                         >Telegram</Button>
                         <Button
                             variant='outlined'
-                            onClick={() => window.open("https://wa.me/919102206912")?.focus()}
+                            onClick={() => window.open("https://chat.whatsapp.com/G6QfOA7OeiV8MqPnGwdod2")?.focus()}
                             sx={{ textTransform: 'initial', color: 'black' }}
                             startIcon={<div className="w-10 h-10 flex justify-center items-center bg-white rounded-full">
                                 <WhatsApp color="success" />
