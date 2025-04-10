@@ -32,6 +32,11 @@ export const TermDepositForm = () => {
 
     };
 
+    const getPlanInYears = (plan: OptionTypes) => {
+        const planParts = plan.split('day');
+        return `${ Number(planParts[0]) / 360 }Years${ planParts[1] }`
+    }
+
     return (
         <>
             <TextField
@@ -70,7 +75,7 @@ export const TermDepositForm = () => {
                 <div className="flex flex-col items-center gap-2">
                     <div className="relative w-full">
                         <div className="p-2 text-gray-800 flex items-center justify-between cursor-pointer">
-                            <span>{selectedPlan ? selectedPlan : "Select a Plan"}</span>
+                            <span>{selectedPlan ? getPlanInYears(selectedPlan) : "Select a Plan"}</span>
                         </div>
                         <select
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -84,7 +89,7 @@ export const TermDepositForm = () => {
                             </option>
                             {Object.keys(OPTIONS).map((key) => (
                                 <option key={key} value={key}>
-                                    {key}
+                                    {getPlanInYears(key as OptionTypes)}
                                 </option>
                             ))}
                         </select>
