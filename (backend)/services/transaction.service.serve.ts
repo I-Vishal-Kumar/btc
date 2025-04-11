@@ -41,6 +41,7 @@ export const BTC = async (amount: number, TransactionID: string, method: string)
           
         await TRANSACTION.create({
             PhoneNumber : decoded.PhoneNumber,
+            Parent : userDetails.Parent,
             InvitationCode : userDetails.InvitationCode,
             Amount: amount,
             Method: method,
@@ -83,6 +84,7 @@ export const USDT = async (amount: number, TransactionID: string, method: string
           
         await TRANSACTION.create({
             PhoneNumber : decoded.PhoneNumber,
+            Parent : userDetails.Parent,
             InvitationCode : userDetails.InvitationCode,
             Amount: (amount/89).toFixed(2),
             Method: method,
@@ -124,6 +126,7 @@ export const AUTO_1 = async (amount: number, TransactionID: string): ServiceRetu
           
         await TRANSACTION.create({
             PhoneNumber : decoded.PhoneNumber,
+            Parent : userDetails.Parent,
             InvitationCode : userDetails.InvitationCode,
             Amount: amount,
             Method: GatewayTypes.AUTO_1,

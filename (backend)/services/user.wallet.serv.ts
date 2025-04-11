@@ -203,7 +203,10 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         // check if user has enough balance.
         const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount}});
+        
+        const isBlocked = await USER.findOne({PhoneNumber, BlockWithdrawal: true});
 
+        if(isBlocked) throw new Error("You cannot withdraw.");
         if(!isSufficientBalance) throw new Error("You dont have enough balance.");
 
         // check if withdrawal password is correct.

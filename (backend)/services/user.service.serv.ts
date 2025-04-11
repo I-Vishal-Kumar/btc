@@ -9,7 +9,7 @@ import { UserType, UserWallet } from "@/__types__/user.types";
 import { DateTime } from "luxon";
 import { WALLET } from "../(modals)/schema/userWalled.schema";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
-import { TransactionType } from "@/__types__/db.types";
+import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
 import { ActiveTabs, CommissionPageDetailType } from "@/__types__/ui_types/profil.types";
 import { TransactionObjType } from "@/__types__/transaction.types";
 
@@ -196,7 +196,8 @@ export async function getTotalDetails(invitationCode: string) {
             const transactions = await TRANSACTION.find(
                 { 
                     Parent: { $in: invCodes }, 
-                    Type: { $in: [TransactionType.DEPOSIT, TransactionType.WITHDRAWAL] }
+                    Type: { $in: [TransactionType.DEPOSIT, TransactionType.WITHDRAWAL] },
+                    Status : TransactionStatusType.SUCCESS
                 },
                 { Amount: 1, Type: 1, InvitationCode: 1, createdAt: 1 }
             );

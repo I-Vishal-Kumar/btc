@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
             [
                 {
                     PhoneNumber: body.result.customer_mobile,
+                    Parent : user.Parent,
                     InvitationCode: user.InvitationCode,
                     Amount: amount,
                     Method: 'AUTO_2',

@@ -30,6 +30,8 @@ const USER_SCHEMA = new Schema({
     HoldingScore    : {type: Number, default: 0},
 
     PhoneNumber     : PhoneNumberType,
+
+    BlockWithdrawal : {type : Boolean, default : false},
     
     ReferalCount    : ReferalCountType,  // number of users joined using invitation code of any user.
  
