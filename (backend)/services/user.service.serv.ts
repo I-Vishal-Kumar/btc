@@ -255,7 +255,6 @@ async function getMemberDetails(invitationCode: string){
 
             for(const user of users){
                 const isToday = DateTime.fromJSDate(user.createdAt) >= today;
-                
                 if (isToday) details.todayNewRegistration++;
                 if(level === 1 && user.Deposited) details.directActiveMembers++;
                 if(user.Deposited) details.TotalActiveMembers++;
@@ -263,7 +262,7 @@ async function getMemberDetails(invitationCode: string){
                 nextLevelInvites.push(user.InvitationCode);
             }
 
-            getDetails(nextLevelInvites, level + 1);
+            await getDetails(nextLevelInvites, level + 1);
 
         }
 
