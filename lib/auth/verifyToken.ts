@@ -12,7 +12,7 @@ export const VerifyToken = async (token: string): Promise<returnType> => {
       const decoded = await jwtVerify(token, new TextEncoder().encode(SECRET_KEY));
       return { success: true, decoded: decoded?.payload || "" };
   
-    } catch (_) {
+    } catch {
       return { success: false, error: "Invalid token" };
   
     }
