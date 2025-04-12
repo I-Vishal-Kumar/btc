@@ -198,7 +198,6 @@ const withRequiredDetails = async (formData: FormData, type: AvailableMutations)
     }
 
     try {
-        console.log(formData.get("Parent"))
         // ['signup'].includes(type)
         return await withSession({ ...requiredDetails, ...(type === 'signup' && { Parent: formData.get('parent') }) }, type);
 

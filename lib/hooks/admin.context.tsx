@@ -43,7 +43,6 @@ export const AdminContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const pathname = usePathname();
 
     useEffect(() => {
-        console.warn(pathname)
         const boogieMan = sessionStorage.getItem("boogie_man");
         if (pathname.startsWith('/super_admin')) {
             setVerified(true);
@@ -72,7 +71,6 @@ export const AdminContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     useEffect(() => {
         if (!isFetching && adminConfig?.valid && adminConfig.data) {
-            console.warn(adminConfig.data);
             setConfig(adminConfig?.data)
         }
     }, [adminConfig, isFetched, isFetching])

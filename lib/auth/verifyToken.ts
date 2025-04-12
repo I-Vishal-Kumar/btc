@@ -13,7 +13,6 @@ export const VerifyToken = async (token: string): Promise<returnType> => {
       return { success: true, decoded: decoded?.payload || "" };
   
     } catch (error) {
-      console.log(error);
       return { success: false, error: "Invalid token" };
   
     }

@@ -21,7 +21,7 @@ export const Section: React.FC<{
 
     const formRef = useRef<HTMLFormElement>(null);
     const { wallet } = useContext(WALLET_CONTEXT);
-    console.log(fields);
+
     const { data, isPending, isSuccess, mutate } = useMutation({
         mutationFn: _walletOperation,
     })

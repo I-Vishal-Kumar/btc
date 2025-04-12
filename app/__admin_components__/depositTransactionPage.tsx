@@ -30,7 +30,6 @@ export const DepositTransaction: React.FC = () => {
         initialPageParam: 1,
         queryFn: ({ pageParam = 1 }) => ad_getDepositTransactions({ page: pageParam }),
         getNextPageParam: (lastPage) => {
-            console.warn(lastPage)
             return lastPage?.data?.length ? (lastPage.pagination?.currentPage || 0) + 1 : undefined;
         },
         enabled: true,

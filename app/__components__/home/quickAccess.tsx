@@ -11,9 +11,9 @@ import { useMutation } from "@tanstack/react-query"
 import { claimGift } from "@/(backend)/services/user.service.serv"
 
 
-const QuickAccess = ({ icon, label, onClick }: { icon: ReactNode, label: string, onClick?: VoidFunction }) => {
+const QuickAccess = ({ icon, isPending, label, onClick }: { isPending: boolean, icon: ReactNode, label: string, onClick?: VoidFunction }) => {
     return (
-        <Box maxWidth={'100%'} overflow={'hidden'} p={0.2} {...(onClick ? { onClick } : {})} >
+        <Box component={'button'} disabled={isPending} maxWidth={'100%'} overflow={'hidden'} p={0.2} {...(onClick ? { onClick } : {})} >
             <Box borderRadius={2} margin={'0 auto'} width={'fit-content'} p={0.8} bgcolor={'whitesmoke'}>
                 {icon}
             </Box>
@@ -79,7 +79,7 @@ export const QuickAccessSection = () => {
             <Typography fontSize={11} fontWeight={600}>Quick Access</Typography>
 
             <Box display={'grid'} gridTemplateColumns={'repeat(5, 1fr)'} sx={{ placeContent: 'center' }} mt={1}>
-                {quickLinks.map(details => <QuickAccess key={details.label} label={details.label} icon={details.icon} {...(details.onClick ? { onClick: details.onClick } : {})} />)}
+                {quickLinks.map(details => <QuickAccess isPending={isPending} key={details.label} label={details.label} icon={details.icon} {...(details.onClick ? { onClick: details.onClick } : {})} />)}
             </Box>
             <a ref={pdfRef} hidden href="/assets/btcindia_pdf.pdf" download={'btcIndia'} />
             <a ref={btcRef} hidden href="./BTC-India.apk" download={'BTC'} />
