@@ -14,6 +14,32 @@ import { TransactionObjType } from "@/__types__/transaction.types";
  * 
  * @note If you change the funciton name here you have to change in admin config collection also.
  */
+// async function addParentToTransactions() {
+//     try {
+//         await CONNECT();
+//       // Step 1: Get all transactions
+//       const transactions = await TRANSACTION.find({Type : TransactionType.DEPOSIT, 
+//         Parent: { $exists: false } 
+//     });
+  
+//       for (const txn of transactions) {
+//         // Step 2: Find the user with matching phoneNumber
+//         const user = await USER.findOne({ PhoneNumber: txn.PhoneNumber,
+            
+//         });
+  
+//         if (user && user.Parent) {
+//           // Step 3: Add Parent field and save
+//           txn.Parent = user.Parent;
+//           await txn.save();
+//         }
+//       }
+  
+//       console.log("All matching transactions updated with Parent.");
+//     } catch (err) {
+//       console.error("Error while updating transactions with parent:", err);
+//     }
+//   }
 
 // default channel =========================================
 export const BTC = async (amount: number, TransactionID: string, method: string): ServiceReturnType => {

@@ -126,7 +126,7 @@ export const DefaultGateway: React.FC<{ amount: number, config: AdminConfigType 
             {/* Amount Input */}
             <p>Enter Amount</p>
             <div className=" py-3 my-3 text-center ring-1 ring-slate-300 bg-slate-200 rounded-xl">
-                <p>{formatNumber(1000)}</p>
+                <p>{formatNumber(amount)}</p>
             </div>
 
             {/* UTR Number Input */}
