@@ -37,7 +37,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const handleSubmit = () => {
 
         // validate minimum amount.
-        if (Number(amount) < 1) return enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' })
+        if (Number(amount) < 100) return enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' })
         if (channelSelected === 'usdt') return setUsdtGateway(true);
 
         setDisabled(true);
