@@ -36,7 +36,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("failure")
     }  
 
+    const transaction = await TRANSACTION.findOne({TransactionID : orderNo});
+
     const {valid, data, msg} = await ad_settleDeposit({
+      _id : transaction._id,
       Amount : Number(oriAmount),
       Method : GatewayTypes.AUTO_1,
       TransactionID : orderNo,
