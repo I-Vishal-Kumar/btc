@@ -1,6 +1,6 @@
 import { TRANSACTION } from "@/(backend)/(modals)/schema/transaction.schema";
 import { ad_settleDeposit } from "@/(backend)/services/admin.service.serve";
-import { GatewayTypes, TransactionStatusType } from "@/__types__/db.types";
+import { TransactionStatusType } from "@/__types__/db.types";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { CONNECT } from "@/lib/_db/db.config";
 import { NextRequest, NextResponse } from "next/server";
@@ -11,20 +11,19 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function POST(request: NextRequest) {
       
+  const merchantId = process.env.NEXT_PUBLIC_MERCHANT_ID;
+
+  const rawBody = await request.text();
+
+  // Parse the URL-encoded body
+  const params = new URLSearchParams(rawBody);
+
+  // Convert the parsed data into an object
+  const body = Object.fromEntries(params);
+
   try {
 
-    const merchantId = process.env.NEXT_PUBLIC_MERCHANT_ID;
-
-    const rawBody = await request.text();
-
-    // Parse the URL-encoded body
-    const params = new URLSearchParams(rawBody);
-
-    // Convert the parsed data into an object
-    const body = Object.fromEntries(params);
-   
-
-    const {tradeResult="", oriAmount=0, amount=1, mchId="",mchOrderNo= '', orderNo="" } = body
+    const {tradeResult="", oriAmount=0, amount=1, mchId="",mchOrderNo= '' } = body
 
     await CONNECT();
     
@@ -38,11 +37,11 @@ export async function POST(request: NextRequest) {
 
     const transaction = await TRANSACTION.findOne({TransactionID : `${mchOrderNo}`});
 
+    if(!transaction) throw new Error("no transaction was found");
+
     const {valid, data, msg} = await ad_settleDeposit({
-      _id : transaction._id,
+      ...transaction,
       Amount : Number(oriAmount),
-      Method : GatewayTypes.AUTO_1,
-      TransactionID : orderNo,
       Status : TransactionStatusType.SUCCESS
     } as TransactionObjType)
 
@@ -54,7 +53,7 @@ export async function POST(request: NextRequest) {
     return new NextResponse('success', {status: 200});
     
   } catch (error) {
-    console.log("AUTO_1", error);
+    console.log("AUTO_1", error, body );
     return new NextResponse('failure', {status: 400 });
   }
 }
