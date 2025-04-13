@@ -24,19 +24,21 @@ export async function POST(request: NextRequest) {
     const body = Object.fromEntries(params);
    
 
-    const {tradeResult="", oriAmount=0, amount=1, mchId="", mchOrderNo=1, orderNo="" } = body
+    const {tradeResult="", oriAmount=0, amount=1, mchId="", orderNo="" } = body
 
     await CONNECT();
+    
+    console.log('body', body);
 
     if(Number(oriAmount) !== Number(amount) || Number(tradeResult) !== 1 
       || Number(mchId) !== Number(merchantId)
     ){
       // its failure
-      await TRANSACTION.findOneAndDelete({TransactionId: `${mchOrderNo}`});
+      await TRANSACTION.findOneAndDelete({TransactionId: `${orderNo}`});
       return NextResponse.json("failure")
     }  
 
-    const transaction = await TRANSACTION.findOne({TransactionID : orderNo});
+    const transaction = await TRANSACTION.findOne({TransactionID : `${orderNo}`});
 
     const {valid, data, msg} = await ad_settleDeposit({
       _id : transaction._id,

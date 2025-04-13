@@ -20,7 +20,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const [disabled, setDisabled] = useState<boolean>(false);
     const [channelSelected, setChannel] = useState<'local' | 'usdt'>('local');
 
-    const predefinedAmounts = [1000, 10000, 50000, 100000];
+    const predefinedAmounts = [100, 1000, 10000, 50000, 100000];
 
     const { _initiate: _initiate_auto_1 } = useAuto_1()
     const { _initiate: _initiate_auto_2 } = useAuto_2();
@@ -37,7 +37,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const handleSubmit = () => {
 
         // validate minimum amount.
-        if (Number(amount) < 100) return enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' })
+        if (Number(amount) < 1) return enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' })
         if (channelSelected === 'usdt') return setUsdtGateway(true);
 
         setDisabled(true);
