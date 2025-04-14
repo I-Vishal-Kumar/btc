@@ -37,7 +37,7 @@ function RechargeCard({ detail }: { detail: TransactionObjType }) {
             <Typography variant="caption" fontWeight={600} fontSize={12}>Deposit</Typography>
             <div className="flex justify-between items-center">
                 <Typography fontSize={10} fontWeight={600} color="textDisabled">
-                    {formatDate(detail.createdAt, "d MMM, yyyy HH:MM a")}
+                    {formatDate(detail.createdAt, "d MMM, yyyy HH:mm a")}
                 </Typography>
                 <Typography fontWeight={500} fontSize={12}>
                     {formatNumber(detail.Amount)}

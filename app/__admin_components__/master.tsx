@@ -46,7 +46,7 @@ export const MasterPage: React.FC = () => {
                                         <Typography sx={{ color: 'blueviolet' }}>{key} -&gt;</Typography>
                                         {
                                             key === 'createdAt' ? (
-                                                <Typography>{formatDate(new Date(value as string), 'dd MMM yyyy hh : ss a')}</Typography>
+                                                <Typography>{formatDate(new Date(value as string), 'dd MMM yyyy hh : mm a')}</Typography>
                                             ) : (
                                                 <Typography>{String(value)}</Typography>
                                             )

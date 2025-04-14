@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   const params = new URLSearchParams(rawBody);
 
   // Convert the parsed data into an object
-  const body = Object.fromEntries(params);
+  const body = Object.fromEntries(params)
 
   try {
 
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     if(!transaction) throw new Error("no transaction was found");
 
     const {valid, data, msg} = await ad_settleDeposit({
-      ...transaction,
+      ...transaction.toObject(),
       Amount : Number(oriAmount),
       Status : TransactionStatusType.SUCCESS
     } as TransactionObjType)

@@ -24,10 +24,10 @@ export function TermDepositCard({ fd_detail }: { fd_detail: FD_type }) {
                     <p>Creation Date {formatDate(fd_detail?.createdAt, 'dd LLL yyyy')}</p>
                     <p>Period - {fd_detail?.FdDuration}days@{fd_detail?.InterestRate}%</p>
                     <p>Investment - {formatNumber(fd_detail?.FdAmount)}</p>
-                    <p>Last climed on - {formatDate(fd_detail?.LastClaimedOn, 'dd LLL yyyy HH:MM a')}</p>
+                    <p>Last climed on - {formatDate(fd_detail?.LastClaimedOn, 'dd LLL yyyy HH:mm a')}</p>
                 </div>
                 <div className="text-[0.65rem] pl-4 font-semibold gap-y-1 grid">
-                    <p>Creation Time- {formatDate(fd_detail.createdAt, 'HH : MM a')}</p>
+                    <p>Creation Time- {formatDate(fd_detail.createdAt, 'HH : mm a')}</p>
                     <p>Expiry {formatDate(expiry_date, 'dd LLL yyyy')}</p>
                     <p>Profit- {formatNumber(profit)}</p>
                 </div>

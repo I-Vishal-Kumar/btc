@@ -32,10 +32,11 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     const [countdown, setCountdown] = useState(120); // 2 minutes
     const [loadingStage, setLoadingStage] = useState("🪄 Starting...");
     const mutationRef = useRef(false);
+    const hasClaimedRef = useRef(false);
 
     // Handle countdown and stage updates
     useEffect(() => {
-        if (isModalOpen && countdown > 0 && !mutationRef.current) {
+        if (isModalOpen && !mutationRef.current) {
             mutationRef.current = true;
             const timer = setInterval(() => {
                 setCountdown((prev) => prev - 1);
@@ -47,14 +48,15 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
                 clearInterval(timer)
             };
         }
-    }, [isModalOpen, countdown]);
+    }, [isModalOpen]);
 
     useEffect(() => {
-        if (countdown === 0 && !isPending) {
+        if (countdown === 0 && !isPending && !hasClaimedRef.current) {
+            hasClaimedRef.current = true;
             mutate();
             setIsModalOpen(false);
         }
-    }, [countdown])
+    }, [countdown, isPending])
 
     // Handle successful claim
     useEffect(() => {
@@ -73,10 +75,14 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
         }
     }, [isSuccess, data]);
 
+    if (isSuccess && !isPending) return null;
+
     return (
         <Box width={"80%"} margin={"0 auto"} py={1} pb={2}>
             <Button
                 onClick={() => {
+                    mutationRef.current = false;
+                    hasClaimedRef.current = false;
                     setIsModalOpen(true);
                     setCountdown(120);
                     setLoadingStage("🪄 Starting...");

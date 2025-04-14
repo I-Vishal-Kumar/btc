@@ -103,7 +103,7 @@ function RenderDepositDetail({ transaction }: { transaction: TransactionObjType 
     return (
         <div className="ring-1 ring-slate-300 rounded-md p-2 flex justify-between items-center">
             <div>
-                <Typography fontSize={10} fontWeight={550} >{formatDate(new Date(transaction.createdAt), 'dd MMM yyyy hh:ss a')}</Typography>
+                <Typography fontSize={10} fontWeight={550} >{formatDate(new Date(transaction.createdAt), 'dd MMM yyyy HH:mm a')}</Typography>
                 <Typography fontSize={10} fontWeight={500} >Phone Number - {transaction.PhoneNumber}</Typography>
             </div>
             <div>

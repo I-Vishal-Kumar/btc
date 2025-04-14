@@ -164,7 +164,7 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         const lastClaimedDate = fd.LastClaimedOn ? DateTime.fromJSDate(fd.LastClaimedOn as unknown as Date).toUTC().startOf("day") : null;
         const shouldClaimToday = (!lastClaimedDate || lastClaimedDate < today ) && !(([FdStatus.CLAIMED, FdStatus.HALTED] as string[]).includes(fd.FdStatus as FdStatusType));
 
-        console.log(lastClaimedDate?.toFormat('yyyy LLL dd HH:MM:SS a'), " todya -", today.toFormat('yyyy LLL dd HH:MM:SS a'), 'last claimed date', fd.LastClaimedOn)
+        console.log(lastClaimedDate?.toFormat('yyyy LLL dd HH:mm:ss a'), " todya -", today.toFormat('yyyy LLL dd HH:mm:ss a'), 'last claimed date', fd.LastClaimedOn)
         if(!shouldClaimToday || fd.Claimed) throw new Error('You have already claimed for this fd.');
 
         // process the profits.
@@ -185,7 +185,7 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         return {valid: false, msg: 'Something went wrong while claiming fd contact admin'};
 
     } catch (error) {
-
+        console.error("claimFD error:", error);
         if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong'};
         return {valid: false, msg: error?.message || 'something went wrong', operation: 'LOGOUT'}
     }

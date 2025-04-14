@@ -49,7 +49,7 @@ function WithdrawalCard({ transaction }: { transaction: TransactionObjType }) {
             <Typography variant="caption" fontWeight={600} fontSize={12}>Withdrawal</Typography>
             <div className="flex justify-between items-center">
                 <Typography fontSize={10} color="textDisabled">
-                    {formatDate(new Date(transaction.createdAt), 'dd LLL yyyy hh:mm a')}
+                    {formatDate(new Date(transaction.createdAt), 'dd LLL yyyy HH:mm a')}
                 </Typography>
                 <Typography fontWeight={500} fontSize={12}>
                     {formatNumber(transaction.Amount)}
