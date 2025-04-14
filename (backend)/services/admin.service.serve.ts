@@ -193,7 +193,7 @@ export const ad_getDepositTransactions = async ({ TransactionID='' , page = 1}):
 
         const details : TransactionObjType[] | null = await TRANSACTION.find({
             Type: TransactionType.DEPOSIT,
-            Status : {$in : [TransactionStatusType.PENDING, TransactionStatusType.FAILED]}
+            Status : TransactionStatusType.PENDING
         }, {
             PhoneNumber: 1, 
             createdAt: 1,
