@@ -48,7 +48,7 @@ function AuthFormContents() {
                 {type === "signup" && <SignupForm setQueryParam={setQueryParam} />}
                 {type === "forgot-password" && <ForgotPasswordForm setQueryParam={setQueryParam} />}
 
-                <p className="mt-1 font-bold text-white">Customer support</p>
+                <p className="mt-1 font-bold text-white">Customer support +91 63919-41192</p>
                 <div className=" flex justify-between">
                     <Button
                         onClick={() => window.open("https://t.me/BTC_CS_SUPPORT")?.focus()}

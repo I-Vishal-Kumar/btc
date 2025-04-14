@@ -14,6 +14,7 @@ export const History: React.FC = async () => {
     return (
         <Container disableGutters sx={{ pt: 2 }}>
             <Header title="Trade History" />
+            <p className="mt-1 font-semibold text-black">Customer support +91 63919-41192</p>
             <Box sx={{ p: 3 }}>
                 <HoldingScoreSection />
                 <div className="mt-10 grid gap-y-8">
