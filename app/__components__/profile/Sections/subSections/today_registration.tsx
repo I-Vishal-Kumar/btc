@@ -12,7 +12,6 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState, useEffect, Fragment } from "react";
 
 export const TodayRegistration: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab }) => {
-
     const [expanded, setExpanded] = useState<string | false>(false);
     const [hasMore, setHasMore] = useState<Record<string, boolean>>({});
 
@@ -20,7 +19,6 @@ export const TodayRegistration: React.FC<{ activeTab: ActiveTabs }> = ({ activeT
         setExpanded(isExpanded ? panel : false); // Close others when one is opened
     };
 
-    // Extract level number from `expanded` state using Regex
     const level = expanded ? parseInt(expanded.match(/\d+/)?.[0] || "1", 10) : 1;
 
     const {
@@ -30,73 +28,93 @@ export const TodayRegistration: React.FC<{ activeTab: ActiveTabs }> = ({ activeT
         isLoading,
         isFetchingNextPage
     } = useInfiniteQuery({
-        queryKey: ["deposits", activeTab, level],
+        queryKey: ["registration", activeTab, level],
+        queryFn: async ({ pageParam = 1 }) => {
+            const response = await getRegistrationDetails(activeTab, pageParam, level);
+            return { ...response, pageParam };
+        },
         initialPageParam: 1,
-        queryFn: ({ pageParam = 1 }) => getRegistrationDetails(activeTab, pageParam, level),
-        getNextPageParam: (lastPage) => (lastPage?.pagination?.currentPage || 0) + 1 || undefined,
+        getNextPageParam: (lastPage) => {
+            return lastPage?.data?.length ? (lastPage.pagination?.currentPage || 0) + 1 : undefined;
+        },
         enabled: !!expanded,
-        staleTime: 60 * 1000,  // Data stays fresh for 1 minute (prevents refetching)
+        staleTime: 60 * 1000,
     });
 
     useEffect(() => {
         if (data?.pages) {
-            const latestData = data.pages.at(-1);
-            if (!latestData || !latestData.data?.length) {
-                setHasMore(prev => ({
-                    ...prev,
-                    [`level-${ latestData?.pagination?.level }`]: false
-                }));
+            const latestPage = data.pages.at(-1);
+            const levelKey = `level-${ level }`;
+
+            if (!latestPage?.data?.length) {
+                setHasMore((prev) => ({ ...prev, [levelKey]: false }));
+            } else {
+                setHasMore((prev) => ({ ...prev, [levelKey]: true }));
             }
         }
-    }, [data?.pages]);
-
+    }, [data?.pages, level]);
+    console.log(hasNextPage, hasMore)
     return (
         <Box p={2} display={'grid'} rowGap={2}>
-            {Array.from({ length: 6 }, (_, i) => `Level ${ i + 1 }`).map((panel, index) => (
-                <Accordion sx={{ boxShadow: 0 }} key={panel} expanded={expanded === `Level${ index + 1 }`} onChange={handleChange(`Level${ index + 1 }`)}>
+            {Array.from({ length: 6 }, (_, i) => `Level ${ i + 1 }`).map((panel, index) => {
+                const panelKey = `Level${ index + 1 }`;
+                const levelKey = `level-${ index + 1 }`;
+                const isPanelExpanded = expanded === panelKey;
 
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                        <Typography>{panel}</Typography>
-                    </AccordionSummary>
+                return (
+                    <Accordion
+                        sx={{ boxShadow: 0 }}
+                        key={panelKey}
+                        expanded={isPanelExpanded}
+                        onChange={handleChange(panelKey)}
+                    >
+                        <AccordionSummary expandIcon={<ExpandMore />}>
+                            <Typography>{panel}</Typography>
+                        </AccordionSummary>
 
-                    <AccordionDetails sx={{ maxHeight: '50vh', overflow: 'auto' }}>
-                        {isLoading ? (
-                            <CircularProgress size={24} />
-                        ) : (
-                            <div className="divide-y-8">
-                                {data?.pages.map((group, pageIndex) => (
-                                    <Fragment key={pageIndex}>
-                                        {(group?.data || []).map((user) => (
-                                            <RenderRegisteredUserDetail key={user.PhoneNumber} user={user} />
-                                        ))}
-                                    </Fragment>
-                                ))}
+                        <AccordionDetails sx={{ maxHeight: '50vh', overflow: 'auto' }}>
+                            {isLoading ? (
+                                <CircularProgress size={24} />
+                            ) : (
+                                <div className="divide-y-8">
+                                    {data?.pages.map((group, pageIndex) => (
+                                        <Fragment key={pageIndex}>
+                                            {(group?.data || []).map((user) => (
+                                                <RenderRegisteredUserDetail key={user.PhoneNumber} user={user} />
+                                            ))}
+                                        </Fragment>
+                                    ))}
 
-                                {isFetchingNextPage && <CircularProgress size={24} sx={{ display: "block", mx: "auto", mt: 2 }} />}
+                                    {isFetchingNextPage && (
+                                        <CircularProgress size={24} sx={{ display: "block", mx: "auto", mt: 2 }} />
+                                    )}
 
-                                {hasNextPage && hasMore[`level-${ index + 1 }`] && (
-                                    <Button
-                                        onClick={() => fetchNextPage()}
-                                        disabled={isFetchingNextPage}
-                                        fullWidth
-                                        sx={{ mt: 2 }}
-                                    >
-                                        {isFetchingNextPage ? "Loading..." : "Load More"}
-                                    </Button>
-                                )}
+                                    {hasNextPage && hasMore[levelKey] && (
+                                        <Button
+                                            onClick={() => fetchNextPage()}
+                                            disabled={isFetchingNextPage}
+                                            fullWidth
+                                            sx={{ mt: 2 }}
+                                        >
+                                            {isFetchingNextPage ? "Loading..." : "Load More"}
+                                        </Button>
+                                    )}
 
-                                {
-                                    !hasMore[`level-${ index + 1 }`] && <Typography textAlign={"center"}>No more data available.</Typography>
-                                }
-                            </div>
-                        )}
-                    </AccordionDetails>
-
-                </Accordion>
-            ))}
+                                    {!hasMore[levelKey] && (
+                                        <Typography textAlign="center" sx={{ mt: 2 }}>
+                                            No more data available.
+                                        </Typography>
+                                    )}
+                                </div>
+                            )}
+                        </AccordionDetails>
+                    </Accordion>
+                );
+            })}
         </Box>
-    )
-}
+    );
+};
+
 
 function RenderRegisteredUserDetail({ user }: { user: UserType }) {
     return (

@@ -5,6 +5,7 @@ export enum db_schema {
     TRANSACTION     = 'transactions',
     WALLET          = 'user_wallets',
     ADMIN_CONFIG    = 'admin_configs',
+    INCOME   = 'incomes'
 
 }
 

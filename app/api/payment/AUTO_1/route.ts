@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
       
   const merchantId = process.env.NEXT_PUBLIC_MERCHANT_ID;
+  const logTime = () => new Date().toISOString();
 
   const rawBody = await request.text();
 
@@ -30,6 +31,7 @@ export async function POST(request: NextRequest) {
     if(Number(oriAmount) !== Number(amount) || Number(tradeResult) !== 1 
       || Number(mchId) !== Number(merchantId)
     ){
+      console.warn(`[${logTime()}] ❌ AUTO_1 [VALIDATION FAILED]`, body);
       // its failure
       await TRANSACTION.findOneAndDelete({TransactionId: `${mchOrderNo}`});
       return NextResponse.json("failure")
@@ -37,7 +39,10 @@ export async function POST(request: NextRequest) {
 
     const transaction = await TRANSACTION.findOne({TransactionID : `${mchOrderNo}`});
 
-    if(!transaction) throw new Error("no transaction was found");
+    if (!transaction) {
+      console.error(`[${logTime()}] ❌ [AUTO_1] Transaction not found for ID: ${mchOrderNo}`, body);
+      throw new Error("No transaction was found");
+    }
 
     const {valid, data, msg} = await ad_settleDeposit({
       ...transaction.toObject(),
@@ -46,14 +51,25 @@ export async function POST(request: NextRequest) {
     } as TransactionObjType)
 
     if(!valid){ 
-      console.log('AUTO_1: NOT VALID', valid, data, msg, body)
+
+      console.error(`[${logTime()}] ❌ [SETTLEMENT FAILED] AUTO_1`, {
+        valid,
+        msg,
+        data,
+        callbackData: body,
+        transaction : transaction.toObject()
+      });
+
       throw new Error('failed')
     };
 
     return new NextResponse('success', {status: 200});
     
   } catch (error) {
-    console.log("AUTO_1", error, body );
+    console.error(`[${logTime()}] 🔥 [ERROR IN CALLBACK]`, {
+      error: (error as Error)?.message,
+      body
+    });
     return new NextResponse('failure', {status: 400 });
   }
 }

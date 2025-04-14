@@ -49,32 +49,30 @@ export async function POST(request: NextRequest) {
     const session = await mongoose.startSession();
     session.startTransaction();
   
-    try {
-        const rawBody = await request.text();
-        const params = new URLSearchParams(rawBody);
-        const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
-        
-        const result = {
-            txnStatus: parsedBody["result[txnStatus]"] as 'COMPLETED' | 'FAILED',  
-            resultInfo: parsedBody["result[resultInfo]"],
-            orderId: parsedBody["result[orderId]"],
-            amount: Number(parsedBody["result[amount]"]), 
-            date: parsedBody["result[date]"],
-            utr: Number(parsedBody["result[utr]"]),
-            customer_mobile: Number(parsedBody["result[customer_mobile]"]),
-            remark1: parsedBody["result[remark1]"],
-            remark2: parsedBody["result[remark2]"]
-        };
-        
-        const body: body = {
-            status: parsedBody["status"] as TransactionStatusType,
-            order_id: parsedBody["order_id"],
-            message: parsedBody["message"],
-            result: result
-        };
-        
-        
+    const rawBody = await request.text();
+    const params = new URLSearchParams(rawBody);
+    const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
+    const result = {
+        txnStatus: parsedBody["result[txnStatus]"] as 'COMPLETED' | 'FAILED',  
+        resultInfo: parsedBody["result[resultInfo]"],
+        orderId: parsedBody["result[orderId]"],
+        amount: Number(parsedBody["result[amount]"]), 
+        date: parsedBody["result[date]"],
+        utr: Number(parsedBody["result[utr]"]),
+        customer_mobile: Number(parsedBody["result[customer_mobile]"]),
+        remark1: parsedBody["result[remark1]"],
+        remark2: parsedBody["result[remark2]"]
+    };
+    
+    const body: body = {
+        status: parsedBody["status"] as TransactionStatusType,
+        order_id: parsedBody["order_id"],
+        message: parsedBody["message"],
+        result: result
+    };
 
+    try {
+        
         // Validate the request body
         if (body.status !== TransactionStatusType.SUCCESS) throw new Error("Transaction Failed");
 
@@ -121,7 +119,7 @@ export async function POST(request: NextRequest) {
         return new NextResponse('success', { status: 200 });
 
     } catch (error: any) {
-        console.error("AUTO_2 Error:", error.message, error);
+        console.error("AUTO_2 Error:", error.message, error, body);
         if(session.inTransaction()){
             await session.abortTransaction();
             session.endSession();

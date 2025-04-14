@@ -11,6 +11,8 @@ import { USER } from "../(modals)/schema/user.schema";
 import { FD_type } from "@/__types__/fd.types";
 import { DateTime } from "luxon";
 import { FdStatus, FdStatusType } from "@/__types__/db.types";
+import { INCOME } from "../(modals)/schema/incomeConfig.schema";
+import { IncomeType } from "@/__types__/transaction.types";
 
 function extractNumbers(plan: string): { days: number; profit: number } | null {
     const match = plan.match(/^(\d+)day@([\d.]+)%$/);
@@ -201,13 +203,13 @@ async function _processFDclaim(fd: FD_type){
     try {
         
         let parent : string | null = fd.Parent;
-        const INCOME = [4, 3, 2, 1, 1, 1];
+        const PROFIT_DISTRIBUTION = [4, 3, 2, 1, 1, 1];
         let processingLevel = 1;
 
         let update_user_arr = [];
         
         // calculate one day profit.
-        const profit =  (fd.InterestRate/100) * Number(fd.FdAmount); 
+        const profit =  (Number(fd.InterestRate)/100) * Number(fd.FdAmount); 
 
         while(parent && processingLevel <= 6){
 
@@ -216,7 +218,7 @@ async function _processFDclaim(fd: FD_type){
             if(!parentInfo) throw new Error("Something went wrong please try again.");
 
             if(parentInfo && parentInfo.Parent && parentInfo.ReferalCount >= processingLevel){
-                const parentCommission = (profit / 100) * INCOME[processingLevel-1];
+                const parentCommission = (profit / 100) * PROFIT_DISTRIBUTION[processingLevel-1];
                 
                 update_user_arr.push({
                     updateOne : {
@@ -250,13 +252,22 @@ async function _processFDclaim(fd: FD_type){
             }
         })
 
-        if(update_user_arr.length){
-            const bulkResult = await USER.bulkWrite(update_user_arr, {session});
-            if(bulkResult.modifiedCount !== update_user_arr.length){
-                // some updates failed.
-                throw new Error("Could not claim this time try again");
-            }
+        const bulkResult = await USER.bulkWrite(update_user_arr, {session});
+        if(bulkResult.modifiedCount !== update_user_arr.length){
+            // some updates failed.
+            throw new Error("Could not claim this time try again");
         }
+
+        // add income information for this user.
+        await INCOME.create([
+            {
+                PhoneNumber : fd.PhoneNumber,
+                InvitationCode : fd.InvitationCode,
+                Parent : fd.Parent,
+                Type : IncomeType.DAILY_INCOME,
+                Amount : profit
+            }
+        ], {session})
 
         const isUpdated = await FD.findOneAndUpdate({_id: fd._id}, {
             $set: {

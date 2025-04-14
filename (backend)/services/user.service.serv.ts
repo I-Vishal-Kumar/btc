@@ -11,7 +11,8 @@ import { WALLET } from "../(modals)/schema/userWalled.schema";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
 import { ActiveTabs, CommissionPageDetailType } from "@/__types__/ui_types/profil.types";
-import { TransactionObjType } from "@/__types__/transaction.types";
+import { IncomeType, TransactionObjType } from "@/__types__/transaction.types";
+import { INCOME } from "../(modals)/schema/incomeConfig.schema";
 
 
 export const getUserDetails = async (): ServiceReturnType<UserType> => {
@@ -105,6 +106,17 @@ export const claimGift = async (): ServiceReturnType<{GIFT_AMOUNT: number}> =>{
                 LastSpinAt : DateTime.now().toISO()
             }
         })
+
+        // add income information for this user.
+        await INCOME.create([
+            {
+                PhoneNumber : dbUser.PhoneNumber,
+                InvitationCode : dbUser.InvitationCode,
+                Parent : dbUser.Parent,
+                Type : IncomeType.DAILY_GIFT,
+                Amount : GIFT_AMOUNT
+            }
+        ])
 
         return {valid: true, data : {GIFT_AMOUNT}, msg: `You have won ${GIFT_AMOUNT} 🎉`}
 
@@ -327,7 +339,7 @@ export const getTodayDepositWithdrawalUsers = async (Type: TransactionType, tab:
 
         if(!details) throw new Error('failed to get details');
 
-        return {valid: true, data: details, pagination: {
+        return {valid: true, data: JSON.parse(JSON.stringify(details)), pagination: {
             currentPage: page,
             level 
         }}

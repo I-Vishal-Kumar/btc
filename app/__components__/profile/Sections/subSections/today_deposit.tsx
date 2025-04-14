@@ -34,11 +34,12 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
         queryKey: ["deposits", activeTab, level],
         initialPageParam: 1,
         queryFn: ({ pageParam = 1 }) => getTodayDepositWithdrawalUsers(TransactionType.DEPOSIT, activeTab, pageParam, level),
-        getNextPageParam: (lastPage) => (lastPage?.pagination?.currentPage || 0) + 1 || undefined,
+        getNextPageParam: (lastPage) => lastPage?.data?.length ? (lastPage.pagination?.currentPage || 0) + 1 : undefined,
         enabled: !!expanded,
         staleTime: 60 * 1000,  // Data stays fresh for 1 minute (prevents refetching)
     });
 
+    console.log(hasMore, hasNextPage)
     useEffect(() => {
         if (data?.pages) {
             const latestData = data.pages.at(-1);
@@ -47,6 +48,8 @@ export const TodayDeposit: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab })
                     ...prev,
                     [`level-${ latestData?.pagination?.level }`]: false
                 }));
+            } else {
+                setHasMore((prev) => ({ ...prev, [`level-${ latestData?.pagination?.level }`]: true }));
             }
         }
     }, [data?.pages]);

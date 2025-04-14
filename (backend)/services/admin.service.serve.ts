@@ -9,12 +9,13 @@ import { AdminConfigType, ad_getUserInfoResType } from "@/__types__/admin.types"
 import { USER } from "../(modals)/schema/user.schema";
 import { TransactionStatusType, TransactionType, db_schema } from "@/__types__/db.types";
 import { getTotalDetails } from "./user.service.serv";
-import { TransactionObjType, adminWithdrawalRespType } from "@/__types__/transaction.types";
+import { IncomeType, TransactionObjType, adminWithdrawalRespType } from "@/__types__/transaction.types";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 import { startSession } from "mongoose";
 import { UserType, UserWallet } from "@/__types__/user.types";
 import { WALLET } from "../(modals)/schema/userWalled.schema";
 import { randomBytes } from "crypto";
+import { INCOME } from "../(modals)/schema/incomeConfig.schema";
 
 
 // VERIFY ADMIN PASS ===============================
@@ -273,6 +274,20 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
                     } 
                 }
             })
+
+            const parentDetails : UserType | null = await USER.findOne({InvitationCode : user.Parent});
+            if(parentDetails){
+                await INCOME.create([
+                    {
+                        PhoneNumber : parentDetails.PhoneNumber,
+                        InvitationCode : parentDetails.InvitationCode,
+                        Parent : parentDetails.Parent,
+                        Type : IncomeType.REFERAL_INCOME,
+                        From : user.InvitationCode,
+                        Amount : REFERAL_PERCENT * amount
+                    }
+                ], {session})
+            }
         }
 
         userUpdateOperations.push({
