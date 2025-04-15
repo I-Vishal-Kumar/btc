@@ -3,6 +3,7 @@ export enum SectionsAvailable {
     WITHDRAWAL_HISTORY = 'withdrawal_history',
     WITHDRAWAL_FUNDS = 'withdrawal_funds',
     TEAM_COMMISSION = 'team_commission',
+    INCOME = 'income_history',
     SUPPORT = 'support',
     LOGOUT = 'logout'
 } 

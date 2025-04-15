@@ -16,7 +16,8 @@ export type UserType = {
     Blocked         : boolean,
     HoldingScore    : number,
     LastSpinAt      : string,   
-    createdAt       ?: string
+    createdAt       ?: string,
+    Deposited       ?: boolean
 }
 
 

@@ -31,9 +31,9 @@ export const TodayWithdrawal: React.FC<{ activeTab: ActiveTabs }> = ({ activeTab
         isLoading,
         isFetchingNextPage
     } = useInfiniteQuery({
-        queryKey: ["deposits", activeTab, level],
+        queryKey: ["withdrawals", activeTab, level],
         initialPageParam: 1,
-        queryFn: ({ pageParam = 1 }) => getTodayDepositWithdrawalUsers(TransactionType.DEPOSIT, activeTab, pageParam, level),
+        queryFn: ({ pageParam = 1 }) => getTodayDepositWithdrawalUsers(TransactionType.WITHDRAWAL, activeTab, pageParam, level),
         getNextPageParam: (lastPage) => lastPage?.data?.length ? (lastPage.pagination?.currentPage || 0) + 1 : undefined,
         enabled: !!expanded,
         staleTime: 60 * 1000,  // Data stays fresh for 1 minute (prevents refetching)

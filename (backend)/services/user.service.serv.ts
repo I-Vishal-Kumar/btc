@@ -41,6 +41,10 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
     }
 }
 
+// console.log('logging')
+// USER.find({Deposited : false}, {PhoneNumber : 1, _id: 0}).lean().then(data => {
+//     console.log(JSON.stringify(data));
+// }).catch(err => console.log(err));
 
 // GET USER WITHDRAWAL DETAILS =========================
 
@@ -95,7 +99,7 @@ export const claimGift = async (): ServiceReturnType<{GIFT_AMOUNT: number}> =>{
         if(lastSpinDate && lastSpinDate === today) return {valid: false, msg: 'You can now claim tomorrow.'};
 
         // generate a random gift amount between 1 - 10
-        const GIFT_AMOUNT = Number((Math.random() * (1 - 5) + 5).toFixed(2))
+        const GIFT_AMOUNT = Number((Math.random() * (1 - (dbUser?.Deposited ? 5 : 2)) + (dbUser?.Deposited ? 5 : 2)).toFixed(2))
         
         await USER.findOneAndUpdate({PhoneNumber: decoded.PhoneNumber}, {
             $inc : {

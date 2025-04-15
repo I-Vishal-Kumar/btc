@@ -7,8 +7,10 @@ import { ServiceReturnType } from "@/__types__/service.types";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 import { USER } from "../(modals)/schema/user.schema";
 import { UserType } from "@/__types__/user.types";
-import { GatewayTypes, TransactionStatusType, TransactionType } from "@/__types__/db.types";
-import { TransactionObjType } from "@/__types__/transaction.types";
+import { GatewayTypes, TransactionStatusType, TransactionType, db_schema } from "@/__types__/db.types";
+import { Income, TransactionObjType } from "@/__types__/transaction.types";
+import { INCOME } from "../(modals)/schema/incomeConfig.schema";
+import { DateTime } from "luxon";
 
 /**
  * 
@@ -203,5 +205,65 @@ export const deleteTransaction = async (TransactionID : string): ServiceReturnTy
         if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};
         return {valid: false, msg: error?.message || 'something went wrong'}
    
+    }
+}
+
+
+export const getIncomeHistory = async () : ServiceReturnType<Income[]> => {
+    try {
+
+        const cookie = await cookies();
+        const token = cookie.get('token')?.value || "";
+
+        if(!token) return { valid: false, data: undefined }
+
+        const {success, decoded=null} = await VerifyToken(token);
+
+        if(!success || !decoded) return {valid: false}
+        const now = DateTime.now();
+        const oneWeekAgo = now.minus({days : 6});
+
+        // const incomeDetails = await INCOME.find({PhoneNumber : decoded.PhoneNumber, createdAt : { $gte : oneWeekAgo.toJSDate() }}).lean();
+        const incomeDetails = await INCOME.aggregate([
+            {
+              $match: {
+                PhoneNumber: decoded.PhoneNumber,
+                createdAt: { $gte: oneWeekAgo.toJSDate() }
+              }
+            },
+            {
+              $lookup: {
+                from: db_schema.USERS,
+                localField: "From",
+                foreignField: "InvitationCode",
+                as: "giftFrom"
+              }
+            },
+            {
+              $addFields: {
+                giftFrom: { $arrayElemAt: ["$giftFrom", 0] } // flatten the joined array
+              }
+            },
+            {
+              $project: {
+                PhoneNumber: 1,
+                Amount: 1,
+                Type: 1,
+                From: 1,
+                createdAt: 1,
+                "giftFrom.Name": 1,
+                "giftFrom.PhoneNumber": 1
+              }
+            }
+          ]);
+          
+
+        if(!incomeDetails) throw new Error("Failed to get income details.");
+        
+        return {valid: true, data: incomeDetails as unknown as Income[] || []}
+
+    } catch (error) {
+        if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};
+        return {valid: false, msg: error?.message || 'something went wrong'}
     }
 }

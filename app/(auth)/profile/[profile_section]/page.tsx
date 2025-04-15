@@ -1,4 +1,5 @@
 import { SectionsAvailable, WithdrawmethodTabsType } from "@/__types__/ui_types/profil.types";
+import { IncomeHistory } from "@/app/__components__/profile/Sections/IncomeHistorySection";
 import { RechargeHistory } from "@/app/__components__/profile/Sections/RechargeHistory";
 import { SectionWrapper } from "@/app/__components__/profile/Sections/SectionWrapper";
 import { Support } from "@/app/__components__/profile/Sections/Support";
@@ -23,6 +24,7 @@ export default async function ProfileSections({ searchParams, params }: props) {
         [SectionsAvailable.WITHDRAWAL_HISTORY]: WithdrawalHistory,
         [SectionsAvailable.WITHDRAWAL_FUNDS]: WithdrawalFunds,
         [SectionsAvailable.TEAM_COMMISSION]: TeamCommission,
+        [SectionsAvailable.INCOME]: IncomeHistory,
         [SectionsAvailable.SUPPORT]: Support
     };
 

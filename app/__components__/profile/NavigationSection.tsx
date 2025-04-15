@@ -1,5 +1,5 @@
 "use client"
-import { ArrowRightAlt, GroupOutlined, LocalPrintshopOutlined, SupportAgent } from "@mui/icons-material";
+import { ArrowRightAlt, GroupOutlined, LocalPrintshopOutlined, Money, SupportAgent } from "@mui/icons-material";
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SxProps, Typography } from "@mui/material";
 import { History as HistoryIcon, Logout } from "@mui/icons-material";
 import { ReactNode } from "react";
@@ -29,6 +29,11 @@ const sections: Sections = {
             key: SectionsAvailable.WITHDRAWAL_HISTORY,
             startIcon: <HistoryIcon />,
             label: "Withdrawal History",
+        },
+        {
+            key: SectionsAvailable.INCOME,
+            startIcon: <Money />,
+            label: "Income History",
         },
     ],
     'Preference': [
