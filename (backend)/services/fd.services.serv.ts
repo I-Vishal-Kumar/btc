@@ -238,6 +238,16 @@ async function _processFDclaim(fd: FD_type){
 
         }
 
+        // check if user has already claimed a fd today if yes then no need to update holding.
+        const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
+        const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
+        
+        
+        const alreadyClaimedHoldingToday = await FD.findOne({
+            PhoneNumber : fd.PhoneNumber,
+            LastClaimedOn: { $gte: startOfDay, $lte: endOfDay }
+        });
+
         // push to update current user balance and profit
         update_user_arr.push({
             updateOne: {
@@ -246,7 +256,7 @@ async function _processFDclaim(fd: FD_type){
                     $inc : {
                         Balance     : profit,
                         Profit      : profit,
-                        HoldingScore: 10 
+                        ...(!alreadyClaimedHoldingToday && {HoldingScore: 10 } || {})
                     }
                 }
             }
