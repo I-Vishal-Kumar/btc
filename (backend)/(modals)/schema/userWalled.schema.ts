@@ -16,7 +16,7 @@ const WALLET_SCHEMA = new Schema({
     
     AccNumber           : { type: String, unique: true, sparse: true },
     
-    IfscCode            : { type: String, unique: true, sparse: true },
+    IfscCode            : { type: String, unique: false },
     
     BankName            : { type: String },
     
