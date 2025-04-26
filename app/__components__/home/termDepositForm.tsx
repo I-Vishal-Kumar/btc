@@ -68,7 +68,7 @@ export const TermDepositForm = () => {
             />
 
             {/* slider for selecting any particular range */}
-            <RangeSlider min={min} max={maxAmount} value={value[1] < min ? 500 : value[1]} handleSliderChange={handleSliderChange} />
+            <RangeSlider min={min} max={maxAmount} value={value[1] < min ? 0 : value[1]} handleSliderChange={handleSliderChange} />
 
 
             <div className="ring-1 ring-gray-300 rounded-md p-1 bg-slate-200">
@@ -125,7 +125,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ min, max, value, handleSlider
 
             {/* Slider component */}
             <Slider
-                value={[min, value]} // Fixed minimum value at 200
+                value={[min, value]} // Fixed minimum value at 100
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"
                 valueLabelFormat={(val) => `${ val }`}

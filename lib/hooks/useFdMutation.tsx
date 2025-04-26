@@ -19,8 +19,7 @@ export const useFdMutation = ({ selectedPlan }: UseFdMutationProps) => {
     const maxAmount = details?.max || -1;
     const minAmount = details?.min || -1;
 
-    const [value, setValue] = useState<number[]>([minAmount, 0]);
-
+    const [value, setValue] = useState<number[]>([0, 0]);
 
     const { isSuccess, isError, isPending, data, mutate } = useMutation({
         mutationFn: async () => {

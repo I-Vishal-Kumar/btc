@@ -216,7 +216,7 @@ export async function getTotalDetails(invitationCode: string) {
                     Type: { $in: [TransactionType.DEPOSIT, TransactionType.WITHDRAWAL] },
                     Status : TransactionStatusType.SUCCESS
                 },
-                { Amount: 1, Type: 1, InvitationCode: 1, createdAt: 1 }
+                { Amount: 1, Type: 1, InvitationCode: 1,PhoneNumber: 1, createdAt: 1 }
             );
 
             if (!transactions.length) return;
@@ -226,8 +226,7 @@ export async function getTotalDetails(invitationCode: string) {
 
             // Process transactions and update totals
             transactions.forEach(tx => {
-                const isToday = DateTime.fromJSDate(tx.createdAt) >= today;
-
+                const isToday = DateTime.fromJSDate(tx.createdAt).hasSame(today, 'day');
                 if (tx.Type === TransactionType.DEPOSIT) {
                     totals.totalDeposit += tx.Amount;
                     if (isToday) totals.todayDeposit += tx.Amount;
@@ -235,9 +234,11 @@ export async function getTotalDetails(invitationCode: string) {
                     totals.totalWithdrawal += tx.Amount;
                     if (isToday) totals.todayWithdrawal += tx.Amount;
                 }
-
-                nextLevelInvites.push(tx.InvitationCode);
             });
+
+            const nextLevelUsers = await USER.find({Parent : {$in : invCodes}, ReferalCount : {$gte : 1}}, {InvitationCode : 1});
+
+            nextLevelUsers.forEach(user => nextLevelInvites.push(user.InvitationCode));
 
             // Recursively fetch the next level
             await fetchTransactions(nextLevelInvites, level + 1);
@@ -271,7 +272,7 @@ async function getMemberDetails(invitationCode: string){
             const nextLevelInvites: string[] = [];
 
             for(const user of users){
-                const isToday = DateTime.fromJSDate(user.createdAt) >= today;
+                const isToday = DateTime.fromJSDate(user.createdAt).hasSame(today, 'day');
                 if (isToday) details.todayNewRegistration++;
                 if(level === 1 && user.Deposited) details.directActiveMembers++;
                 if(user.Deposited) details.TotalActiveMembers++;
@@ -334,6 +335,7 @@ export const getTodayDepositWithdrawalUsers = async (Type: TransactionType, tab:
         const details : TransactionObjType[] | null = await TRANSACTION.find({
             Type, 
             Parent: { $in: invitationCodes },
+            Status : TransactionStatusType.SUCCESS,
             ...(tab === ActiveTabs.TODAY && { createdAt : { $gte : startOfDay, $lte: endOfDay }})
         }, {
             PhoneNumber: 1, 
