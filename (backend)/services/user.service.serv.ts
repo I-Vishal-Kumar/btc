@@ -218,8 +218,7 @@ export async function getTotalDetails(invitationCode: string) {
                 },
                 { Amount: 1, Type: 1, InvitationCode: 1,PhoneNumber: 1, createdAt: 1 }
             );
-
-            if (!transactions.length) return;
+            // if (!transactions.length) return;
 
             // Prepare next level invitation codes
             const nextLevelInvites: string[] = [];
@@ -236,7 +235,15 @@ export async function getTotalDetails(invitationCode: string) {
                 }
             });
 
-            const nextLevelUsers = await USER.find({Parent : {$in : invCodes}, ReferalCount : {$gte : 1}}, {InvitationCode : 1});
+            const nextLevelUsers = await USER.find({
+                Parent : {$in : invCodes},
+                $or : [
+                    {Deposited : true},
+                    {ReferalCount : {$gte: 1}}
+                ]
+            }, {InvitationCode : 1});
+
+            if(!nextLevelUsers?.length || level === 6) return;
 
             nextLevelUsers.forEach(user => nextLevelInvites.push(user.InvitationCode));
 
