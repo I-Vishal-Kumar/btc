@@ -381,7 +381,7 @@ export const ad_getWithdrawalTransactions = async ({ TransactionID='' , page = 1
             {
                 $match : {
                     Type: TransactionType.WITHDRAWAL,
-                    Status: {$in : [TransactionStatusType.FAILED, TransactionStatusType.PENDING]}
+                    Status: TransactionStatusType.PENDING
                 }
             },
             {
