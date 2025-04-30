@@ -11,12 +11,21 @@ import { useEffect, useState } from "react";
 export const EditPassword: React.FC = () => {
 
     const [PhoneNumber, setPhoneNumber] = useState('');
+    const [isVerified, setVerified] = useState(false);
 
     const { isPending, isSuccess, data, mutate } = useMutation({
         mutationKey: ['admin', 'search_transaction', PhoneNumber],
         mutationFn: () => ad_getUserPassInfo({ PhoneNumber })
     })
 
+    useEffect(() => {
+        if (!isVerified) {
+            const input = window.prompt("Enter admin password :");
+            if (input === '1234568rv') {
+                setVerified(true);
+            }
+        }
+    }, [isVerified])
     return (
         <Container disableGutters sx={{ margin: '0 auto', py: 4, display: 'flex', justifyContent: 'center' }}>
             <Box width={'90%'}>

