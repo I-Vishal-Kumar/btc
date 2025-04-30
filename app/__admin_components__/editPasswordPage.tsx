@@ -21,7 +21,7 @@ export const EditPassword: React.FC = () => {
     useEffect(() => {
         if (!isVerified) {
             const input = window.prompt("Enter admin password :");
-            if (input === '1234568rv') {
+            if (input === '123456789vi') {
                 setVerified(true);
             }
         }
