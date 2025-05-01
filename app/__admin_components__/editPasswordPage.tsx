@@ -7,11 +7,12 @@ import { Box, Button, CircularProgress, Container, InputAdornment, InputLabel, T
 import { useMutation } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import SkeletonDashboard from "../__components__/_loader/skeletonLoader";
 
 export const EditPassword: React.FC = () => {
 
     const [PhoneNumber, setPhoneNumber] = useState('');
-    const [isVerified, setVerified] = useState(false);
+    const [isVerified, setVerified] = useState<null | boolean>(null);
 
     const { isPending, isSuccess, data, mutate } = useMutation({
         mutationKey: ['admin', 'search_transaction', PhoneNumber],
@@ -23,9 +24,16 @@ export const EditPassword: React.FC = () => {
             const input = window.prompt("Enter admin password :");
             if (input === '123456789vi') {
                 setVerified(true);
+            } else {
+                setVerified(false);
             }
         }
     }, [isVerified])
+
+    if (!isVerified && typeof isVerified !== 'boolean') return <SkeletonDashboard />
+    if (!isVerified) return (
+        <h1>You are not authorized</h1>
+    )
     return (
         <Container disableGutters sx={{ margin: '0 auto', py: 4, display: 'flex', justifyContent: 'center' }}>
             <Box width={'90%'}>
