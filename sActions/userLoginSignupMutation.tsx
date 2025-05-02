@@ -86,6 +86,13 @@ const SIGNUP = async (credentials: SignupDetails & { Parent?: string }) => {
         // invitation code was correct 
         if (credentials.Parent && !validInvitationCode) throw new Error("Invalid invitation code provided.");
 
+        if (credentials.Parent) {
+            await USER.findOneAndUpdate({ InvitationCode: credentials.Parent }, {
+                $inc: {
+                    ReferalCount: 1
+                }
+            });
+        }
 
         // create a new invitation code for this new user.
         const InvitationCode = getInvitationCode();

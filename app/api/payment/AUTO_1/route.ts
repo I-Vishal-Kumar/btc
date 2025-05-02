@@ -31,7 +31,10 @@ export async function POST(request: NextRequest) {
     if(Number(oriAmount) !== Number(amount) || Number(tradeResult) !== 1 
       || Number(mchId) !== Number(merchantId)
     ){
-      console.warn(`[${logTime()}] ❌ AUTO_1 [VALIDATION FAILED]`, body);
+      console.warn(`[${logTime()}] ❌ AUTO_1 [VALIDATION FAILED]`, {
+        receivedBody: body,
+        expected: { merchantId, oriAmount, amount, tradeResult }
+      });
       // its failure
       await TRANSACTION.findOneAndDelete({TransactionId: `${mchOrderNo}`});
       return NextResponse.json("failure")

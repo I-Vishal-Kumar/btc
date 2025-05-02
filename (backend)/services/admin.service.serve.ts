@@ -267,7 +267,6 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
                     update : {
                         $inc : {
                             Level1Deposit : amount,
-                            ReferalCount : 1,
                             Balance : REFERAL_PERCENT * amount,
                             Profit : REFERAL_PERCENT * amount,
                         }
