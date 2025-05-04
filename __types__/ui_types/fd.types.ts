@@ -1,8 +1,7 @@
 export const OPTIONS = {
-    '360day@2%'      : { max: 50_000, min : 100 },
-    '360day@2.2%'    : { max: 100_000, min : 50_001 },
-    '720day@2.4%'    : { max: 200_000, min : 100_001 },
-    '1800day@3%'     : { max: 10_00_000, min: 200_001 },
+    '360day@2%'      : { max: (3_50_000 - 1), min : 100 },
+    '720day@2.4%'    : { max: (6_50_000 - 1), min : 3_50_000 },
+    '1800day@2.6%'    : { max: 15_00_000, min : 6_50_000 },
 } as const;
 
 export type OptionTypes = keyof typeof OPTIONS;
