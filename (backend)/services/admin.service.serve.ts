@@ -457,19 +457,10 @@ export const ad_settleWithdrawal = async (editedDetails : TransactionObjType): S
             return {valid: true, msg: 'Updated'}
         }
 
-        // check if first deposit.
-        const user = await USER.findOne({PhoneNumber: editedDetails.PhoneNumber});
-
-        if(user.Parent){
-            // this is the first deposit of this user.
-            // update the parent
-            const isPrentUpdated = await USER.findOneAndUpdate(
-                {InvitationCode: user.Parent},
-                {$inc : {Level1Withdrawal : editedDetails.Amount}},
-                {session}
-            );
-            if(!isPrentUpdated) throw new Error("Failed to update parent.");
-        }
+        // reset holding score.
+        await USER.findOneAndUpdate({PhoneNumber: editedDetails.PhoneNumber}, {
+            $set: {HoldingScore : 0}
+        });
 
         // Commit transaction
         await session.commitTransaction();
