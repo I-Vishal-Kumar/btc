@@ -43,7 +43,7 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 
 // console.log('logging')
 // await CONNECT()
-// USER.find({Deposited : false}, {PhoneNumber : 1, _id: 0}).lean().then(data => {
+// USER.find({Deposited : true, createdAt : {$gte : DateTime.fromJSDate(new Date('2025-04-28'))}}, {PhoneNumber : 1, _id: 0}).lean().then(data => {
 //     console.log(JSON.stringify(data));
 // }).catch(err => console.log(err));
 

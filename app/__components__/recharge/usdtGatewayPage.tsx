@@ -108,7 +108,7 @@ export const UsdtGateway: React.FC<{ amount: number, config: AdminConfigType }> 
                                 className="py-1 flex place-items-center justify-center w-[80%] rounded-md "
                             >
                                 <Image src={'/assets/usdtNetwork.png'} alt="..." width={15} height={15} unoptimized className="mr-1.5 " />
-                                <p className="text-[rgb(0,0,0,0.5)] text-[.65rem] ">TRC20</p>
+                                <p className="text-[rgb(0,0,0,0.5)] text-[.65rem] ">BEP20</p>
                             </button>
                         </div>
 
