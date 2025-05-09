@@ -213,7 +213,7 @@ async function _processFDclaim(fd: FD_type){
 
         while(parent && processingLevel <= 6){
 
-            const parentInfo:UserType | null = await USER.findOne({InvitationCode: parent}, {Parent: 1, ReferalCount: 1}).session(session);
+            const parentInfo:UserType | null = await USER.findOne({InvitationCode: parent}, {Parent: 1, DirectActiveMembers: 1}).session(session);
             
             if(!parentInfo) throw new Error("Something went wrong please try again.");
 
