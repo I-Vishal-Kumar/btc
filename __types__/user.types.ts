@@ -18,6 +18,7 @@ export type UserType = {
     LastSpinAt      : string,   
     createdAt       ?: string,
     Deposited       ?: boolean
+    DirectActiveMembers : number;
 }
 
 

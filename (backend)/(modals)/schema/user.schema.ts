@@ -34,6 +34,8 @@ const USER_SCHEMA = new Schema({
     BlockWithdrawal : {type : Boolean, default : false},
     
     ReferalCount    : ReferalCountType,  // number of users joined using invitation code of any user.
+    
+    DirectActiveMembers    : ReferalCountType,  // number of users joined using invitation code of any user and deposited..
  
     LastSpinAt      : { type: Date, default: null },  // Track last spin time
 

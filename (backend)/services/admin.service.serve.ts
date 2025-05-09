@@ -269,6 +269,7 @@ export const ad_settleDeposit = async (editedDetails : TransactionObjType): Serv
                             Level1Deposit : amount,
                             Balance : REFERAL_PERCENT * amount,
                             Profit : REFERAL_PERCENT * amount,
+                            DirectActiveMembers : 1
                         }
                     } 
                 }

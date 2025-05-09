@@ -217,7 +217,7 @@ async function _processFDclaim(fd: FD_type){
             
             if(!parentInfo) throw new Error("Something went wrong please try again.");
 
-            if(parentInfo && parentInfo.Parent && parentInfo.ReferalCount >= processingLevel){
+            if(parentInfo && parentInfo.Parent && parentInfo.DirectActiveMembers >= processingLevel){
                 const parentCommission = (profit / 100) * PROFIT_DISTRIBUTION[processingLevel-1];
                 
                 update_user_arr.push({

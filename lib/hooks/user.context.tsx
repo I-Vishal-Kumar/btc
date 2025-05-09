@@ -22,7 +22,8 @@ const User: UserType = {
     HoldingScore: 0,
     Level1Deposit: 0,
     Level1Withdrawal: 0,
-    LastSpinAt: ''
+    LastSpinAt: '',
+    DirectActiveMembers: 0
 }
 
 type context_type = {
