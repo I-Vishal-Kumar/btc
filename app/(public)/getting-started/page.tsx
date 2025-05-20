@@ -58,7 +58,7 @@ function AuthFormContents() {
                         </div>}
                     >Telegram</Button>
                     <Button
-                        onClick={() => window.open("https://wa.me/919102206912")?.focus()}
+                        onClick={() => window.open("https://wa.aisensy.com/aaaea3")?.focus()}
                         sx={{ textTransform: 'initial', color: 'white' }}
                         startIcon={<div className="w-10 h-10 flex justify-center items-center bg-white rounded-full">
                             <WhatsApp color="success" />
