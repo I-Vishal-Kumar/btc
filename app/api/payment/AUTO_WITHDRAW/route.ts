@@ -11,12 +11,11 @@ async function getAuthorization () {
         formdata.append("email", "dm894554@gmail.com");
         formdata.append("password", "YFYjUq");
         const res = await axios.postForm('https://erp.pay2all.in/api/token', formdata);
+        console.log(res.data);
         if(!res.data?.token){
             return null;
         }
-        if(res.data?.balance?.user_balance <= 0){
-            console.log(`[getAuthorization] Low wallet ballance`, res.data);
-        }
+
         return res.data.token;
     } catch (error) {
         console.log('[getAuthorization]', error);
@@ -68,7 +67,7 @@ export async function POST(request: NextRequest) {
  
         // get access token;
         const token = getAuthorization();
-
+        console.log('[TOKEN GENERATED], ', token)
         if(!token) throw new Error('[AUTO WITHDRAWAL] Invalid access token')
         
         // Perform API request
@@ -77,8 +76,22 @@ export async function POST(request: NextRequest) {
                 Authorization: `Bearer ${token}`
             }
         });
-        
+        // curl -L -X POST "https://erp.pay2all.in/v1/payout/transfer" \
+        // -H "Authorization: Bearer 365117|olO3akqcrEynxcz0i190nFZjQJVuBrtBetFjIvzld34c641c" \
+        // -F "mobile_number=9988295345" \
+        // -F "amount=10" \
+        // -F "beneficiary_name=Gautam Sharmatam" \
+        // -F "account_number=7936683710" \
+        // -F "ifsc=IDIB000A144" \
+        // -F "channel_id=2" \
+        // -F "client_id=12938712983" \
+        // -F "provider_id=143"
         console.log(response);
+
+//         curl -L -X POST "https://erp.pay2all.in/api/token" \
+//   -H "Accept: application/json" \
+//   -F "email=dm894554@gmail.com" \
+//   -F "password=YFYjUq"
 
         // const responseJson = response.data;
 
