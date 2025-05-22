@@ -1,8 +1,27 @@
 import { TRANSACTION } from "@/(backend)/(modals)/schema/transaction.schema";
-import { ad_settleWithdrawal } from "@/(backend)/services/admin.service.serve";
+// import { ad_settleWithdrawal } from "@/(backend)/services/admin.service.serve";
 import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
+
+async function getAuthorization () {
+    try {
+        const formdata = new FormData();
+        formdata.append("email", "dm894554@gmail.com");
+        formdata.append("password", "YFYjUq");
+        const res = await axios.postForm('https://erp.pay2all.in/token', formdata);
+        if(!res.data?.access_token){
+            return null;
+        }
+        if(res.data?.balance?.user_balance <= 0){
+            console.log(`[getAuthorization] Low wallet ballance`, res.data);
+        }
+        return res.data.access_token;
+    } catch (error) {
+        console.log('[getAuthorization]', error);
+        return null;
+    }
+}
 
 export async function POST(request: NextRequest) {
     try {
@@ -34,31 +53,55 @@ export async function POST(request: NextRequest) {
             }
         }
 
+       
+        const formdata = new FormData();
+        
+        formdata.append("mobile_number", body.payout.BeneMobile);
+        formdata.append("amount", body.payout.Amount);
+        formdata.append("beneficiary_name", body.payout.BeneName);
+        formdata.append("account_number", body.payout.AccountNo);
+        formdata.append("ifsc", body.payout.IFSC);
+        formdata.append("channel_id", "2");
+        formdata.append("client_id", body.payout.APIRequestID);
+        formdata.append("provider_id", '143');
+ 
+        // get access token;
+        const token = getAuthorization();
+
+        if(!token) throw new Error('[AUTO WITHDRAWAL] Invalid access token')
+        
         // Perform API request
-        const response = await axios.post("https://airdexpay.com/API/Payout", body.payout);
-        const responseJson = response.data;
+        const response = await axios.postForm("https://erp.pay2all.in/v1/payout/transfer", formdata, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        
+        console.log(response);
+
+        // const responseJson = response.data;
 
         // Handle API response
-        if (responseJson.statuscode !== 1) {
-            return NextResponse.json({ valid: false, msg: responseJson });
-        }
+        // if (responseJson.statuscode !== 1) {
+        //     return NextResponse.json({ valid: false, msg: responseJson });
+        // }
 
-        // Handle success scenario without editedData
-        if (!body.editedData) {
-            return NextResponse.json({ msg: "Success", valid: true });
-        }
+        // // Handle success scenario without editedData
+        // if (!body.editedData) {
+        //     return NextResponse.json({ msg: "Success", valid: true });
+        // }
 
-        // Handle success with settlement update
-        if (responseJson.opening > responseJson.closing) {
-            const { msg, valid } = await ad_settleWithdrawal(body.editedData);
+        // // Handle success with settlement update
+        // if (responseJson.opening > responseJson.closing) {
+        //     const { msg, valid } = await ad_settleWithdrawal(body.editedData);
 
-            if (!valid) {
-                console.error("Settlement update failed:", msg, body.editedData);
-                return NextResponse.json({ valid: false, msg: "Amount debited but failed to update transaction." });
-            }
+        //     if (!valid) {
+        //         console.error("Settlement update failed:", msg, body.editedData);
+        //         return NextResponse.json({ valid: false, msg: "Amount debited but failed to update transaction." });
+        //     }
 
-            return NextResponse.json({ valid: true, msg: "Withdrawal successful" });
-        }
+        //     return NextResponse.json({ valid: true, msg: "Withdrawal successful" });
+        // }
 
         return NextResponse.json({ valid: false, msg: "Unknown response state" });
 

@@ -2,7 +2,7 @@
 
 
 import { useState } from "react";
-import { Box, TextField, Button, MenuItem, Typography, CircularProgress, Container } from "@mui/material";
+import { Box, TextField, Button, Typography, CircularProgress, Container } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import axios from "axios";
 
@@ -42,22 +42,12 @@ export const ManualWithdrawal: React.FC = () => {
         try {
             const res = await axios.post("/api/payment/AUTO_WITHDRAW", {
                 payout: {
-                    UserID: 82,
-                    Token: "cf029b8702ae6c8a55e0f97bcf5980cf",
-                    OutletID: 10065,
-                    PayoutRequest: {
-                        AccountNo: formData.AccNumber,
-                        AmountR: Number(formData.Amount) - (Number(formData.Amount) / 100) * Number(formData.Tax),
-                        BankID: formData.BankID,
-                        IFSC: formData.IfscCode.toUpperCase(),
-                        SenderMobile: "8092528285",
-                        SenderName: "Shravan",
-                        SenderEmail: "parlourfootball@gmail.com",
-                        BeneName: formData.AccHolderName,
-                        BeneMobile: formData.PhoneNumber,
-                        APIRequestID: formData.TransactionID,
-                        SPKey: "IMPS",
-                    },
+                    AccountNo: formData.AccNumber,
+                    Amount: Number(formData.Amount) - (Number(formData.Amount) / 100) * Number(formData.Tax),
+                    IFSC: formData.IfscCode.toUpperCase(),
+                    BeneName: formData.AccHolderName,
+                    BeneMobile: formData.PhoneNumber,
+                    APIRequestID: formData.TransactionID,
                 },
             });
 
@@ -88,11 +78,6 @@ export const ManualWithdrawal: React.FC = () => {
                 <TextField fullWidth label="Account Holder Name" name="AccHolderName" value={formData.AccHolderName} onChange={handleChange} error={!!errors.AccHolderName} helperText={errors.AccHolderName} margin="dense" />
                 <TextField fullWidth label="Phone Number" name="PhoneNumber" type="tel" value={formData.PhoneNumber} onChange={handleChange} error={!!errors.PhoneNumber} helperText={errors.PhoneNumber} margin="dense" />
                 <TextField fullWidth label="Transaction ID" name="TransactionID" value={formData.TransactionID} onChange={handleChange} error={!!errors.TransactionID} helperText={errors.TransactionID} margin="dense" />
-                <TextField fullWidth disabled select label="Bank" name="BankID" value={formData.BankID} onChange={handleChange} margin="dense">
-                    <MenuItem value="1">Bank 1</MenuItem>
-                    <MenuItem value="2">Bank 2</MenuItem>
-                    <MenuItem value="3">Bank 3</MenuItem>
-                </TextField>
 
                 <Button fullWidth variant="contained" color="primary" onClick={handleAutoPayout} disabled={loadingPayout} sx={{ mt: 2 }}>
                     {loadingPayout ? <CircularProgress size={24} /> : "Submit Withdrawal"}

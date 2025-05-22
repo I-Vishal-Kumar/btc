@@ -132,22 +132,12 @@ function RenderWithdrawalTransaction({ index, details }: { index: string, detail
         try {
             const res = await axios.post("/api/payment/AUTO_WITHDRAW", {
                 payout: {
-                    UserID: 82,
-                    Token: 'cf029b8702ae6c8a55e0f97bcf5980cf',
-                    OutletID: 10065,
-                    PayoutRequest: {
-                        AccountNo: editedData.walletDetails.AccNumber,
-                        AmountR: editedData.Amount - (Number(editedData.Amount || 0) / 100 * (editedData?.Tax || 0)),
-                        BankID: 1,
-                        IFSC: editedData.walletDetails.IfscCode?.toUpperCase(),
-                        SenderMobile: '8092528285',
-                        SenderName: 'Shravan',
-                        SenderEmail: "parlourfootball@gmail.com",
-                        BeneName: editedData.walletDetails.AccHolderName,
-                        BeneMobile: editedData.PhoneNumber,
-                        APIRequestID: editedData.TransactionID,
-                        SPKey: 'IMPS',
-                    },
+                    AccountNo: editedData.walletDetails.AccNumber,
+                    Amount: Number(editedData.Amount) - (Number(editedData.Amount) / 100) * Number(editedData.Tax),
+                    IFSC: editedData.walletDetails.IfscCode?.toUpperCase(),
+                    BeneName: editedData.walletDetails.AccHolderName,
+                    BeneMobile: editedData.walletDetails.PhoneNumber,
+                    APIRequestID: editedData.TransactionID,
                 },
                 editedData
             })
