@@ -4,19 +4,20 @@ import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
+
 async function getAuthorization () {
     try {
         const formdata = new FormData();
         formdata.append("email", "dm894554@gmail.com");
         formdata.append("password", "YFYjUq");
-        const res = await axios.postForm('https://api.pay2all.in/token', formdata);
-        if(!res.data?.access_token){
+        const res = await axios.postForm('https://erp.pay2all.in/api/token', formdata);
+        if(!res.data?.token){
             return null;
         }
         if(res.data?.balance?.user_balance <= 0){
             console.log(`[getAuthorization] Low wallet ballance`, res.data);
         }
-        return res.data.access_token;
+        return res.data.token;
     } catch (error) {
         console.log('[getAuthorization]', error);
         return null;
