@@ -9,7 +9,7 @@ async function getAuthorization () {
         const formdata = new FormData();
         formdata.append("email", "dm894554@gmail.com");
         formdata.append("password", "YFYjUq");
-        const res = await axios.postForm('https://erp.pay2all.in/token', formdata);
+        const res = await axios.postForm('https://api.pay2all.in/token', formdata);
         if(!res.data?.access_token){
             return null;
         }
