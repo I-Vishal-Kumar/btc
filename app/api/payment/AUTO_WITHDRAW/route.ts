@@ -1,5 +1,5 @@
 import { TRANSACTION } from "@/(backend)/(modals)/schema/transaction.schema";
-// import { ad_settleWithdrawal } from "@/(backend)/services/admin.service.serve";
+import { ad_settleWithdrawal } from "@/(backend)/services/admin.service.serve";
 import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
@@ -8,11 +8,12 @@ import { NextRequest, NextResponse } from "next/server";
 async function getAuthorization () {
     try {
         const formdata = new FormData();
-        formdata.append("email", "dm894554@gmail.com");
-        formdata.append("password", "YFYjUq");
+        formdata.append("email", process.env?.AUTH_EMAIL as string);
+        formdata.append("password", process.env?.AUTH_PASS as string);
         const res = await axios.postForm('https://erp.pay2all.in/api/token', formdata);
-        console.log(res.data);
+
         if(!res.data?.token){
+            console.log(res.data);
             return null;
         }
 
@@ -57,70 +58,55 @@ export async function POST(request: NextRequest) {
         const formdata = new FormData();
         
         formdata.append("mobile_number", body.payout.BeneMobile);
-        formdata.append("amount", body.payout.Amount);
+        formdata.append("amount", Number(body.payout.Amount).toFixed(2));
         formdata.append("beneficiary_name", body.payout.BeneName);
         formdata.append("account_number", body.payout.AccountNo);
         formdata.append("ifsc", body.payout.IFSC);
         formdata.append("channel_id", "2");
         formdata.append("client_id", body.payout.APIRequestID);
-        formdata.append("provider_id", '143');
+        formdata.append("provider_id", '160');
  
         // get access token;
-        const token = getAuthorization();
-        console.log('[TOKEN GENERATED], ', token)
+        const token = await getAuthorization();
         if(!token) throw new Error('[AUTO WITHDRAWAL] Invalid access token')
         
         // Perform API request
-        const response = await axios.postForm("https://erp.pay2all.in/v1/payout/transfer", formdata, {
+        const response = await axios.postForm("https://erp.pay2all.in/api/v1/payout/bank_transfer", formdata, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
-        // curl -L -X POST "https://erp.pay2all.in/v1/payout/transfer" \
-        // -H "Authorization: Bearer 365117|olO3akqcrEynxcz0i190nFZjQJVuBrtBetFjIvzld34c641c" \
-        // -F "mobile_number=9988295345" \
-        // -F "amount=10" \
-        // -F "beneficiary_name=Gautam Sharmatam" \
-        // -F "account_number=7936683710" \
-        // -F "ifsc=IDIB000A144" \
-        // -F "channel_id=2" \
-        // -F "client_id=12938712983" \
-        // -F "provider_id=143"
-        console.log(response);
+        if(Number(response.data?.status_id || -1) !== 1){
+            console.log(`[Error while processing]`, response.data);
+            throw new Error("Error while processing");
+        }
 
-//         curl -L -X POST "https://erp.pay2all.in/api/token" \
-//   -H "Accept: application/json" \
-//   -F "email=dm894554@gmail.com" \
-//   -F "password=YFYjUq"
+        // Handle success scenario without editedData
+        if (!body.editedData) {
+            return NextResponse.json({ msg: "Success", valid: true });
+        }
 
-        // const responseJson = response.data;
+        // Handle success with settlement update
+        if (response.data?.utr && typeof response.data.utr === 'string') {
+            
+            const { msg, valid } = await ad_settleWithdrawal({
+                ...body.editedData,
+                TransactionID : response.data.utr
+            });
 
-        // Handle API response
-        // if (responseJson.statuscode !== 1) {
-        //     return NextResponse.json({ valid: false, msg: responseJson });
-        // }
+            if (!valid) {
+                console.error("Settlement update failed:", msg, body.editedData, response.data);
+                return NextResponse.json({ valid: false, msg: "Amount debited but failed to update transaction." });
+            }
 
-        // // Handle success scenario without editedData
-        // if (!body.editedData) {
-        //     return NextResponse.json({ msg: "Success", valid: true });
-        // }
+            return NextResponse.json({ valid: true, msg: `Avail Bal: ${response.data?.balance} | Withdrawal successful` });
+        }
 
-        // // Handle success with settlement update
-        // if (responseJson.opening > responseJson.closing) {
-        //     const { msg, valid } = await ad_settleWithdrawal(body.editedData);
-
-        //     if (!valid) {
-        //         console.error("Settlement update failed:", msg, body.editedData);
-        //         return NextResponse.json({ valid: false, msg: "Amount debited but failed to update transaction." });
-        //     }
-
-        //     return NextResponse.json({ valid: true, msg: "Withdrawal successful" });
-        // }
-
+        console.log('[UNKNOWN RESPONSE PAYOUT]', response.data, body, token)
         return NextResponse.json({ valid: false, msg: "Unknown response state" });
 
     } catch (error) {
-        console.error("Error processing payout:", error);
+        console.error("Error [processing payout]:", error);
         return NextResponse.json({ valid: false, msg: "Internal server error" });
     }
 }
