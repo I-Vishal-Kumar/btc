@@ -25,8 +25,10 @@ async function getAuthorization () {
 }
 
 export async function POST(request: NextRequest) {
+    
+    const body = await request.json();
+
     try {
-        const body = await request.json();
 
         // Validate request body
         if (!body || !body.payout) {
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ valid: false, msg: "Unknown response state" });
 
     } catch (error) {
-        console.error("Error [processing payout]:", error, request.body);
+        console.error("Error [processing payout]:", error, body);
         return NextResponse.json({ valid: false, msg: "Internal server error" });
     }
 }
