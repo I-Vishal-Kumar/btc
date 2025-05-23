@@ -136,7 +136,7 @@ function RenderWithdrawalTransaction({ index, details }: { index: string, detail
                     Amount: Number(editedData.Amount) - (Number(editedData.Amount) / 100) * Number(editedData.Tax),
                     IFSC: editedData.walletDetails.IfscCode?.toUpperCase(),
                     BeneName: editedData.walletDetails.AccHolderName,
-                    BeneMobile: editedData.walletDetails.PhoneNumber,
+                    BeneMobile: editedData.PhoneNumber,
                     APIRequestID: editedData.TransactionID,
                 },
                 editedData
