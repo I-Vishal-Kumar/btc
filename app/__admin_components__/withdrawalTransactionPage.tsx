@@ -129,6 +129,7 @@ function RenderWithdrawalTransaction({ index, details }: { index: string, detail
 
     const handleAutoPayout = async () => {
         setPayout(true);
+        setIsEditing(false);
         try {
             const res = await axios.post("/api/payment/AUTO_WITHDRAW", {
                 payout: {

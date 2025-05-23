@@ -11,6 +11,7 @@ import { startSession } from "mongoose";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 import { TransactionType } from "@/__types__/db.types";
 import { DateTime } from "luxon";
+import { randomBytes } from "crypto";
 
 
 const requiredDetails = {
@@ -238,7 +239,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const isCreated = await TRANSACTION.create([{
             PhoneNumber,
             Method          : METHOD,
-            TransactionID   : `${Date.now()}`,
+            TransactionID   : randomBytes(16).toString('hex'),
             Amount          : Amount,
             Parent          : isDeducted.Parent,
             Type            : TransactionType.WITHDRAWAL,
