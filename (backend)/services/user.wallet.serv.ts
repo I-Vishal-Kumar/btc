@@ -244,7 +244,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
             Parent          : isDeducted.Parent,
             Type            : TransactionType.WITHDRAWAL,
             InvitationCode  : isDeducted.InvitationCode,
-            Tax             : isDeducted.HoldingScore > 600 ? 10 : 15  // if more than 600 then 10% tax else 15% tax.
+            Tax             : isDeducted.HoldingScore > 600 ? 15 : 20  // if more than 600 then 15% tax else 20% tax.
         }],{session});
 
 

@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ valid: false, msg: "Unknown response state" });
 
     } catch (error) {
-        console.error("Error [processing payout]:", error);
+        console.error("Error [processing payout]:", error, request.body);
         return NextResponse.json({ valid: false, msg: "Internal server error" });
     }
 }

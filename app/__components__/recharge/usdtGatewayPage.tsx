@@ -196,7 +196,7 @@ function RechargeAmount({ amount }: { amount: number }) {
     return (
         <div className="flex  items-center  ">
             <p className="ml-1 text-[.65rem] font-[500] text-[#000000d3] ">
-                ${formatNumber(amount / 89)}
+                ${formatNumber(amount / 80)}
             </p>
             <p className="ml-1 text-[.65rem] font-[500] text-[#000000d3] ">(USDT)</p>
         </div>
