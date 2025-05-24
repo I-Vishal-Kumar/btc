@@ -196,8 +196,8 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
             Type: TransactionType.WITHDRAWAL,
             createdAt: { $gte: startOfDay, $lte: endOfDay }
         });
-
-        if(existingTransaction) throw new Error("You have already withdrawn today.");
+        console.log(existingTransaction)
+        // if(existingTransaction) throw new Error("You have already withdrawn today.");
 
         // check if user has a bank account.
         const hasBank = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : { $exists: true, $nin: [null, ""] } })
@@ -282,7 +282,7 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
         // get wallet details of this user check if has a valid bank account or not.
         const bankDetails = await WALLET.findOne({PhoneNumber: withdrawData.PhoneNumber}) as UserWallet
         console.log('received withdraw detilas', withdrawData);
-        
+
         if(!bankDetails.AccNumber || !bankDetails.AccHolderName || !bankDetails.BankName || !bankDetails.IfscCode) {
             console.warn('[processAutoWithdrawal]', bankDetails)
             throw new Error("[processAutoWithdrawal] failed to process auto withdraw bank details not available");
