@@ -192,8 +192,6 @@ export const claimFD = async ({_id}:{_id: string}): ServiceReturnType => {
         return {valid: false, msg: error?.message || 'something went wrong', operation: 'LOGOUT'}
     }
 }
-
-
 // Only update the profit 
 async function _processFDclaim(fd: FD_type){
 

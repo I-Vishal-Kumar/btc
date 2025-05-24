@@ -6,6 +6,7 @@ export type AdminConfigType = {
     Gateway     : GatewayTypes,
     Usdt        : boolean,
     UsdtAddress : string;
+    AutoWithdraw : boolean;
 }
 
 export type ad_getUserInfoResType = {

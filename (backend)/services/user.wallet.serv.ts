@@ -9,8 +9,12 @@ import { WALLET } from "../(modals)/schema/userWalled.schema";
 import { USER } from "../(modals)/schema/user.schema";
 import { startSession } from "mongoose";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
-import { TransactionType } from "@/__types__/db.types";
+import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
 import { DateTime } from "luxon";
+import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
+import { TransactionObjType } from "@/__types__/transaction.types";
+import { UserWallet } from "@/__types__/user.types";
+import axios from "axios";
 
 
 const requiredDetails = {
@@ -251,6 +255,11 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         await session.commitTransaction();
 
+        // after commiting the transaction check if auto withdraw is on
+        // if yes then give withdraway asynchronously.
+        const {AutoWithdraw} = await ADMIN_CONFIG.findOne({}, {AutoWithdraw : 1, _id : 0});
+        if(AutoWithdraw && METHOD === 'LOCAL') processAutoWithdrawal(isCreated[0])
+
         return {valid: true, msg: 'Your Withdrawal is in processing.'}
 
     } catch (error) {
@@ -266,6 +275,42 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
     }
 }
 
+const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
+    try {
+        
+        // get wallet details of this user check if has a valid bank account or not.
+        const bankDetails = await WALLET.findOne({PhoneNumber: withdrawData.PhoneNumber}) as UserWallet
+        
+        if(!bankDetails.AccNumber || !bankDetails.AccHolderName || !bankDetails.BankName || !bankDetails.IfscCode) {
+            console.warn('[processAutoWithdrawal]', bankDetails)
+            throw new Error("[processAutoWithdrawal] failed to process auto withdraw bank details not available");
+        }
+
+        const res = await axios.post("/api/payment/AUTO_WITHDRAW", {
+            payout: {
+                AccountNo: bankDetails.AccNumber,
+                Amount: Number(withdrawData.Amount) - (Number(withdrawData.Amount) / 100) * Number(withdrawData.Tax),
+                IFSC: bankDetails.IfscCode?.toUpperCase(),
+                BeneName: bankDetails.AccHolderName,
+                BeneMobile: withdrawData.PhoneNumber,
+                APIRequestID: withdrawData.TransactionID,
+            },
+            editedData : {
+                ...withdrawData,
+                Status : TransactionStatusType.SUCCESS
+            }
+        })
+
+        if (res.data.valid) {
+            console.log('[processAutoWithdrawal] Auto withdrawal processed at ', new Date().toDateString(), res.data);
+        } else{
+            console.log('[processAutoWithdrawal] post request failed', res.data, withdrawData);
+        }
+
+    } catch (error) {
+        console.error('[processAutoWithdrawal] Error while processing auto withdrawal', error, withdrawData)
+    }
+}
 // ===================================================================================
 
 

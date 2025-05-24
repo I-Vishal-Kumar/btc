@@ -15,6 +15,8 @@ const ADMIN_CONFIG_SCHEMA = new Schema({
     
     Usdt            : { type: Boolean, default: false},
     
+    AutoWithdraw    : { type: Boolean, default: false},
+    
     UsdtAddress     : { type: String, default : 'TLNpPzXAMhW1rh32TddcRJDhPj5EeD2gH7' },
     
    });

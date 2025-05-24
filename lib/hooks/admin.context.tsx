@@ -23,7 +23,8 @@ const initial_adminConfig = {
     UpiIds: [],
     Gateway: GatewayTypes.DEFAULT,
     Usdt: false,
-    UsdtAddress: ''
+    UsdtAddress: '',
+    AutoWithdraw: false
 }
 
 const initial_context = {

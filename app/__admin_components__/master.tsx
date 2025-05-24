@@ -10,6 +10,7 @@ import { ToggleUSDTSection } from "./master_components/toggleUSDTSection"
 import { EditUpiIdSection } from "./master_components/editUpiId"
 import { ToggleGateway } from "./master_components/toggleGatewaySection"
 import { QrUploadSection } from "./master_components/qrUploadSection"
+import { ToggleWithdrawalType } from "./master_components/toggleWithdrawalTypeSection"
 
 export const MasterPage: React.FC = () => {
 
@@ -83,6 +84,7 @@ export const MasterPage: React.FC = () => {
                     </div>
                     <Box mt={3}>
                         <ToggleUSDTSection />
+                        <ToggleWithdrawalType />
                     </Box>
                 </div>
 
