@@ -171,8 +171,8 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const now = DateTime.now().setZone("Asia/Kolkata");
         const isSunday = now.weekday === 7;
         const isBetween9and12 = now.hour >= 9 && now.hour < 12;
-        console.log(isBetween9and12, isSunday)
-        // if(isSunday || !isBetween9and12) throw new Error("Withdrawal time is over.");
+
+        if(isSunday || !isBetween9and12) throw new Error("Withdrawal time is over.");
 
         let Amount = Number(data.Amount);
         if(Amount < 200) throw new Error("Minimum withdrawal amount is 200");
@@ -196,8 +196,8 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
             Type: TransactionType.WITHDRAWAL,
             createdAt: { $gte: startOfDay, $lte: endOfDay }
         });
-        console.log(existingTransaction)
-        // if(existingTransaction) throw new Error("You have already withdrawn today.");
+
+        if(existingTransaction) throw new Error("You have already withdrawn today.");
 
         // check if user has a bank account.
         const hasBank = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : { $exists: true, $nin: [null, ""] } })
@@ -258,7 +258,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         // after commiting the transaction check if auto withdraw is on
         // if yes then give withdraway asynchronously.
         const {AutoWithdraw} = await ADMIN_CONFIG.findOne({}, {AutoWithdraw : 1, _id : 0});
-        console.log(isCreated)
+
         if(AutoWithdraw && METHOD === 'LOCAL') processAutoWithdrawal(JSON.parse(JSON.stringify(isCreated[0])))
 
         return {valid: true, msg: 'Your Withdrawal is in processing.'}
@@ -281,7 +281,6 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
         await CONNECT();
         // get wallet details of this user check if has a valid bank account or not.
         const bankDetails = await WALLET.findOne({PhoneNumber: withdrawData.PhoneNumber}) as UserWallet
-        console.log('received withdraw detilas', withdrawData);
 
         if(!bankDetails.AccNumber || !bankDetails.AccHolderName || !bankDetails.BankName || !bankDetails.IfscCode) {
             console.warn('[processAutoWithdrawal]', bankDetails)
