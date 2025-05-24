@@ -258,7 +258,8 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         // after commiting the transaction check if auto withdraw is on
         // if yes then give withdraway asynchronously.
         const {AutoWithdraw} = await ADMIN_CONFIG.findOne({}, {AutoWithdraw : 1, _id : 0});
-        if(AutoWithdraw && METHOD === 'LOCAL') processAutoWithdrawal(isCreated[0])
+        console.log(isCreated)
+        if(AutoWithdraw && METHOD === 'LOCAL') processAutoWithdrawal(JSON.parse(JSON.stringify(isCreated[0])))
 
         return {valid: true, msg: 'Your Withdrawal is in processing.'}
 
@@ -277,9 +278,10 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
 const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
     try {
-        
+        await CONNECT();
         // get wallet details of this user check if has a valid bank account or not.
         const bankDetails = await WALLET.findOne({PhoneNumber: withdrawData.PhoneNumber}) as UserWallet
+        console.log('received withdraw detilas', withdrawData);
         
         if(!bankDetails.AccNumber || !bankDetails.AccHolderName || !bankDetails.BankName || !bankDetails.IfscCode) {
             console.warn('[processAutoWithdrawal]', bankDetails)
