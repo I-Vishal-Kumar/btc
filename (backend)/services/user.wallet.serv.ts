@@ -14,7 +14,7 @@ import { DateTime } from "luxon";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
-import { handleAutoWithdraw } from "@/app/api/payment/AUTO_WITHDRAW/route";
+import { handleAutoWithdraw } from "@/lib/helpers/handleAutoWithdraw";
 
 
 const requiredDetails = {
