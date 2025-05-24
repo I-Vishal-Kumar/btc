@@ -14,7 +14,7 @@ import { DateTime } from "luxon";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
-import axios from "axios";
+import { handleAutoWithdraw } from "@/app/api/payment/AUTO_WITHDRAW/route";
 
 
 const requiredDetails = {
@@ -288,7 +288,7 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
             throw new Error("[processAutoWithdrawal] failed to process auto withdraw bank details not available");
         }
 
-        const res = await axios.post("/api/payment/AUTO_WITHDRAW", {
+        const res = await handleAutoWithdraw({
             payout: {
                 AccountNo: bankDetails.AccNumber,
                 Amount: Number(withdrawData.Amount) - (Number(withdrawData.Amount) / 100) * Number(withdrawData.Tax),
@@ -303,10 +303,10 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
             }
         })
 
-        if (res.data.valid) {
-            console.log('[processAutoWithdrawal] Auto withdrawal processed at ', new Date().toDateString(), res.data);
+        if (res.valid) {
+            console.log('[processAutoWithdrawal] Auto withdrawal processed at ', new Date().toDateString(), res);
         } else{
-            console.log('[processAutoWithdrawal] post request failed', res.data, withdrawData);
+            console.log('[processAutoWithdrawal] post request failed', res, withdrawData);
         }
 
     } catch (error) {
