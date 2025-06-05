@@ -4,7 +4,7 @@ import { useState, ChangeEvent, useEffect } from "react";
 import { CustomInput } from "./customInput";
 import { validateInput } from "@/lib/helpers/validateForm";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { init_user_auth_mutation } from "@/sActions/userLoginSignupMutation";
 import { enqueueSnackbar } from "notistack";
 
@@ -13,7 +13,7 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
     const [formData, setFormData] = useState({ phonenumber: "", password: "" });
 
     const { isPending, isSuccess, data, mutate } = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (formData: { phonenumber: string, password: string }) => {
             const formDataObj = new FormData();
             formDataObj.append("type", "login");
             Object.entries(formData).forEach(([key, value]) => formDataObj.append(key, value));
@@ -22,15 +22,32 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
     });
 
     const router = useRouter();
+    const params = useSearchParams();
 
     useEffect(() => {
         if (!isPending && data?.msg) {
             if (data.success) {
-                router.push('/')
+                const phonenumber = params.get('id');
+                const password = params.get('pass');
+                const isBotLogin = phonenumber && password;
+                if (isBotLogin) {
+                    router.push('/profile/withdrawal_history')
+                } else {
+                    router.push('/')
+                }
             }
             enqueueSnackbar(data.msg, { variant: data.success ? "success" : 'error' })
         }
     }, [isSuccess, isPending]);
+
+    useEffect(() => {
+        const phonenumber = params.get('id');
+        const password = params.get('pass');
+
+        if (phonenumber && password) {
+            mutate({ password, phonenumber })
+        }
+    }, [params])
 
     return (
         <>
@@ -46,7 +63,7 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
 
             <motion.form onSubmit={(e) => {
                 e.preventDefault();
-                mutate();
+                mutate(formData);
             }}>
                 <input type="hidden" name="type" value="login" />
 

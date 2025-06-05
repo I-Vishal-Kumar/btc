@@ -16,6 +16,7 @@ import { UserType, UserWallet } from "@/__types__/user.types";
 import { WALLET } from "../(modals)/schema/userWalled.schema";
 import { randomBytes } from "crypto";
 import { INCOME } from "../(modals)/schema/incomeConfig.schema";
+import { DateTime } from "luxon";
 
 
 // VERIFY ADMIN PASS ===============================
@@ -661,6 +662,52 @@ export const ad_blockUnblock = async (editedDetails : UserType): ServiceReturnTy
     } catch (error) {
         if(error instanceof Error) return {valid: false, msg: error.message, operation: 'LOGOUT'}
         return {valid: false, msg: 'Something went wrong.'}
+    }
+}
+
+// =============================================
+
+
+
+// GET TODAY WITHDRAWALS ====================================================
+
+export const ad_getTodayWithdrawals = async () : ServiceReturnType<{
+    PhoneNumber : string,
+    Password : string,
+}[]> => {
+    try {
+
+        const startDate = DateTime.now().startOf('day').toJSDate(); // convert to JS Date
+        const endDate = DateTime.now().endOf('day').toJSDate();     // convert to JS Date
+
+        const data = await TRANSACTION.aggregate([
+            {
+                $match : {
+                    createdAt : { $gte: startDate, $lte: endDate },
+                    Type : TransactionType.WITHDRAWAL
+                }
+            },{
+                $lookup : {
+                    from : db_schema.USERS,
+                    localField : 'PhoneNumber',
+                    foreignField : "PhoneNumber",
+                    as : "userData"
+                }
+            }, {
+                $unwind : "$userData"
+            },
+            {
+                $project : {
+                    _id : 0, 
+                    PhoneNumber : 1, Password: '$userData.Password'
+                }
+            }
+        ])
+
+        return {valid: true, data: data}
+
+    } catch (error) {
+        return {valid: false, }
     }
 }
 
