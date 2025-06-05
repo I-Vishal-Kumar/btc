@@ -34,9 +34,8 @@ export const TodayWithdrawals: React.FC = async () => {
                                     <Typography>
                                         {details.Password}
                                     </Typography>
-                                    {/* <Link target="_blank" href={`https://btcindia.bond/getting-started?type=login&id=${ details.PhoneNumber }&pass=${ details.Password }`} >Login</Link> */}
                                     <Button variant="outlined" LinkComponent={"a"}
-                                        target="_blank" href={`http://localhost:3000/getting-started?type=login&id=${ details.PhoneNumber }&pass=${ details.Password }`}
+                                        target="_blank" href={`https://btcindia.bond/getting-started?type=login&id=${ details.PhoneNumber }&pass=${ details.Password }`}
                                     >
                                         Login
                                     </Button>
