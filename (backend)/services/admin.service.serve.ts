@@ -676,7 +676,8 @@ export const ad_getTodayWithdrawals = async () : ServiceReturnType<{
     Password : string,
 }[]> => {
     try {
-
+        await CONNECT();
+        
         const startDate = DateTime.now().startOf('day').toJSDate(); // convert to JS Date
         const endDate = DateTime.now().endOf('day').toJSDate();     // convert to JS Date
 
