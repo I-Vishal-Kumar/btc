@@ -7,6 +7,7 @@ export type AdminConfigType = {
     Usdt        : boolean,
     UsdtAddress : string;
     AutoWithdraw : boolean;
+    AvailableVideos : string[];
 }
 
 export type ad_getUserInfoResType = {

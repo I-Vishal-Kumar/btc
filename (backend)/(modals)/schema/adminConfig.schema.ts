@@ -10,6 +10,8 @@ const ADMIN_CONFIG_SCHEMA = new Schema({
     Password        : {type: String, default: '__998*855__'},
     
     UpiIds          : Array,
+
+    AvailableVideos : Array,
     
     Gateway         : { type: String, enum: Object.values(GatewayTypes), default: GatewayTypes.DEFAULT},
     

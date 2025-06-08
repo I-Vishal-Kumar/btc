@@ -24,7 +24,8 @@ const initial_adminConfig = {
     Gateway: GatewayTypes.DEFAULT,
     Usdt: false,
     UsdtAddress: '',
-    AutoWithdraw: false
+    AutoWithdraw: false,
+    AvailableVideos: []
 }
 
 const initial_context = {

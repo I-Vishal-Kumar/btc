@@ -11,6 +11,7 @@ import { EditUpiIdSection } from "./master_components/editUpiId"
 import { ToggleGateway } from "./master_components/toggleGatewaySection"
 import { QrUploadSection } from "./master_components/qrUploadSection"
 import { ToggleWithdrawalType } from "./master_components/toggleWithdrawalTypeSection"
+import { EditAvailableVideosSection } from "./master_components/editAvailableVideos"
 
 export const MasterPage: React.FC = () => {
 
@@ -82,6 +83,9 @@ export const MasterPage: React.FC = () => {
                             <ToggleGateway />
                         </div>
                         <EditUpiIdSection />
+                    </div>
+                    <div className="my-4">
+                        <EditAvailableVideosSection />
                     </div>
                     <Box mt={3}>
                         <ToggleUSDTSection />
