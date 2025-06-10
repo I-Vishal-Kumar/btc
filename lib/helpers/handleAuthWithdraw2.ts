@@ -57,7 +57,8 @@ export async function handleAutoWithdraw2(body: PayoutRequestBody): Promise<{ va
     formdata.append("channel_id", "2");
     formdata.append("client_id", payout.APIRequestID);
 
-    const response = await axios.post('https://sprezapay.com/api/payout/v2/transfer-now', {
+    const response = await axios.postForm("https://sprezapay.com/api/payout/v2/transfer-now", {
+        api_token : 'oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa',
         mobile_number: payout.BeneMobile,
         email : 'btccompanyind@gmail.com',
         beneficiary_name: payout.BeneName,
@@ -66,28 +67,11 @@ export async function handleAutoWithdraw2(body: PayoutRequestBody): Promise<{ va
         amount:  Number(payout.Amount).toFixed(2),
         channel_id: '2',
         client_id: payout.APIRequestID
-    }, {
-        headers: {
-            Authorization: `Bearer ${'oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa'}`,
-        },
-    })
-    // const response = await axios.postForm("https://sprezapay.com/api/payout/v2/transfer-now", {}, {
-    //     params : {
-    //         api_token : 'oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa',
-    //         mobile_number: payout.BeneMobile,
-    //         email : 'btccompanyind@gmail.com',
-    //         beneficiary_name: payout.BeneName,
-    //         ifsc_code : payout.IFSC,
-    //         account_number: payout.AccountNo,
-    //         amount:  Number(payout.Amount).toFixed(2),
-    //         channel_id: '2',
-    //         client_id: payout.APIRequestID
-    //     },
-    //     headers: {
-    //         Authorization: `Bearer ${'oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa'}`,
-    //     },
-    // });
-
+    });
+    // curl -L -X POST \
+    // https://sprezapay.com/api/payout/v2/transfer-now \
+    // -H 'Content-Type: application/json' \
+    // -d 'mobile_number=9162874125&email=btccompanyind@gmail.com&beneficiary_name=Gaurav kumar Rajak&ifsc_code=PUNB0760700&account_number=7607000100036657&amount=12&channel_id=2&client_id=223948020934&api_token=oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa'
     if (response.data?.status !== 'success') {
         console.log(`[Error while processing]`, response.data);
         return { valid: false, msg: "Payout API rejected the request" };
