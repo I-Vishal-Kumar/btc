@@ -57,7 +57,7 @@ export async function handleAutoWithdraw2(body: PayoutRequestBody): Promise<{ va
     formdata.append("channel_id", "2");
     formdata.append("client_id", payout.APIRequestID);
 
-    const response = await axios.postForm("https://sprezapay.com/api/payout/v2/transfer-now", {
+    const response = await axios.post("https://sprezapay.com/api/payout/v2/transfer-now", {
         api_token : 'oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa',
         mobile_number: payout.BeneMobile,
         email : 'btccompanyind@gmail.com',
