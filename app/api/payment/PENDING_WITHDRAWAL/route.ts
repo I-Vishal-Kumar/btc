@@ -16,7 +16,7 @@ export const GET = async (req: NextRequest) => {
         
         const availableParams = req.nextUrl.searchParams.entries()
         for(const [key, value] of availableParams){
-            // @ts-ignore
+            // @ts-expect-error dont know why but i did this.
             params[key as keyof Params] = value
         }
         console.log('[Processing pending request] ', params);
