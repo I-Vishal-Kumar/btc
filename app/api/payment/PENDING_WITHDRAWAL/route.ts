@@ -15,7 +15,7 @@ export const GET = async (req: NextRequest) => {
     try {
         
         const availableParams = req.nextUrl.searchParams.entries()
-        for(let [key, value] of availableParams){
+        for(const [key, value] of availableParams){
             // @ts-ignore
             params[key as keyof Params] = value
         }
