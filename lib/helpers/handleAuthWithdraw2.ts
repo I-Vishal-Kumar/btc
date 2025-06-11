@@ -56,7 +56,7 @@ export async function handleAutoWithdraw2(body: PayoutRequestBody): Promise<{ va
     formdata.append("amount", Number(payout.Amount).toFixed(2));
     formdata.append("channel_id", "2");
     formdata.append("client_id", payout.APIRequestID);
-
+    console.log( Number(payout.Amount).toFixed(2));
     const response = await axios.post("https://sprezapay.com/api/payout/v2/transfer-now", {
         api_token : 'oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa',
         mobile_number: payout.BeneMobile,
@@ -68,10 +68,12 @@ export async function handleAutoWithdraw2(body: PayoutRequestBody): Promise<{ va
         channel_id: '2',
         client_id: payout.APIRequestID
     });
-    // curl -L -X POST \
-    // https://sprezapay.com/api/payout/v2/transfer-now \
-    // -H 'Content-Type: application/json' \
-    // -d 'mobile_number=9162874125&email=btccompanyind@gmail.com&beneficiary_name=Gaurav kumar Rajak&ifsc_code=PUNB0760700&account_number=7607000100036657&amount=12&channel_id=2&client_id=223948020934&api_token=oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa'
+    
+    if (response.data?.status === 'pending'){
+        console.log('[withdraw request in pending]', response.data);
+        return { valid: false, msg: "PENDING Do not send withdrawal from your side." };
+    }
+    
     if (response.data?.status !== 'success') {
         console.log(`[Error while processing]`, response.data);
         return { valid: false, msg: "Payout API rejected the request" };
