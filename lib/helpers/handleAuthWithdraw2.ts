@@ -56,7 +56,17 @@ export async function handleAutoWithdraw2(body: PayoutRequestBody): Promise<{ va
     formdata.append("amount", Number(payout.Amount).toFixed(2));
     formdata.append("channel_id", "2");
     formdata.append("client_id", payout.APIRequestID);
-    console.log( Number(payout.Amount).toFixed(2));
+    console.log( "api request", {
+        mobile_number: payout.BeneMobile,
+        email : 'btccompanyind@gmail.com',
+        beneficiary_name: payout.BeneName,
+        ifsc_code : payout.IFSC,
+        account_number: payout.AccountNo,
+        amount:  Math.floor(Number(payout.Amount)),
+        channel_id: '2',
+        client_id: payout.APIRequestID
+    });
+
     const response = await axios.post("https://sprezapay.com/api/payout/v2/transfer-now", {
         api_token : 'oxH6cdNkp0ecXYrjRlRqPdkDdR0oHDRZq72rUPfD3zkSByV5ykHRr6sSFbJa',
         mobile_number: payout.BeneMobile,
@@ -64,7 +74,7 @@ export async function handleAutoWithdraw2(body: PayoutRequestBody): Promise<{ va
         beneficiary_name: payout.BeneName,
         ifsc_code : payout.IFSC,
         account_number: payout.AccountNo,
-        amount:  Number(payout.Amount).toFixed(2),
+        amount:  Math.floor(Number(payout.Amount)),
         channel_id: '2',
         client_id: payout.APIRequestID
     });
