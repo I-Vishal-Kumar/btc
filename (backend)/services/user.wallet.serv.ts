@@ -14,7 +14,7 @@ import { DateTime } from "luxon";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
-import { handleAutoWithdraw } from "@/lib/helpers/handleAutoWithdraw";
+import { handleAutoWithdraw2 } from "@/lib/helpers/handleAuthWithdraw2";
 
 
 const requiredDetails = {
@@ -287,7 +287,7 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
             throw new Error("[processAutoWithdrawal] failed to process auto withdraw bank details not available");
         }
 
-        const res = await handleAutoWithdraw({
+        const res = await handleAutoWithdraw2({
             payout: {
                 AccountNo: bankDetails.AccNumber,
                 Amount: Number(withdrawData.Amount) - (Number(withdrawData.Amount) / 100) * Number(withdrawData.Tax),
