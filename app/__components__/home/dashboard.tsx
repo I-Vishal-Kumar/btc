@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Typography, Container, CardHeader, Stack, Modal, Button } from '@mui/material';
+import { Box, Typography, Container, CardHeader, Stack, Modal, Button, ClickAwayListener } from '@mui/material';
 import LineClamp from '@/lib/helpers/lineClamper';
 import { TermDepositForm } from './termDepositForm';
 import { QuickAccessSection } from './quickAccess';
@@ -8,14 +8,13 @@ import { USER_CONTEXT } from '@/lib/hooks/user.context';
 import { memo, useContext, useEffect, useState } from 'react';
 import { RenderBalance } from '../_commonComponents/RenderBalance';
 import Image from 'next/image';
-import { Telegram, WhatsApp } from '@mui/icons-material';
 
 
 const MemoizedVideo = memo(Video);
 const MemoizedUserDetails = memo(RenderUserDetails);
 const MemoizedQuickAccess = memo(QuickAccessSection);
 
-const TermDepositDashboard = () => {
+const TermDepositDashboard = ({ homePopupImage }: { homePopupImage?: string }) => {
 
     const [showModel, setModel] = useState(true);
 
@@ -27,22 +26,30 @@ const TermDepositDashboard = () => {
     }, []);
 
     return (
-        <Container sx={{ bgcolor: '#79dcfd', height: '100%' }} disableGutters maxWidth="md">
-            <Box height={'50%'} position={'relative'}>
+        <Container sx={{ background: 'url(/assets/home_bg.jpg) center no-repeat', height: '100%' }} disableGutters maxWidth="md">
+            <Box height={'60%'} position={'relative'}>
                 <MemoizedUserDetails />
                 <MemoizedVideo />
                 <MemoizedQuickAccess />
             </Box>
 
             <Box sx={{
-                height: '50%',
                 bgcolor: 'whitesmoke',
-                p: 6,
+                p: 4,
+                pt: 13,
                 borderTopRightRadius: 40,
                 borderTopLeftRadius: 40
             }}>
-                <Typography variant='body2' fontWeight={600}>Create New Term Deposit</Typography>
-                <TermDepositForm />
+                <div className="p-[2px] flex justify-center items-center rounded-[1rem] bg-gradient-to-r from-red-500/80 to-orange-400/80">
+                    <div className="bg-[#fef0e6] flex-1 p-8 rounded-[0.9rem]">
+                        <Typography variant="body2" fontWeight={600}>
+                            Create New Term Deposit
+                        </Typography>
+                        <TermDepositForm />
+                    </div>
+                </div>
+
+
             </Box>
             <Stack spacing={1}>
                 <Image height={400} width={500}
@@ -55,25 +62,59 @@ const TermDepositDashboard = () => {
                     alt='btc certificate' src={'/assets/supporters.jpg'} />
             </Stack>
             <Modal open={showModel} onClose={() => setModel(false)} >
-                <div className='h-full w-full grid place-content-center'>
-                    <div className='w-[90vw] h-[30vh] rounded-md items-center max-w-md flex justify-evenly bg-white '>
-                        <Button
-                            variant='outlined'
-                            onClick={() => window.open("https://t.me/+IzSkZkmM6sMxYTJl")?.focus()}
-                            sx={{ textTransform: 'initial', color: 'black' }}
-                            startIcon={<div className="w-10 h-10 flex justify-center items-center bg-white rounded-full">
-                                <Telegram color="primary" />
-                            </div>}
-                        >Telegram</Button>
-                        <Button
-                            variant='outlined'
-                            onClick={() => window.open("https://chat.whatsapp.com/G6QfOA7OeiV8MqPnGwdod2")?.focus()}
-                            sx={{ textTransform: 'initial', color: 'black' }}
-                            startIcon={<div className="w-10 h-10 flex justify-center items-center bg-white rounded-full">
-                                <WhatsApp color="success" />
-                            </div>}
-                        >Whatsapp</Button>
-                    </div>
+                <div className='h-full w-full p-20 grid place-content-center'>
+                    <ClickAwayListener onClickAway={() => setModel(false)}>
+                        <div className="w-[90vw] p-4 flex flex-col rounded-md items-center max-w-md bg-white space-y-4">
+                            {
+                                homePopupImage ? (
+                                    <Image
+                                        src={homePopupImage}
+                                        height={500}
+                                        width={300}
+                                        priority
+                                        className='max-h-[60vh]'
+                                        alt='test'
+                                    />
+                                ) : null
+                            }
+                            <Button
+                                onClick={() => window.open("https://t.me/+IzSkZkmM6sMxYTJl")?.focus()}
+                                fullWidth
+                                sx={{
+                                    background: 'linear-gradient(to right, #00B4DB, #00FF88)', // blue to green
+                                    color: 'white',
+                                    textTransform: 'none',
+                                    borderRadius: '999px',
+                                    py: 1.5,
+                                    fontWeight: 600,
+                                    fontSize: '1rem',
+                                    '&:hover': {
+                                        background: 'linear-gradient(to right, #00A3CC, #00E07B)',
+                                    }
+                                }}>
+                                Telegram Group
+                            </Button>
+
+                            <Button
+                                onClick={() => window.open("https://chat.whatsapp.com/G6QfOA7OeiV8MqPnGwdod2")?.focus()}
+                                fullWidth
+                                sx={{
+                                    background: 'linear-gradient(to right, #00C851, #FFEB3B)', // green to yellow
+                                    color: 'white',
+                                    textTransform: 'none',
+                                    borderRadius: '999px',
+                                    py: 1.5,
+                                    fontWeight: 600,
+                                    fontSize: '1rem',
+                                    '&:hover': {
+                                        background: 'linear-gradient(to right, #00B64A, #FFE600)',
+                                    }
+                                }}>
+                                WhatsApp Group
+                            </Button>
+                        </div>
+                    </ClickAwayListener>
+
                 </div>
             </Modal>
         </Container>
@@ -83,9 +124,27 @@ const TermDepositDashboard = () => {
 
 function Video() {
     return (
-        <Box height={'50%'} width={'90%'} position={'relative'} margin={'0 auto'} overflow={'hidden'} boxShadow={4} borderRadius={5}>
-            <video controls loop style={{ position: 'absolute', top: 0, left: 0 }} height={'100%'} width={"100%"} muted src="/assets/home_video.mp4"></video>
+        <Box
+            position="relative"
+            width="90%"
+            margin="0 auto"
+            overflow="hidden"
+            borderRadius={5}
+            boxShadow={4}
+            sx={{
+                aspectRatio: 1280 / 719
+            }}
+        >
+            <Image
+                src="/assets/home_crypto.jpg"
+                alt="crypto coming soon"
+                fill
+                style={{
+                    objectFit: 'cover',
+                }}
+            />
         </Box>
+
     )
 }
 

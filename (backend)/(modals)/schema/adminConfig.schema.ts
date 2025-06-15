@@ -6,6 +6,10 @@ import { Schema, model, models } from "mongoose";
 const ADMIN_CONFIG_SCHEMA = new Schema({
     
     QrCode          : String,
+    
+    HomePopImage    : String,
+
+    HistoryPopImage : String,
 
     Password        : {type: String, default: '__998*855__'},
     

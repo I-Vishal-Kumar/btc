@@ -20,6 +20,8 @@ type adminContextType = {
 
 const initial_adminConfig = {
     QrCode: '',
+    HistoryPopImage: '',
+    HomePopImage: '',
     UpiIds: [],
     Gateway: GatewayTypes.DEFAULT,
     Usdt: false,

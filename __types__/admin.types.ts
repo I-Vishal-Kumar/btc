@@ -2,6 +2,8 @@ import { GatewayTypes } from "./db.types"
 
 export type AdminConfigType = {
     QrCode      : string,
+    HistoryPopImage: string,
+    HomePopImage: string,
     UpiIds      : string[],
     Gateway     : GatewayTypes,
     Usdt        : boolean,

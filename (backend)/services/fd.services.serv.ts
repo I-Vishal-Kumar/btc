@@ -320,3 +320,19 @@ async function handleMaturedFD(fd: FD_type){
         console.log('error while setting fd matured.', error, fd.PhoneNumber);
     }
 }
+
+
+// book profit . 
+
+export async function bookFdProfit({id}:{id: string}){
+    try {
+        await FD.findOneAndUpdate({_id: id}, {
+            $set : {
+                FdStatus : FdStatus.HALTED,
+                LastClaimedOn: DateTime.utc().toJSDate()
+            }
+        })
+    } catch (error) {
+        console.log('[bookFdProfit]', error);   
+    }
+}

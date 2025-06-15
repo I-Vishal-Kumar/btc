@@ -1,7 +1,13 @@
+import { getAdminConfig } from "@/(backend)/services/admin.service.serve";
 import TermDepositDashboard from "../__components__/home/dashboard";
 
-export default function Home() {
+export default async function Home() {
+
+    const { valid, data } = await getAdminConfig();
+
+    if (!valid) return null;
+
     return (
-        <TermDepositDashboard />
+        <TermDepositDashboard homePopupImage={data?.HomePopImage} />
     );
 }

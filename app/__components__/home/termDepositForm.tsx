@@ -50,6 +50,7 @@ export const TermDepositForm = () => {
                 onChange={handleInputChange}
                 sx={{
                     mt: 2,
+                    bgcolor: 'whitesmoke',
                     "& .MuiOutlinedInput-root": {
                         "&.Mui-focused fieldset": {
                             borderColor: "#808080", // Change border color when focused
@@ -98,7 +99,10 @@ export const TermDepositForm = () => {
 
             </div>
 
-            <Button onClick={() => mutate()} disabled={isPending} fullWidth sx={{ mt: 3, borderRadius: '100vw', textTransform: 'initial', bgcolor: '#79dcfd' }} variant="contained">
+            <Button onClick={() => mutate()} disabled={isPending} fullWidth sx={{
+                mt: 3, borderRadius: '100vw', textTransform: 'initial',
+                background: 'linear-gradient(to right, #f3c45c,#e43905)'
+            }} variant="contained">
                 {isPending ? "Loading...." : 'Submit'}
             </Button>
         </>
