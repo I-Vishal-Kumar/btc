@@ -1,13 +1,14 @@
 "use client"
 
-import { Box, Typography, Container, CardHeader, Stack, Modal, Button, ClickAwayListener } from '@mui/material';
+import { Box, Typography, Container, CardHeader, Stack, Modal, Button, ClickAwayListener, IconButton } from '@mui/material';
 import LineClamp from '@/lib/helpers/lineClamper';
 import { TermDepositForm } from './termDepositForm';
 import { QuickAccessSection } from './quickAccess';
 import { USER_CONTEXT } from '@/lib/hooks/user.context';
-import { memo, useContext, useEffect, useState } from 'react';
+import { memo, useContext, useState } from 'react';
 import { RenderBalance } from '../_commonComponents/RenderBalance';
 import Image from 'next/image';
+import { Close } from '@mui/icons-material';
 
 
 const MemoizedVideo = memo(Video);
@@ -17,13 +18,6 @@ const MemoizedQuickAccess = memo(QuickAccessSection);
 const TermDepositDashboard = ({ homePopupImage }: { homePopupImage?: string }) => {
 
     const [showModel, setModel] = useState(true);
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setModel(false);
-        }, 1000 * 2)
-        return () => clearTimeout(timeout)
-    }, []);
 
     return (
         <Container sx={{ background: 'url(/assets/home_bg.jpg) center no-repeat', height: '100%' }} disableGutters maxWidth="md">
@@ -62,7 +56,7 @@ const TermDepositDashboard = ({ homePopupImage }: { homePopupImage?: string }) =
                     alt='btc certificate' src={'/assets/supporters.jpg'} />
             </Stack>
             <Modal open={showModel} onClose={() => setModel(false)} >
-                <div className='h-full w-full p-20 grid place-content-center'>
+                <div className='h-full w-full relative p-20 grid place-content-center'>
                     <ClickAwayListener onClickAway={() => setModel(false)}>
                         <div className="w-[90vw] p-4 flex flex-col rounded-md items-center max-w-md bg-white space-y-4">
                             {
@@ -112,6 +106,12 @@ const TermDepositDashboard = ({ homePopupImage }: { homePopupImage?: string }) =
                                 }}>
                                 WhatsApp Group
                             </Button>
+
+                            <div className='absolute top-4 right-2'>
+                                <IconButton onClick={() => setModel(false)} sx={{ bgcolor: '#d6d6d6' }}>
+                                    <Close sx={{ color: 'black' }} />
+                                </IconButton>
+                            </div>
                         </div>
                     </ClickAwayListener>
 

@@ -50,11 +50,11 @@ export const QuickAccessSection = () => {
     }
 
     const quickLinks = [
-        { label: "Recharge", icon: <Icon icon={'noto-v1:bank'} />, onClick: () => { router.push('/recharge') } },
-        { label: "PDF", icon: <Icon icon={'icon-park:file-pdf'} />, onClick: () => { if (pdfRef?.current) pdfRef.current.click() } },
-        { label: "Application", icon: <Icon icon={'devicon:androidstudio'} />, onClick: () => btcRef?.current && btcRef.current.click() },
-        { label: "Gift", icon: <Icon icon={'noto:wrapped-gift'} />, onClick: () => handleGiftClaim() },
-        { label: "Support", icon: <Icon icon={'streamline-plump-color:customer-support-7'} />, onClick: () => { router.push('/profile/support') } },
+        { label: "Recharge", icon: <Icon height={25} width={25} icon={'noto-v1:bank'} />, onClick: () => { router.push('/recharge') } },
+        { label: "PDF", icon: <Icon height={25} width={25} icon={'icon-park:file-pdf'} />, onClick: () => { if (pdfRef?.current) pdfRef.current.click() } },
+        { label: "Application", icon: <Icon height={25} width={25} icon={'devicon:androidstudio'} />, onClick: () => btcRef?.current && btcRef.current.click() },
+        { label: "Gift", icon: <Icon height={25} width={25} icon={'noto:wrapped-gift'} />, onClick: () => handleGiftClaim() },
+        { label: "Support", icon: <Icon height={25} width={25} icon={'streamline-plump-color:customer-support-7'} />, onClick: () => { router.push('/profile/support') } },
         { label: "Coming Soon", icon: <Image alt="coming soon" src={"/assets/coming-soon.png"} height={16} width={16} /> },
         { label: "Coming soon", icon: <Image alt="coming soon" src={"/assets/coming-soon.png"} height={16} width={16} /> },
     ]
