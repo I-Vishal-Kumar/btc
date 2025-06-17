@@ -70,7 +70,7 @@ export function TermDepositCard({ fd_detail }: { fd_detail: FD_type }) {
                 </div>
             </Box>
 
-            {isClaimAvailable && <ClaimButton _id={plainFD._id} fd={plainFD} />}
+            {(isClaimAvailable && FdStatus !== statusType.HALTED) && <ClaimButton _id={plainFD._id} fd={plainFD} />}
             <BookButton fd={plainFD} />
 
             <div className="flex flex-col text-center pb-4 text-slate-400 text-[0.6rem] px-4 items-center">
