@@ -36,9 +36,22 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [countdown, setCountdown] = useState(120); // 2 minutes
     const [loadingStage, setLoadingStage] = useState("🪄 Starting...");
+    const [isWaitingDelay, setIsWaitingDelay] = useState(false);
     const mutationRef = useRef(false);
     const hasClaimedRef = useRef(false);
 
+    const handleClaimStart = () => {
+        setIsWaitingDelay(true);
+
+        setTimeout(() => {
+            mutationRef.current = false;
+            hasClaimedRef.current = false;
+            setIsModalOpen(true);
+            setCountdown(120);
+            setLoadingStage("Claim process started");
+            setIsWaitingDelay(false);
+        }, 12000)
+    }
     // Handle countdown and stage updates
     useEffect(() => {
         if (isModalOpen && !mutationRef.current) {
@@ -58,6 +71,7 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     useEffect(() => {
         if (countdown === 0 && !isPending && !hasClaimedRef.current) {
             hasClaimedRef.current = true;
+            alert('call')
             mutate();
             setIsModalOpen(false);
         }
@@ -88,19 +102,17 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     return (
         <Box width={"90%"} maxWidth={420} margin="0 auto" py={1} pb={2}>
             <Button
-                onClick={() => {
-                    mutationRef.current = false;
-                    hasClaimedRef.current = false;
-                    setIsModalOpen(true);
-                    setCountdown(120);
-                    setLoadingStage("Claim process started");
-                }}
-                disabled={isPending}
+                onClick={handleClaimStart}
+                disabled={isPending || isWaitingDelay}
                 sx={{
                     bgcolor: "#98bbffe8",
                     color: "black",
                     boxShadow: 0,
                     fontWeight: 600,
+                    ":disabled": {
+                        bgcolor: "#98bbffe8",
+                        color: "black",
+                    }
                 }}
                 fullWidth
                 variant="contained"
