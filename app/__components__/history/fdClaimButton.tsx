@@ -43,14 +43,14 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     const handleClaimStart = () => {
         setIsWaitingDelay(true);
 
-        setTimeout(() => {
-            mutationRef.current = false;
-            hasClaimedRef.current = false;
-            setIsModalOpen(true);
-            setCountdown(120);
-            setLoadingStage("Claim process started");
-            setIsWaitingDelay(false);
-        }, 12000)
+        // setTimeout(() => {
+        mutationRef.current = false;
+        hasClaimedRef.current = false;
+        setIsModalOpen(true);
+        setCountdown(120);
+        setLoadingStage("Claim process started");
+        setIsWaitingDelay(false);
+        // }, 12000)
     }
     // Handle countdown and stage updates
     useEffect(() => {
