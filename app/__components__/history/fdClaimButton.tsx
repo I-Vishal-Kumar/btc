@@ -71,7 +71,7 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     useEffect(() => {
         if (countdown === 0 && !isPending && !hasClaimedRef.current) {
             hasClaimedRef.current = true;
-            alert('call')
+            // alert('call')
             mutate();
             setIsModalOpen(false);
         }
