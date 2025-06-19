@@ -180,9 +180,6 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         if(METHOD === 'USDT'){
             // change db key for usdt;
             DbWithdrawalPassKey = 'UsdtWithdrawPassword';
-
-            // convert to inr.
-            Amount = parseFloat((80 * parseFloat(data.Amount)).toFixed(2));
         }
 
         // check if already withdrawan today.
