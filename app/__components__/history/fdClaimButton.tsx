@@ -94,7 +94,7 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
         }
     }, [isSuccess, data]);
 
-    if (isSuccess && !isPending || isLoadingAdminData) return null;
+    if (isSuccess && !isPending || isLoadingAdminData || new Date().getDay() === 0) return null;
 
     const randomIndex = Math.floor(Math.random() * (adminConfig?.data?.AvailableVideos?.length || 0));
     const randomVideo = adminConfig?.data?.AvailableVideos?.[randomIndex];

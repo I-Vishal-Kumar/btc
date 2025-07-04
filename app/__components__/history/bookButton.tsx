@@ -15,6 +15,11 @@ export default function BookButton({ fd }: { fd: FD_type }) {
 
 
     const handleBooking = async () => {
+        
+        const proceed = window.confirm("Do you really want to book this fd.");
+
+        if(!proceed) return;
+        
         if (fd.FdStatus === FdStatus.HALTED) {
             enqueueSnackbar("Already booked", { variant: 'warning' });
             return;
