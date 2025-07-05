@@ -99,8 +99,8 @@ export const claimGift = async (): ServiceReturnType<{GIFT_AMOUNT: number}> =>{
 
         if(lastSpinDate && lastSpinDate === today) return {valid: false, msg: 'You can now claim tomorrow.'};
 
-        // generate a random gift amount between 1 - 10
-        const GIFT_AMOUNT = Number((Math.random() * (1 - (dbUser?.Deposited ? 5 : 2)) + (dbUser?.Deposited ? 5 : 2)).toFixed(2))
+        // generate a random gift amount between 1 - 1.5
+        const GIFT_AMOUNT = Number((Math.random() * 1 + 0.5).toFixed(2))
         
         await USER.findOneAndUpdate({PhoneNumber: decoded.PhoneNumber}, {
             $inc : {
