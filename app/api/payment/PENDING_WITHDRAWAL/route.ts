@@ -1,6 +1,7 @@
 import { TRANSACTION } from "@/(backend)/(modals)/schema/transaction.schema";
 import { ad_settleWithdrawal } from "@/(backend)/services/admin.service.serve";
 import { TransactionStatusType } from "@/__types__/db.types";
+import { TransactionObjType } from "@/__types__/transaction.types";
 import { NextRequest, NextResponse } from "next/server";
 type Params = {
     payid : string;
@@ -23,13 +24,15 @@ export const GET = async (req: NextRequest) => {
         if(!params?.status) return NextResponse.json({status : 'failure'});
 
         if(params?.status === "success" && params?.client_id){
-            const existingTransaction = await TRANSACTION.findOne({TransactionID: params?.client_id});
+            const existingTransaction = await TRANSACTION.findOne({TransactionID: params?.client_id}).lean();
             if(!existingTransaction) throw new Error(`No transaction available for id ${params.client_id}`);
+            
+            console.log('passing', {...existingTransaction,   Status : TransactionStatusType.SUCCESS});
             
             const {valid, data, msg} = await ad_settleWithdrawal({
                 ...existingTransaction,
                 Status : TransactionStatusType.SUCCESS
-            })
+            } as unknown as TransactionObjType)
 
             if(!valid){
                 console.log('[failed to settle pending withdrawal]', data, msg, params)
