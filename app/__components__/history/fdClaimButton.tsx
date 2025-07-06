@@ -94,8 +94,15 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
         }
     }, [isSuccess, data]);
 
-    if (isSuccess && !isPending || isLoadingAdminData || new Date().getDay() === 0) return null;
+    if (isSuccess && !isPending || isLoadingAdminData ) return null;
 
+    if(new Date().getDay() === 0){
+        return (
+            <div className="flex justify-center border-2 border-solid border-green-500">
+                <Typography variant="overline">You can claim tomorrow</Typography>
+            </div>
+        )
+    }
     const randomIndex = Math.floor(Math.random() * (adminConfig?.data?.AvailableVideos?.length || 0));
     const randomVideo = adminConfig?.data?.AvailableVideos?.[randomIndex];
 
