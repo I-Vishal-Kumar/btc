@@ -102,6 +102,10 @@ const createBank = async (identifier: WithdrawalOperationIdentifierType, PhoneNu
         const exists = await WALLET.findOne({PhoneNumber});
 
         if(exists){
+            
+            delete data.LocalWithdrawPassword;
+            delete data.UsdtWithdrawPassword;
+
             // user has added usdt wallet.
             const wasSuccess = await WALLET.findOneAndUpdate({PhoneNumber}, {
                 $set : {...data}
