@@ -16,15 +16,11 @@ export const generate_url = async (postData: Record<string, string | number>) =>
         api_token
     }
 
-    // const params = new URLSearchParams();
-    // Object.entries(postData).forEach(([key, value]) => {
-    //     params.append(key, String(value));
-    // });
     try {
-        const data = await axios.post(reqUrl, postData);
-        console.log(data);
-        if (data.data?.status === 'success') {
-            return data.data?.payment_link
+        const res = await axios.post(reqUrl, postData);
+        console.log(res);
+        if (res.data?.status === 'success') {
+            return res.data?.data?.payment_link
         }
 
         return false;
