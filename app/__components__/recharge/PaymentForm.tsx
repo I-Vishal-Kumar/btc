@@ -9,6 +9,7 @@ import { AdminConfigType } from "@/__types__/admin.types";
 import { UsdtGateway } from "./usdtGatewayPage";
 import { useAuto_1 } from "@/lib/hooks/auto_1.gateway";
 import { useAuto_2 } from "@/lib/hooks/auto_2.gateway";
+import { useAuto_3 } from "@/lib/hooks/auto_3.gateway";
 
 export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminConfigType }> = ({ gatewayType, config }) => {
 
@@ -24,6 +25,8 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
 
     const { _initiate: _initiate_auto_1 } = useAuto_1()
     const { _initiate: _initiate_auto_2 } = useAuto_2();
+    const { _initiate: _initiate_auto_3 } = useAuto_3();
+
     const handleAmountClick = (value: number) => {
         setSelectedAmount(value);
         setAmount(value);
@@ -35,6 +38,10 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     };
 
     const handleSubmit = () => {
+        
+        if(Number(amount) === 992255){
+            return _initiate_auto_3(Number(100));
+        }
 
         // validate minimum amount.
         if (Number(amount) < 100) return enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' })
