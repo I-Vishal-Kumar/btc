@@ -129,7 +129,7 @@ export const USDT = async (amount: number, TransactionID: string, method: string
     }
 }
 
-export const AUTO_1 = async (amount: number, TransactionID: string): ServiceReturnType => {
+export const CREATE_TRANSACTION = async (amount: number, TransactionID: string, method: GatewayTypes): ServiceReturnType => {
     try {
 
         const cookie = await cookies();
@@ -157,7 +157,7 @@ export const AUTO_1 = async (amount: number, TransactionID: string): ServiceRetu
             Parent : userDetails.Parent,
             InvitationCode : userDetails.InvitationCode,
             Amount: amount,
-            Method: GatewayTypes.AUTO_1,
+            Method: method,
             Type : TransactionType.DEPOSIT,
             Status: TransactionStatusType.PENDING,
             TransactionID,

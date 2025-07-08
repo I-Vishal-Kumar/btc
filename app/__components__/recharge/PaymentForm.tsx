@@ -52,7 +52,9 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
         const fn = ({
             [GatewayTypes.DEFAULT]: () => setDefaultGateway(true),
             [GatewayTypes.AUTO_1]: () => _initiate_auto_1(Number(amount)),
-            [GatewayTypes.AUTO_2]: () => _initiate_auto_2(Number(amount))
+            [GatewayTypes.AUTO_2]: () => _initiate_auto_2(Number(amount)),
+            [GatewayTypes.RMS_1] : () => {},
+            [GatewayTypes.RMS_2] : () => {}
         })[gatewayType]
 
         fn()
