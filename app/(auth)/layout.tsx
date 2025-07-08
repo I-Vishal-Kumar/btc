@@ -71,6 +71,9 @@ export default function RootLayout({
         />
 
         <meta name="robots" content="index, follow" />
+
+        <script src='https://typof.co/smepay/checkout.js'></script>
+
       </head>
       <body
         className={` bg-emerald-500`}
