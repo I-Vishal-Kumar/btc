@@ -36,6 +36,7 @@ export default function PublicLayout({
                     </AdminContextProvider>
                 </Providers>
             </body>
+            <script src='https://typof.co/smepay/checkout.js'></script>
         </html>
     );
 }
