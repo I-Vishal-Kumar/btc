@@ -14,10 +14,11 @@ import { NextRequest, NextResponse } from "next/server";
 //     utr: string,
 // }
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
     // const session = await mongoose.startSession();
     // session.startTransaction();
-    
+    console.log(request.body);
+    console.log(request.text);
     const params = request.nextUrl.searchParams
     console.log('params', params.toString());
     // const params = new URLSearchParams(rawBody);
