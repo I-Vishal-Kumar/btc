@@ -17,11 +17,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
     // const session = await mongoose.startSession();
     // session.startTransaction();
-    console.log(request.body);
-    console.log(request.text);
-    const params = request.nextUrl.searchParams
-    console.log('params', params.toString());
-    // const params = new URLSearchParams(rawBody);
+    const rawBody = await request.text();
+    console.log('rawbody', rawBody, typeof rawBody);
+    const params = new URLSearchParams(rawBody);
     const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
     console.log('parsed body', parsedBody);
     return new NextResponse('success', { status: 200 });
