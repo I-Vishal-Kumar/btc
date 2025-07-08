@@ -13,10 +13,10 @@ import { NextRequest, NextResponse } from "next/server";
 //   utr: '555565020384'
 // }
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
     
-    const rawBody = await request.text();
-    const params = new URLSearchParams(rawBody);
+    const params = request.nextUrl.searchParams;
+    // const params = new URLSearchParams(rawBody);
     const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
 
     console.log('parsed body', parsedBody);
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
         return new NextResponse('success', { status: 200 });
 
     } catch (error: any) {
-        console.error("RMS_1 Error:", error.message, error, parsedBody, rawBody);
+        console.error("RMS_1 Error:", error.message, error, parsedBody, params);
         
         return new NextResponse(`Error: ${error.message}`, { status: 400 });
     }

@@ -22,7 +22,7 @@ export const useAuto_4 = () => {
             amount,
             client_id: transactionId,
             redirect_url: 'https://btcindia.bond/',
-            callback_url: 'https://btcindia.bond/api/payment/AUTO_3',
+            callback_url: 'https://btcindia.bond/api/payment/AUTO_4',
             customer_name: userInfo.Name,
             email : 'btccompanyind@gmail.com'
         }
