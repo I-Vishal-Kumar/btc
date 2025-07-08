@@ -13,9 +13,10 @@ export const useAuto_3 = () => {
     const { userInfo } = useContext(USER_CONTEXT)
 
     const _initiate = async (amount: number) => {
-
-        const transactionId = randomBytes(16).toString('hex');
-
+        try {
+            
+            const transactionId = randomBytes(16).toString('hex');
+            
         const postData = {
             mobile_number: userInfo.PhoneNumber,
             amount,
@@ -25,10 +26,10 @@ export const useAuto_3 = () => {
             customer_name: userInfo.Name,
             email : 'btccompanyind@gmail.com'
         }
-
+        
         const {valid} = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.RMS_1)
         if(!valid) return  enqueueSnackbar('Failed to process request', {variant: "error"});
-
+        
         // transaction is created procede.
         const url = await generate_url(postData); 
         console.log(url);
@@ -37,6 +38,10 @@ export const useAuto_3 = () => {
         } else {
             deleteTransaction(transactionId);
         }
+
+    } catch (error) {
+        console.log('error in auto 3', error);
+    }
 
     }
 
