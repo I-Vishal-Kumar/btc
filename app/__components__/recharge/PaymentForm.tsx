@@ -43,10 +43,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     };
 
     const handleSubmit = async () => {
-        if(Number(amount) === 992255){
-            _initiate_auto_4(Number(100));
-            return;
-        }
+
         if (Number(amount) < 100) {
             enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' });
             return;
@@ -65,7 +62,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
             [GatewayTypes.AUTO_1]: () => _initiate_auto_1(Number(amount)),
             [GatewayTypes.AUTO_2]: () => _initiate_auto_2(Number(amount)),
             [GatewayTypes.RMS_1]: () => _initiate_auto_3(Number(amount)),
-            [GatewayTypes.RMS_2]: () => {}
+            [GatewayTypes.RMS_2]: () => _initiate_auto_4(Number(amount))
         })[gatewayType];
 
         try {

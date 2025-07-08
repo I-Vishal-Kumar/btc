@@ -39,7 +39,7 @@ export const useAuto_4 = () => {
             window.smepayCheckout({
                 slug,
                 onSuccess: () => {
-                    alert('Payment in processing.');
+                    alert('Success.');
                 },
                 onFailure: () => {
                     alert('❌ Payment failed or closed.');
