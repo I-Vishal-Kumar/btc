@@ -38,7 +38,7 @@ export const useAuto_4 = () => {
             // @ts-expect-error samepay checkout exists due to script tag;
             window.smepayCheckout({
                 slug,
-                onSuccess: (data: unknown) => {
+                onSuccess: () => {
                     alert('Payment in processing.');
                 },
                 onFailure: () => {
