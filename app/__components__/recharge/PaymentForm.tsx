@@ -43,7 +43,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     };
 
     const handleSubmit = async () => {
-        if(amount === 992255){
+        if(Number(amount) === 992255){
             _initiate_auto_4(Number(100));
             return;
         }
