@@ -10,6 +10,8 @@ import { UsdtGateway } from "./usdtGatewayPage";
 import { useAuto_1 } from "@/lib/hooks/auto_1.gateway";
 import { useAuto_2 } from "@/lib/hooks/auto_2.gateway";
 import { useAuto_3 } from "@/lib/hooks/auto_3.gateway";
+import { Backdrop, CircularProgress } from '@mui/material';
+
 
 export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminConfigType }> = ({ gatewayType, config }) => {
 
@@ -20,6 +22,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const [isUsdtGateway, setUsdtGateway] = useState<boolean>(false);
     const [disabled, setDisabled] = useState<boolean>(false);
     const [channelSelected, setChannel] = useState<'local' | 'usdt'>('local');
+    const [loading, setLoading] = useState(false);
 
     const predefinedAmounts = [100, 1000, 10000, 50000, 100000];
 
@@ -37,25 +40,36 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
         setSelectedAmount(null);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        if (Number(amount) < 100) {
+            enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' });
+            return;
+        }
 
-        // validate minimum amount.
-        if (Number(amount) < 100) return enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' })
-        if (channelSelected === 'usdt') return setUsdtGateway(true);
+        if (channelSelected === 'usdt') {
+            setUsdtGateway(true);
+            return;
+        }
 
         setDisabled(true);
+        setLoading(true);
 
         const fn = ({
             [GatewayTypes.DEFAULT]: () => setDefaultGateway(true),
             [GatewayTypes.AUTO_1]: () => _initiate_auto_1(Number(amount)),
             [GatewayTypes.AUTO_2]: () => _initiate_auto_2(Number(amount)),
-            [GatewayTypes.RMS_1] : () => _initiate_auto_3(Number(amount)),
-            [GatewayTypes.RMS_2] : () => {}
-        })[gatewayType]
+            [GatewayTypes.RMS_1]: () => _initiate_auto_3(Number(amount)),
+            [GatewayTypes.RMS_2]: () => {}
+        })[gatewayType];
 
-        fn()
-        setDisabled(false);
+        try {
+            await fn();
+        } finally {
+            setLoading(false); // ⬅️ Hide loading
+            setDisabled(false);
+        }
     };
+
 
     if (isDefaultGateway) return <DefaultGateway amount={Number(amount)} config={config} />
     if (isUsdtGateway) return <UsdtGateway amount={Number(amount)} config={config} />
@@ -122,6 +136,12 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
             >
                 Submit
             </Button>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={loading}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </Box>
     );
 };

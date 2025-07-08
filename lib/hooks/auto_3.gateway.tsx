@@ -32,7 +32,7 @@ export const useAuto_3 = () => {
         
         // transaction is created procede.
         const url = await generate_url(postData); 
-        console.log(url);
+
         if (url) {
             window.open(url);
         } else {
