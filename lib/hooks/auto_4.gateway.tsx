@@ -1,12 +1,12 @@
 "use client"
 
-// import { CREATE_TRANSACTION, deleteTransaction } from "@/(backend)/services/transaction.service.serve"
 import { randomBytes } from "crypto"
 import { useContext } from "react";
 import { USER_CONTEXT } from "./user.context";
 import { generate_url } from "@/sActions/generateAuto4.gateway";
-// import { GatewayTypes } from "@/__types__/db.types";
-// import { enqueueSnackbar } from "notistack";
+import { CREATE_TRANSACTION, deleteTransaction } from "@/(backend)/services/transaction.service.serve";
+import { enqueueSnackbar } from "notistack";
+import { GatewayTypes } from "@/__types__/db.types";
 
 export const useAuto_4 = () => {
 
@@ -27,8 +27,8 @@ export const useAuto_4 = () => {
             email : 'btccompanyind@gmail.com'
         }
         
-        // const {valid} = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.RMS_1)
-        // if(!valid) return  enqueueSnackbar('Failed to process request', {variant: "error"});
+        const {valid} = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.RMS_2)
+        if(!valid) return  enqueueSnackbar('Failed to process request', {variant: "error"});
         
         // transaction is created procede.
         const slug = await generate_url(postData); 
@@ -39,14 +39,14 @@ export const useAuto_4 = () => {
             window.smepayCheckout({
                 slug,
                 onSuccess: (data: unknown) => {
-                    alert(JSON.stringify(data));
+                    alert('Payment in processing.');
                 },
                 onFailure: () => {
                     alert('❌ Payment failed or closed.');
                 },
             })
         } else {
-            // deleteTransaction(transactionId);
+            deleteTransaction(transactionId);
         }
 
     } catch (error) {
