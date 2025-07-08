@@ -6,6 +6,7 @@ import Providers from '../providers';
 import Footer from '../__components__/footer/footer';
 import { Box } from '@mui/material';
 import { WalletContextProvider } from '@/lib/hooks/userWallet.context';
+import Script from 'next/script';
 
 
 export const metadata: Metadata = {
@@ -72,12 +73,14 @@ export default function RootLayout({
 
         <meta name="robots" content="index, follow" />
 
-        <script src='https://typof.co/smepay/checkout.js'></script>
-
       </head>
       <body
         className={` bg-emerald-500`}
       >
+        <Script
+          src='https://typof.co/smepay/checkout.js'
+          strategy='lazyOnload'
+        />
         <AppRouterCacheProvider >
           <Providers>
             <UserContextProvider>
