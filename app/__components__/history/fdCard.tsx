@@ -59,12 +59,11 @@ export function TermDepositCard({ fd_detail }: { fd_detail: FD_type }) {
             <Box mt={2} sx={{ gridTemplateColumns: '1fr 1fr', margin: '2rem auto', width: '90%', display: 'grid' }}>
                 <div className="text-[0.65rem] pl-4 font-semibold gap-y-1 grid">
                     <p>Creation Date - {formatDate(createdAt, 'dd LLL yyyy')}</p>
-                    <p>Period - {FdDuration} days @ {InterestRate}%</p>
                     <p>Investment - {formatNumber(FdAmount)}</p>
-                    <p>{isHalted ? "Booked On" : "Last claimed on"} - {formatDate(LastClaimedOn, 'dd LLL yyyy HH:mm a')}</p>
+                    <p>{isHalted ? "Booked On" : "Last claimed on"} - {formatDate(LastClaimedOn, 'dd LLL yyyy')}</p>
                 </div>
                 <div className="text-[0.65rem] pl-4 font-semibold gap-y-1 grid">
-                    <p>Creation Time - {formatDate(createdAt, 'HH : mm a')}</p>
+                    <p>Period - {FdDuration} days @ {InterestRate}%</p>
                     <p>Expiry - {formatDate(expiryDate.toISO()!, 'dd LLL yyyy')}</p>
                     <p>Profit - {formatNumber(profit)}</p>
                 </div>
