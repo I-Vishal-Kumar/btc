@@ -435,6 +435,7 @@ export const ad_settleWithdrawal = async (editedDetails : TransactionObjType): S
     try {
         
         if(editedDetails.Status === TransactionStatusType.PENDING) throw new Error('Please choose correct type.');
+        console.log('received', editedDetails);
 
         const isTransactionUpdated = await TRANSACTION.findByIdAndUpdate(editedDetails._id, {
             Amount : editedDetails.Amount,
@@ -442,7 +443,7 @@ export const ad_settleWithdrawal = async (editedDetails : TransactionObjType): S
             TransactionID : editedDetails.TransactionID,
             Status : editedDetails.Status
         }, {session});
-
+        console.log('is transaction updated', isTransactionUpdated);
         if(!isTransactionUpdated) throw new Error("Failed to update transaction.");
 
         if(editedDetails.Status === TransactionStatusType.FAILED) {

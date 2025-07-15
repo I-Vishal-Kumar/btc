@@ -45,6 +45,8 @@ export const GatewayTypes = {
     AUTO_1 : 'AUTO-1',
     AUTO_2 : 'AUTO-2',
     DEFAULT : 'BTC',
+    RMS_1 : 'RMS_1',
+    RMS_2 : 'RMS_2'
 } as const;
 
 export type GatewayTypes = typeof GatewayTypes[keyof typeof GatewayTypes]

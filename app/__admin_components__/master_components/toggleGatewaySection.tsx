@@ -36,6 +36,8 @@ export function ToggleGateway() {
             >
                 <FormControlLabel label={GatewayTypes.AUTO_1} value={GatewayTypes.AUTO_1} control={<Radio />} />
                 <FormControlLabel label={GatewayTypes.AUTO_2} value={GatewayTypes.AUTO_2} control={<Radio />} />
+                <FormControlLabel label={GatewayTypes.RMS_1} value={GatewayTypes.RMS_1} control={<Radio />} />
+                <FormControlLabel label={GatewayTypes.RMS_2} value={GatewayTypes.RMS_2} control={<Radio />} />
                 <FormControlLabel label={GatewayTypes.DEFAULT} value={GatewayTypes.DEFAULT} control={<Radio />} />
             </RadioGroup>
         </FormControl>

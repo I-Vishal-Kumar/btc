@@ -2,6 +2,7 @@
 
 import { getAdminConfig } from "@/(backend)/services/admin.service.serve"
 import { claimFD } from "@/(backend)/services/fd.services.serv"
+import { FdStatus } from "@/__types__/db.types"
 import { FD_type } from "@/__types__/fd.types"
 import { calculateFDProfit } from "@/lib/helpers/calcFdProfit"
 import { USER_CONTEXT } from "@/lib/hooks/user.context"
@@ -94,8 +95,15 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
         }
     }, [isSuccess, data]);
 
-    if (isSuccess && !isPending || isLoadingAdminData) return null;
+    if (isSuccess && !isPending || isLoadingAdminData ) return null;
 
+    if(new Date().getDay() === 0 && fd.FdStatus !== FdStatus.HALTED){
+        return (
+            <div className="flex justify-center border-2 border-solid border-green-500">
+                <Typography variant="overline">You can claim tomorrow</Typography>
+            </div>
+        )
+    }
     const randomIndex = Math.floor(Math.random() * (adminConfig?.data?.AvailableVideos?.length || 0));
     const randomVideo = adminConfig?.data?.AvailableVideos?.[randomIndex];
 

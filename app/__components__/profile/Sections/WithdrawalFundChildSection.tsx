@@ -1,13 +1,13 @@
 "use client"
 
 import { _walletOperation } from "@/(backend)/services/user.wallet.serv";
-import { WithdrawalOperationIdentifierType } from "@/__types__/ui_types/profil.types";
+import { WithdrawalOperationIdentifier, WithdrawalOperationIdentifierType } from "@/__types__/ui_types/profil.types";
 import { UserWallet } from "@/__types__/user.types";
 import { WALLET_CONTEXT } from "@/lib/hooks/userWallet.context";
 import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 type fields = Record<string, string>
 
@@ -21,7 +21,7 @@ export const Section: React.FC<{
 
     const formRef = useRef<HTMLFormElement>(null);
     const { wallet } = useContext(WALLET_CONTEXT);
-
+    const [showFull, setShowFull] = useState(!([WithdrawalOperationIdentifier.LOCAL_BANK_PASS_RESET, WithdrawalOperationIdentifier.USDT_BANK_PASS_RESET] as string[]).includes(_identifier));
     const { data, isPending, isSuccess, mutate } = useMutation({
         mutationFn: _walletOperation,
     })
@@ -50,6 +50,17 @@ export const Section: React.FC<{
         }
     }, [data, isSuccess, isPending])
 
+    if(!showFull){
+        return (
+            <div className="flex mt-4 justify-center">
+                <Button
+                    onClick={()=> setShowFull(prev => !prev)}
+                    size="small"
+                    variant="outlined"
+                    >Forgot password</Button>
+            </div>
+        )
+    }
     return (
         <Box component={'form'} ref={formRef} onSubmit={handleSubmit} >
             <Typography fontWeight={600} mt={2}>{title}</Typography>

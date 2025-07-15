@@ -8,6 +8,7 @@ export const generate_url = async (postData: Record<string, string | number>) =>
     const reqUrl = process.env.REQUEST_URL_IMB;
     const user_token = process.env.USER_TOKEN;
 
+    
     if (!user_token) return false;
 
     postData = {

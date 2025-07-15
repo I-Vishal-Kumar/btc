@@ -1,4 +1,5 @@
-import { AUTO_1, deleteTransaction } from "@/(backend)/services/transaction.service.serve"
+import { CREATE_TRANSACTION, deleteTransaction } from "@/(backend)/services/transaction.service.serve"
+import { GatewayTypes } from "@/__types__/db.types";
 import axios from "axios";
 import crypto, { randomBytes } from "crypto"
 import { enqueueSnackbar } from "notistack";
@@ -75,7 +76,7 @@ export const useAuto_1 = () => {
 
         const transactionId = randomBytes(16).toString('hex');
 
-        const { valid } = await AUTO_1(amount, transactionId);
+        const { valid } = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.AUTO_1);
 
         if (!valid) return enqueueSnackbar("Something went wrong try again", { variant: 'error' });
 
