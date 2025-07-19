@@ -18,7 +18,7 @@ export const Support: React.FC = () => {
                         Telegram Agent
                     </div>
                 </Link>
-                <Link href="https://chat.whatsapp.com/G6QfOA7OeiV8MqPnGwdod2" target="_blank">
+                <Link href="https://chat.whatsapp.com/COvgZaLPqP8GRLsGe7W5JT?mode=ac_c" target="_blank">
                     <div className="bg-slate-200 rounded-md p-3 mt-6 ring-1 ring-slate-300 cursor-pointer">
                         Whatsapp Group
                     </div>
