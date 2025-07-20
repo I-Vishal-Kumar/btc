@@ -15,11 +15,11 @@ export default function BookButton({ fd }: { fd: FD_type }) {
 
 
     const handleBooking = async () => {
-        
+
         const proceed = window.confirm("Do you really want to book this fd.");
 
-        if(!proceed) return;
-        
+        if (!proceed) return;
+
         if (fd.FdStatus === FdStatus.HALTED) {
             enqueueSnackbar("Already booked", { variant: 'warning' });
             return;
@@ -28,8 +28,8 @@ export default function BookButton({ fd }: { fd: FD_type }) {
         enqueueSnackbar("Profit booked", { variant: 'success' });
     }
 
-    const maturityOn = DateTime.fromJSDate(new Date(fd.createdAt)).toUTC().plus({ days: fd.FdDuration }).startOf('day');
-    const today = DateTime.fromJSDate(new Date("2025-06-17")).startOf('day');
+    const maturityOn = DateTime.fromJSDate(new Date(fd.createdAt)).toUTC().plus({ days: Number(fd.FdDuration) }).startOf('day');
+    const today = DateTime.fromJSDate(new Date()).startOf('day');
     const LastClaimedOn = DateTime.fromJSDate(new Date(fd.LastClaimedOn)).startOf('day');
 
     const daysDiff = Math.floor(Math.max(maturityOn.diff(fd.FdStatus === 'HALTED' ? LastClaimedOn : today, 'days').days, 1));

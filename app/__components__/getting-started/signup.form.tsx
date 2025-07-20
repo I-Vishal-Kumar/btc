@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Typography } from "@mui/material";
+import { Button, CircularProgress, Modal, TextField, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -25,10 +25,6 @@ export const SignupForm = ({ setQueryParam }: { setQueryParam: (key: string, val
     });
 
     const router = useRouter();
-    if (isSuccess && data.success) {
-        router.push('/')
-        return <>Redirecting...</>
-    }
 
     return (
         <>
@@ -74,6 +70,66 @@ export const SignupForm = ({ setQueryParam }: { setQueryParam: (key: string, val
                     {isPending ? <CircularProgress sx={{ color: 'black' }} size={'1rem'} /> : "Sign up"}
                 </Button>
             </motion.form>
+
+            <Modal hideBackdrop open={isSuccess && data.success}>
+                <div className="h-full bg-black/10 w-full flex justify-center items-center">
+                    <div className="p-6 rounded-2xl bg-[#c2c2c2] w-[80%]">
+                        <Typography sx={{ px: 2, fontSize: 14, textAlign: 'center', color: 'rgba(0, 0, 0, 0.8)' }}>Take a screenshort or copy the ID & password to remember them easily.</Typography>
+                        <div className="mt-6">
+                            <TextField
+                                fullWidth
+                                size="small"
+                                margin="dense"
+                                label="Phone Number"
+                                variant="filled"
+                                focused
+                                value={formData.phonenumber}
+                                slotProps={{
+                                    input: {
+                                        readOnly: true
+                                    }
+                                }}
+                                sx={{
+                                    bgcolor: 'white',
+                                    borderRadius: 1,
+                                    '& .MuiInputBase-input.Mui-disabled': {
+                                        WebkitTextFillColor: 'black',
+                                    },
+                                }}
+                            />
+                            <TextField
+                                fullWidth
+                                size="small"
+                                label="Password"
+                                variant="filled"
+                                focused
+                                value={formData.password}
+                                slotProps={{
+                                    input: {
+                                        readOnly: true
+                                    }
+                                }}
+                                sx={{
+                                    mt: 3,
+                                    bgcolor: 'white',
+                                    borderRadius: 1,
+                                    '& .MuiInputBase-input.Mui-disabled': {
+                                        WebkitTextFillColor: 'black',
+                                    },
+                                }}
+                            />
+                            <Button
+                                onClick={() => router.push("/")}
+                                fullWidth sx={{
+                                    mt: 5, borderRadius: '100vw', textTransform: 'initial',
+                                    background: 'linear-gradient(to right, #f3c45c,#e43905)'
+                                }} variant="contained">
+                                Okay
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
         </>
     );
 };
