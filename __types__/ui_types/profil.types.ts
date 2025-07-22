@@ -5,7 +5,11 @@ export enum SectionsAvailable {
     TEAM_COMMISSION = 'team_commission',
     INCOME = 'income_history',
     SUPPORT = 'support',
-    LOGOUT = 'logout'
+    LOGOUT = 'logout',
+    UPLOAD_CONTENT = 'upload_content',
+    MY_VIDEOS = 'my_videos',
+    VIDEO_EARNINGS = 'video_earnings',
+    WATCH_TO_EARN = 'watch_to_earn'
 } 
 
 export enum SubSectionsAvailable {

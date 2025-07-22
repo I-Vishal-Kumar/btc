@@ -1,3 +1,4 @@
+import { ApprovalStatusType, VissibilityStatusType } from "./db.types";
 
 
 export type UserType = {
@@ -35,4 +36,21 @@ export type UserWallet = {
     BankName       ?: string,
     Branch         ?: string,
     
+}
+
+
+// video types 
+
+export type VideoType = {
+    ApprovalStatus : ApprovalStatusType,
+    DailyRates : number;
+    Duration : number;
+    InvitationCode : string;
+    PhoneNumber : string;
+    VideoSource : string;
+    VideoUploadedEarning : number;
+    Vissibility : VissibilityStatusType;
+    createdAt : Date;
+    updatedAt : Date;
+    _id : string
 }

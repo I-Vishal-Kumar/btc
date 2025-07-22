@@ -205,25 +205,30 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         
         if(!hasBank) throw new Error("You don't have a bank account.");
 
-        // check if user has enough balance.
-        const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount}});
-        
         const isBlocked = await USER.findOne({PhoneNumber, BlockWithdrawal: true});
-
+        
         if(isBlocked) throw new Error("You cannot withdraw.");
-        if(!isSufficientBalance) throw new Error("You dont have enough balance.");
+        
+        const userInfo = await USER.findOne({PhoneNumber});
+
+        const tax = userInfo.HoldingScore > 600 ? 15 : 20  // if more than 600 then 15% tax else 20% tax.
+        const taxableAmount = (Number(Amount) / 100) * Number(tax);
+        
+        // check if user has enough balance.
+        const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount + taxableAmount}});
+        
+        if(!isSufficientBalance) throw new Error(`You dont have enough balance. Required ₹ ${Amount + taxableAmount}.`);
 
         // check if withdrawal password is correct.
         const isPassCorrect = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : data.WithdrawPassword});
 
         if(!isPassCorrect) throw new Error("Incorrect withdrawal password");
 
-
         // Process withdrawal --------------------------------------------------.
 
         // 1. deduct user balance.
         const isDeducted = await USER.findOneAndUpdate({PhoneNumber}, {
-            $inc : {Balance : -Amount}
+            $inc : {Balance : -(Number(Amount) + taxableAmount)}
         }, {session});
 
         if(!isDeducted) throw new Error("Could not process withdrawal this time.");
@@ -248,7 +253,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
             Parent          : isDeducted.Parent,
             Type            : TransactionType.WITHDRAWAL,
             InvitationCode  : isDeducted.InvitationCode,
-            Tax             : isDeducted.HoldingScore > 600 ? 15 : 20  // if more than 600 then 15% tax else 20% tax.
+            Tax             : tax
         }],{session});
 
 

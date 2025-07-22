@@ -5,6 +5,8 @@ export enum db_schema {
     TRANSACTION     = 'transactions',
     WALLET          = 'user_wallets',
     ADMIN_CONFIG    = 'admin_configs',
+    VIDEOS          = 'videos',
+    VIDEO_EARNING   = 'video_earning',
     INCOME   = 'incomes'
 
 }
@@ -93,3 +95,27 @@ export const ReferalCountType = {
     type: Number, 
     default: 0
 }
+
+
+export const VideoApprovalStatusType = {
+    APPROVED : 'APPROVED',
+    PENDING_APPROVAL : 'PENDING_APPROVAL',
+    REJECTED : 'REJECTED'
+} as const;
+
+export type ApprovalStatusType = typeof VideoApprovalStatusType[keyof typeof VideoApprovalStatusType]
+
+export const VideoVissibilityStatusType = {
+    VISSIBLE : 'VISSIBLE',
+    BUCKET : 'BUCKET',
+} as const;
+
+export type VissibilityStatusType = typeof VideoVissibilityStatusType[keyof typeof VideoVissibilityStatusType]
+
+export const VideoEarningType = {
+    UPLOAD : 'UPLOAD',
+    WATCH : 'WATCH',
+} as const;
+
+export type VideoEarningType = typeof VideoEarningType[keyof typeof VideoEarningType]
+

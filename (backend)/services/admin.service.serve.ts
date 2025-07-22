@@ -7,16 +7,18 @@ import { ServiceReturnType } from "@/__types__/service.types";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { AdminConfigType, ad_getUserInfoResType } from "@/__types__/admin.types";
 import { USER } from "../(modals)/schema/user.schema";
-import { TransactionStatusType, TransactionType, db_schema } from "@/__types__/db.types";
+import { ApprovalStatusType, TransactionStatusType, TransactionType, VideoApprovalStatusType, VideoEarningType, db_schema } from "@/__types__/db.types";
 import { getTotalDetails } from "./user.service.serv";
 import { IncomeType, TransactionObjType, adminWithdrawalRespType } from "@/__types__/transaction.types";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
-import { startSession } from "mongoose";
-import { UserType, UserWallet } from "@/__types__/user.types";
+import mongoose, { Schema, startSession } from "mongoose";
+import { UserType, UserWallet, VideoType } from "@/__types__/user.types";
 import { WALLET } from "../(modals)/schema/userWalled.schema";
 import { randomBytes } from "crypto";
 import { INCOME } from "../(modals)/schema/incomeConfig.schema";
 import { DateTime } from "luxon";
+import { VIDEOS } from "../(modals)/schema/videos.schema";
+import { VIDEO_EARNING } from "../(modals)/schema/videoEarning.schema";
 
 
 // VERIFY ADMIN PASS ===============================
@@ -35,7 +37,7 @@ export const verifyAdminPass = async (Password: string):ServiceReturnType => {
         
         return {valid: false, msg: 'Incorrect Password.'}
 
-    } catch (error) {
+    } catch {
         return {valid: false, msg: 'Incorrect password.'}
     }
 }
@@ -62,7 +64,7 @@ export const getAdminConfig = async (): ServiceReturnType<AdminConfigType> => {
 
         return {valid: true, data: adminConfig[0].toObject() as AdminConfigType};
 
-    } catch (error) {
+    } catch {
         return {valid: false, operation: 'LOGOUT'}
     }
 }
@@ -157,7 +159,7 @@ export const ad_getAdminConfig = async (): ServiceReturnType<AdminConfigType> =>
 
         return {valid: true, data: adminConfig[0].toObject() as AdminConfigType};
 
-    } catch (error) {
+    } catch {
         return {valid: false, operation: 'LOGOUT'}
     }
 }
@@ -435,7 +437,6 @@ export const ad_settleWithdrawal = async (editedDetails : TransactionObjType): S
     try {
         
         if(editedDetails.Status === TransactionStatusType.PENDING) throw new Error('Please choose correct type.');
-        console.log('received', editedDetails);
 
         const isTransactionUpdated = await TRANSACTION.findByIdAndUpdate(editedDetails._id, {
             Amount : editedDetails.Amount,
@@ -443,14 +444,17 @@ export const ad_settleWithdrawal = async (editedDetails : TransactionObjType): S
             TransactionID : editedDetails.TransactionID,
             Status : editedDetails.Status
         }, {session});
-        console.log('is transaction updated', isTransactionUpdated);
+
         if(!isTransactionUpdated) throw new Error("Failed to update transaction.");
 
         if(editedDetails.Status === TransactionStatusType.FAILED) {
+        
+            const taxableAmount = (Number(editedDetails.Amount) / 100) * 20;
+        
             // reupdate the user's balance and return.
             const isUpdated = await USER.findOneAndUpdate(
                 {PhoneNumber: editedDetails.PhoneNumber},
-                {$inc : {Balance : editedDetails.Amount}}, 
+                {$inc : {Balance : Number(editedDetails.Amount) + taxableAmount}}, 
                 {session}
             );
             
@@ -708,9 +712,90 @@ export const ad_getTodayWithdrawals = async () : ServiceReturnType<{
 
         return {valid: true, data: data}
 
-    } catch (error) {
+    } catch {
         return {valid: false, }
     }
 }
 
 // =============================================
+
+
+// VIDEO HANDLERS ==============================
+
+export const ad_getPeningVideoApproval = async () : ServiceReturnType<VideoType[]> => {
+    try {
+        await CONNECT();
+        const videos = await VIDEOS.find({
+            ApprovalStatus : VideoApprovalStatusType.PENDING_APPROVAL
+        }).sort({createdAt : -1}) as unknown as VideoType[]
+
+        if(!videos) throw new Error();
+
+        return {valid: true, data : JSON.parse(JSON.stringify(videos))}
+    } catch {
+        return {valid: false}
+    }   
+}
+
+
+export const ad_videoRejectApprove = async ({id, operation, rewardAmount, durationInSec} : {
+    id : string,
+    operation : ApprovalStatusType,
+    rewardAmount ?: number,
+    durationInSec ?: number,
+}) : ServiceReturnType => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        
+        if(operation === VideoApprovalStatusType.REJECTED){
+            await VIDEOS.findOneAndUpdate({_id : new mongoose.Types.ObjectId(id), ApprovalStatus : VideoApprovalStatusType.PENDING_APPROVAL}, {
+                $set : {
+                    ApprovalStatus : VideoApprovalStatusType.REJECTED
+                }
+            });
+
+            return {valid : true, msg : 'Rejected Successfully'};
+        }   
+
+        if(!durationInSec || durationInSec <= 1) throw new Error("Failed to approve please select a valid duration.");
+        
+        if(!rewardAmount || rewardAmount <= 1) throw new Error("Please select a valid reward ammount");
+
+        const videoUpdated = await VIDEOS.findOneAndUpdate({_id : new mongoose.Types.ObjectId(id)}, {
+            $set : {
+                ApprovalStatus : VideoApprovalStatusType.APPROVED,
+                VideoUploadEarning : rewardAmount,
+                Duration : durationInSec
+            }
+        }, {session});
+        if(!videoUpdated) throw new Error("Error while updating video");
+        
+        // create a new earning for this user.
+        await VIDEO_EARNING.create([{
+            PhoneNumber : videoUpdated.PhoneNumber,
+            InvitationCode : videoUpdated.InvitationCode,
+            Type : VideoEarningType.UPLOAD,
+            Amount : rewardAmount,
+            Video  : videoUpdated._id
+        }])
+
+        //  update users balance. 
+        await USER.findOneAndUpdate({PhoneNumber: videoUpdated.PhoneNumber}, {
+            $inc : {Balance : Number(rewardAmount), Profit : Number(rewardAmount)}
+        }, {session});
+
+        await session.commitTransaction();
+        return {valid : true, msg : 'Updated'};
+
+    } catch (error) {
+        await session.abortTransaction();
+        console.error(error);
+        return {valid : false, msg : error instanceof Error ? error.message : 'something went wrong'}
+    }finally{
+        await session.endSession();
+    }
+}
+
+// =============================
