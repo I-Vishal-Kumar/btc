@@ -56,7 +56,7 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/getting-started", req.nextUrl));
       }
       
-    } catch (error) {
+    } catch {
         return NextResponse.redirect(new URL("/getting-started", req.nextUrl));  
     }
     return NextResponse.next();
