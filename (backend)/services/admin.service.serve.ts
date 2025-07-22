@@ -11,7 +11,7 @@ import { ApprovalStatusType, TransactionStatusType, TransactionType, VideoApprov
 import { getTotalDetails } from "./user.service.serv";
 import { IncomeType, TransactionObjType, adminWithdrawalRespType } from "@/__types__/transaction.types";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
-import mongoose, { Schema, startSession } from "mongoose";
+import mongoose, { startSession } from "mongoose";
 import { UserType, UserWallet, VideoType } from "@/__types__/user.types";
 import { WALLET } from "../(modals)/schema/userWalled.schema";
 import { randomBytes } from "crypto";
