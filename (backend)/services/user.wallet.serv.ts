@@ -15,6 +15,7 @@ import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
 import { handleAutoWithdraw2 } from "@/lib/helpers/handleAuthWithdraw2";
+import { DateTime } from "luxon";
 
 
 const requiredDetails = {
@@ -172,11 +173,11 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const METHOD = identifier === WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER ? 'LOCAL' : 'USDT';
         let DbWithdrawalPassKey = 'LocalWithdrawPassword';
 
-        // const now = DateTime.now().setZone("Asia/Kolkata");
-        // const isSunday = now.weekday === 7;
-        // const isBetween9and11 = now.hour >= 9 && now.hour < 11;
+        const now = DateTime.now().setZone("Asia/Kolkata");
+        const isSunday = now.weekday === 7;
+        const isBetween9and11 = now.hour >= 9 && now.hour < 11;
 
-        // if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
+        if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
 
         const Amount = Number(data.Amount);
         if(Amount < 600) throw new Error("Minimum withdrawal amount is 600");
@@ -187,18 +188,18 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         }
 
         // check if already withdrawan today.
-        // const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
-        // const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
+        const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
+        const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
         
         await CONNECT();
 
-        // const existingTransaction = await TRANSACTION.findOne({
-        //     PhoneNumber,
-        //     Type: TransactionType.WITHDRAWAL,
-        //     createdAt: { $gte: startOfDay, $lte: endOfDay }
-        // });
+        const existingTransaction = await TRANSACTION.findOne({
+            PhoneNumber,
+            Type: TransactionType.WITHDRAWAL,
+            createdAt: { $gte: startOfDay, $lte: endOfDay }
+        });
 
-        // if(existingTransaction) throw new Error("You have already withdrawn today.");
+        if(existingTransaction) throw new Error("You have already withdrawn today.");
 
         // check if user has a bank account.
         const hasBank = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : { $exists: true, $nin: [null, ""] } })
