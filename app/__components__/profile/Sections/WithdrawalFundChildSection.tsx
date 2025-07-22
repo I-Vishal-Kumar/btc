@@ -51,7 +51,7 @@ export const Section: React.FC<{
                     ${ totalAmount } will be deducted from your account
                     Base Amount - ${ data.Amount }
                     Tax Amount - ${ tax }
-                `);
+                    `);
             if (!procede) return;
         }
 
