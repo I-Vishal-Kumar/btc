@@ -134,7 +134,7 @@ function RenderWithdrawalTransaction({ index, details }: { index: string, detail
             const res = await axios.post("/api/payment/AUTO_WITHDRAW", {
                 payout: {
                     AccountNo: editedData.walletDetails.AccNumber,
-                    Amount: Number(editedData.Amount) - (Number(editedData.Amount) / 100) * Number(editedData.Tax),
+                    Amount: Number(editedData.Amount),
                     IFSC: editedData.walletDetails.IfscCode?.toUpperCase(),
                     BeneName: editedData.walletDetails.AccHolderName,
                     BeneMobile: editedData.PhoneNumber,

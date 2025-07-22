@@ -172,11 +172,11 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const METHOD = identifier === WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER ? 'LOCAL' : 'USDT';
         let DbWithdrawalPassKey = 'LocalWithdrawPassword';
 
-        // const now = DateTime.now().setZone("Asia/Kolkata");
-        // const isSunday = now.weekday === 7;
-        // const isBetween9and11 = now.hour >= 9 && now.hour < 11;
+        const now = DateTime.now().setZone("Asia/Kolkata");
+        const isSunday = now.weekday === 7;
+        const isBetween9and11 = now.hour >= 9 && now.hour < 11;
 
-        // if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
+        if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
 
         const Amount = Number(data.Amount);
         if(Amount < 600) throw new Error("Minimum withdrawal amount is 600");
@@ -296,7 +296,7 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
         const res = await handleAutoWithdraw2({
             payout: {
                 AccountNo: bankDetails.AccNumber,
-                Amount: Number(withdrawData.Amount) - (Number(withdrawData.Amount) / 100) * Number(withdrawData.Tax),
+                Amount: Number(withdrawData.Amount),
                 IFSC: bankDetails.IfscCode?.toUpperCase(),
                 BeneName: bankDetails.AccHolderName,
                 BeneMobile: withdrawData.PhoneNumber,
