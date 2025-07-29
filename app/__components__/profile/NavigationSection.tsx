@@ -6,6 +6,7 @@ import { ReactNode } from "react";
 import { SectionsAvailable } from "@/__types__/ui_types/profil.types";
 import { useRouter } from "next/navigation";
 import { Router } from "next/router";
+import { logoutAndRedirect } from "@/(backend)/services/user.service.serv";
 
 type ButtonType = {
     key: SectionsAvailable,
@@ -57,7 +58,10 @@ const sections: Sections = {
             startIcon: <Logout />,
             label: "Log Out",
             sx: { color: 'red' },
-            onClick: (router) => { router.push("/getting-started?type=login") }
+            onClick: async (router) => {
+                await logoutAndRedirect()
+                router.push("/getting-started?type=login")
+            }
         },
     ]
 }

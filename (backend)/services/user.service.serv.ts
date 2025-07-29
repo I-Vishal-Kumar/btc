@@ -427,3 +427,12 @@ export const getRegistrationDetails = async ( tab: ActiveTabs , page: number = 1
 }
 
 // =======================================
+
+export async function logoutAndRedirect() {
+  const cookieStore = await cookies();
+  cookieStore.set('token', '', {
+    maxAge: 0,
+    path: '/',
+  });
+
+}
