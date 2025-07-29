@@ -1,4 +1,6 @@
 import { Button, CircularProgress, Typography } from "@mui/material";
+// @ts-expect-error types not availabe for these
+import { forceUpdateCookies, isNativeApp } from 'webtonative'
 import { motion } from "framer-motion";
 import { useState, ChangeEvent, useEffect } from "react";
 import { CustomInput } from "./customInput";
@@ -33,6 +35,9 @@ export const LoginForm = ({ setQueryParam }: { setQueryParam: (key: string, valu
                 if (isBotLogin) {
                     router.push('/profile/withdrawal_history')
                 } else {
+                    if (isNativeApp) {
+                        forceUpdateCookies();
+                    }
                     router.push('/')
                 }
             }
