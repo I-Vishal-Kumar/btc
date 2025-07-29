@@ -27,9 +27,9 @@ const SetCookie = async (sess_token: string) => {
     const cookie = await cookies()
 
     cookie.set("token", `${ sess_token }`, {
-        httpOnly: true,
+        // httpOnly: true,
         maxAge: Date.now() + 60 * 60 * 24, // one day in seconds
-        secure: true
+        // secure: true
     })
 }
 
