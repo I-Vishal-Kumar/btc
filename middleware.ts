@@ -1,53 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
-import { VerifyToken } from "@/lib/auth/verifyToken";
+import { VerifyToken } from '@/lib/auth/verifyToken'
+
 
 export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
 
-  const token = req.cookies.get("token")?.value || "";
+    const { pathname } = req.nextUrl;
 
-  // 1. If token exists, verify it
-  let isAuthenticated = false;
-  if (token) {
-    try {
-      const result = await VerifyToken(token);
-      if (result?.success) {
-        isAuthenticated = true;
+    // check for public path
+    const isPublic = pathname.startsWith("/nimda__") || pathname === 'terms-condition';
+
+    if (isPublic) return NextResponse.next();
+
+    const token = req?.cookies?.get("token")?.value || "";
+
+    if(!token){
+      if(pathname.startsWith("/getting-started")){
+        return NextResponse.next();
+      }else{
+        return NextResponse.redirect(new URL("/getting-started", req.nextUrl));
       }
-    } catch {
-      isAuthenticated = false;
     }
-  }
 
-  // 2. Handle /getting-started logic
-  if (pathname.startsWith("/getting-started")) {
-    // If user is logged in, redirect them to home
-    if (isAuthenticated) {
+    try {
+      
+      const isValidToken = await VerifyToken(token);
+      
+      if (!isValidToken.success) {
+        return NextResponse.redirect(new URL("/getting-started", req.nextUrl));
+      }
+      
+    } catch {
+        return NextResponse.redirect(new URL("/getting-started", req.nextUrl));  
+    }
+
+    if(pathname.includes('getting-started')){
       return NextResponse.redirect(new URL("/", req.nextUrl));
     }
 
-    // Otherwise, let unauthenticated users see the page
     return NextResponse.next();
-  }
 
-  // 3. Define other public routes
-  const isPublic =
-    pathname.startsWith("/nimda__") || pathname === "/terms-condition" || pathname.startsWith("/super_admin");
-
-  if (isPublic) {
-    return NextResponse.next();
-  }
-
-  // 4. All other routes require auth
-  if (!isAuthenticated) {
-    return NextResponse.redirect(new URL("/getting-started", req.nextUrl));
-  }
-
-  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next|favicon.ico|.*\\..*).*)",
+    matcher: [
+    '/((?!api|_next|favicon.ico|.*\\..*).*)',
   ],
 };
