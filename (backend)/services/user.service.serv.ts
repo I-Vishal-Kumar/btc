@@ -181,15 +181,13 @@ export const getCommissionPageDetails = async (): ServiceReturnType<CommissionPa
 
         if(!userDetails) throw new Error('Could not find the user');
         
-        // get total deposit and withdrawal data up to 6 level's 
-        const details = await getTotalDetails(userDetails.InvitationCode);
+        // get total deposit and withdrawal data up to 6 level's
+        const [details,memberDetails ] = await Promise.all([
+            getTotalDetails(userDetails.InvitationCode),
+            getMemberDetails(userDetails.InvitationCode)
+        ]) 
         
-        if(!details) throw new Error('Something went wrong');
-
-        // get today new registrations.
-        const memberDetails = await getMemberDetails(userDetails.InvitationCode);
-        
-        if(!memberDetails) throw new Error("Something went wrong");
+        if(!details || !memberDetails) throw new Error('Something went wrong');
 
         return {valid: true, data: {...details, ...memberDetails}};
 
