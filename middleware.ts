@@ -33,10 +33,6 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/getting-started", req.nextUrl));  
     }
 
-    if(pathname.includes('getting-started')){
-      return NextResponse.redirect(new URL("/", req.nextUrl));
-    }
-
     return NextResponse.next();
 
 }
