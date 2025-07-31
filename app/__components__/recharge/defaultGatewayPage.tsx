@@ -39,7 +39,7 @@ export const UploadFile = async (file: File | null, PhoneNumber: string) => {
             { headers: { "Content-Type": "multipart/form-data" }, }
         );
 
-        return Boolean(response.data.url)
+        return response.data.url
     } catch {
         return false;
     }

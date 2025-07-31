@@ -1,4 +1,5 @@
 import { ad_editAdminConfig } from "@/(backend)/services/admin.service.serve";
+import { UploadFile } from "@/app/__components__/recharge/defaultGatewayPage";
 import { ADMIN_CONTEXT } from "@/lib/hooks/admin.context";
 import { FileUpload } from "@mui/icons-material";
 import { Box, Button, Typography } from "@mui/material";
@@ -31,7 +32,7 @@ export function PopupImageUploadSection() {
 
     }, [data, isPending]);
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>, type: 'HistoryPopImage' | 'HomePopImage') => {
+    const handleChange = async (e: ChangeEvent<HTMLInputElement>, type: 'HistoryPopImage' | 'HomePopImage') => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -39,14 +40,15 @@ export function PopupImageUploadSection() {
             enqueueSnackbar("File size too large. Maximum allowed is 1MB.", { variant: "error" });
             return;
         }
+        const url = await UploadFile(file, `${ Date.now() }`);
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            if (typeof reader.result === "string") {
-                mutate({ key: type, newVal: reader.result });
-            }
-        };
-        reader.readAsDataURL(file);
+        if (!url) {
+            enqueueSnackbar('Failed to upload file', { variant: 'error' });
+            return;
+        }
+
+        mutate({ key: type, newVal: url });
+
     };
 
     return (

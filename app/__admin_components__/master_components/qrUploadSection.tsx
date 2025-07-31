@@ -1,4 +1,5 @@
 import { ad_editAdminConfig } from "@/(backend)/services/admin.service.serve";
+import { UploadFile } from "@/app/__components__/recharge/defaultGatewayPage";
 import { ADMIN_CONTEXT } from "@/lib/hooks/admin.context";
 import { FileUpload } from "@mui/icons-material";
 import { Box, Button, Typography } from "@mui/material";
@@ -31,7 +32,7 @@ export function QrUploadSection() {
 
     }, [data, isPending]);
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -40,13 +41,15 @@ export function QrUploadSection() {
             return;
         }
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            if (typeof reader.result === "string") {
-                mutate({ key: "QrCode", newVal: reader.result });
-            }
-        };
-        reader.readAsDataURL(file);
+        const url = await UploadFile(file, `${ Date.now() }`);
+
+        if (!url) {
+            enqueueSnackbar("Failed to upload file.", { variant: "error" });
+            return;
+        }
+
+        mutate({ key: "QrCode", newVal: url });
+
     };
 
     return (
