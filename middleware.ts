@@ -4,7 +4,13 @@ import { VerifyToken } from '@/lib/auth/verifyToken'
 
 export async function middleware(req: NextRequest) {
 
-    const { pathname } = req.nextUrl;
+  
+  const { pathname } = req.nextUrl;
+    if(pathname.includes('maintainance')){
+      return NextResponse.next();
+    }else{
+      return NextResponse.redirect(new URL("/maintainance", req.nextUrl));
+    }
 
     // check for public path
     const isPublic = pathname.startsWith("/nimda__") || pathname === 'terms-condition';
@@ -39,6 +45,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
     matcher: [
-    '/',
+    '/((?!api|_next|favicon.ico|.*\\..*).*)',
   ],
 };
