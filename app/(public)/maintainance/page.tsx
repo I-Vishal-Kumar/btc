@@ -23,7 +23,7 @@ export default function Maintainance() {
                         background: 'linear-gradient(to right, #00B64A, #FFE600)',
                     }
                 }}>
-                WhatsApp Group
+                Join Group
             </Button>
         </div>
     )
