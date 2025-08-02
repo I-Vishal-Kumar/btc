@@ -9,7 +9,8 @@ export enum SectionsAvailable {
     UPLOAD_CONTENT = 'upload_content',
     MY_VIDEOS = 'my_videos',
     VIDEO_EARNINGS = 'video_earnings',
-    WATCH_TO_EARN = 'watch_to_earn'
+    WATCH_TO_EARN = 'watch_to_earn',
+    ADD_OR_REMOVE_VIDEOS = 'add_or_remove_videos'
 } 
 
 export enum SubSectionsAvailable {

@@ -48,7 +48,7 @@ export type VideoType = {
     InvitationCode : string;
     PhoneNumber : string;
     VideoSource : string;
-    VideoUploadedEarning : number;
+    VideoUploadEarning : number;
     Vissibility : VissibilityStatusType;
     createdAt : Date;
     updatedAt : Date;

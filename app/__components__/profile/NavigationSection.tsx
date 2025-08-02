@@ -1,5 +1,5 @@
 "use client"
-import { ArrowRightAlt, GroupOutlined, LocalPrintshopOutlined, Money, SupportAgent } from "@mui/icons-material";
+import { ArrowRightAlt, GroupOutlined, LocalPrintshopOutlined, Money, SlowMotionVideo, SupportAgent } from "@mui/icons-material";
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SxProps, Typography } from "@mui/material";
 import { History as HistoryIcon, Logout } from "@mui/icons-material";
 import { ReactNode } from "react";
@@ -36,6 +36,16 @@ const sections: Sections = {
             startIcon: <Money />,
             label: "Income History",
         },
+        {
+            key: SectionsAvailable.MY_VIDEOS,
+            startIcon: <SlowMotionVideo />,
+            label: "My Videos",
+        },
+        {
+            key: SectionsAvailable.VIDEO_EARNINGS,
+            startIcon: <SlowMotionVideo />,
+            label: "Video Earnings",
+        },
     ],
     'Preference': [
         {
@@ -47,6 +57,16 @@ const sections: Sections = {
             key: SectionsAvailable.TEAM_COMMISSION,
             startIcon: <GroupOutlined />,
             label: "Team Commission",
+        },
+        {
+            key: SectionsAvailable.UPLOAD_CONTENT,
+            startIcon: <SlowMotionVideo />,
+            label: "Earn From Videos",
+        },
+        {
+            key: SectionsAvailable.WATCH_TO_EARN,
+            startIcon: <SlowMotionVideo />,
+            label: "Watch to Earn",
         },
         {
             key: SectionsAvailable.SUPPORT,

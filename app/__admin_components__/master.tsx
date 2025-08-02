@@ -71,6 +71,8 @@ export const MasterPage: React.FC = () => {
                     <Button role="a" href="/nimda__/block-account" variant="outlined">Block Account</Button>
                     <Button role="a" href="/nimda__/manual-withdrawal" variant="outlined">Manual Withdrawal</Button>
                     <Button role="a" href="/nimda__/today-withdrawals" variant="outlined">Today Withdrawal</Button>
+                    <Button role="a" href="/nimda__/verify-reject-videos" variant="outlined">Verify Reject Videos</Button>
+                    <Button role="a" href="/nimda__/add-or-remove-videos" variant="outlined">Add OR remove videos</Button>
                 </Stack>
 
 

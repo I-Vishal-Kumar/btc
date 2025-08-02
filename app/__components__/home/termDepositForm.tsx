@@ -8,7 +8,7 @@ import { MdOutlineCurrencyRupee } from "react-icons/md";
 
 export const TermDepositForm = () => {
 
-    const [selectedPlan, setPlan] = useState<OptionTypes>("360day@2%");
+    const [selectedPlan, setPlan] = useState<OptionTypes>("360day@1%");
 
     // fd mutation hook.
     const { isPending, maxAmount, minAmount: min, mutate, setValue, value } = useFdMutation({ selectedPlan });

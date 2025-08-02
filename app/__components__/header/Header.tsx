@@ -16,7 +16,7 @@ export const Header: React.FC<{ title: string }> = ({ title }) => {
             </div>
             <div className="w-full">
                 <LineClamp>
-                    <Typography textAlign={'center'} textTransform={"capitalize"} fontWeight={600} fontSize={15}>{title.replace("_", " ")}</Typography>
+                    <Typography textAlign={'center'} textTransform={"capitalize"} fontWeight={600} fontSize={15}>{title.replaceAll("_", " ")}</Typography>
                 </LineClamp>
             </div>
             <div className="w-full"></div>

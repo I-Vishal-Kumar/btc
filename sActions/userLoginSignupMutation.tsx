@@ -121,7 +121,7 @@ const LOGIN = async (credentials: LoginDetails) => {
 
         const sess_token = await generateSessionToken({ PhoneNumber: credentials.PhoneNumber });
 
-        let res = await USER.findOne(credentials);
+        const res = await USER.findOne(credentials);
 
         if (!res) throw new Error('Wrong password or username.');
 

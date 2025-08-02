@@ -7,7 +7,7 @@ import { ServiceReturnType } from "@/__types__/service.types";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { AdminConfigType, ad_getUserInfoResType } from "@/__types__/admin.types";
 import { USER } from "../(modals)/schema/user.schema";
-import { ApprovalStatusType, TransactionStatusType, TransactionType, VideoApprovalStatusType, VideoEarningType, db_schema } from "@/__types__/db.types";
+import { ApprovalStatusType, TransactionStatusType, TransactionType, VideoApprovalStatusType, VideoEarningType, VissibilityStatusType, db_schema } from "@/__types__/db.types";
 import { getTotalDetails } from "./user.service.serv";
 import { IncomeType, TransactionObjType, adminWithdrawalRespType } from "@/__types__/transaction.types";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
@@ -735,6 +735,37 @@ export const ad_getPeningVideoApproval = async () : ServiceReturnType<VideoType[
     } catch {
         return {valid: false}
     }   
+}
+
+export const ad_getAllApprovedVideos = async () : ServiceReturnType<VideoType[]> => {
+    try {
+        await CONNECT();
+        const videos = await VIDEOS.find({
+            ApprovalStatus : VideoApprovalStatusType.APPROVED
+        }).sort({createdAt : -1}) as unknown as VideoType[]
+
+        if(!videos) throw new Error();
+
+        return {valid: true, data : JSON.parse(JSON.stringify(videos))}
+    } catch {
+        return {valid: false}
+    }   
+}
+
+
+export const ad_toggleVideoVisibility = async ({id, newStatus }: {newStatus : VissibilityStatusType, id: string}) : Promise<boolean> => {
+    try {
+        
+        if(!id || !newStatus) return false;
+        await VIDEOS.findOneAndUpdate({_id : id}, {
+            Vissibility : newStatus
+        })
+        return true;
+
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
 }
 
 
