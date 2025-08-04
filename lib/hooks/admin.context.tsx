@@ -18,7 +18,7 @@ type adminContextType = {
     setConfig: VoidFunction | React.Dispatch<SetStateAction<AdminConfigType>>
 }
 
-const initial_adminConfig = {
+const initial_adminConfig: AdminConfigType = {
     QrCode: '',
     HistoryPopImage: '',
     HomePopImage: '',
@@ -27,7 +27,9 @@ const initial_adminConfig = {
     Usdt: false,
     UsdtAddress: '',
     AutoWithdraw: false,
-    AvailableVideos: []
+    AvailableVideos: [],
+    HomePageCarousel: [],
+    HomePageImg: ''
 }
 
 const initial_context = {
