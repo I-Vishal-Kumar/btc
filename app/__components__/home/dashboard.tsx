@@ -127,7 +127,7 @@ const TermDepositDashboard = ({ homePopupImage }: { homePopupImage?: string }) =
                             </Button>
 
                             <Button
-                                onClick={() => window.open("https://chat.whatsapp.com/G6QfOA7OeiV8MqPnGwdod2")?.focus()}
+                                onClick={() => window.open("https://chat.whatsapp.com/CYNTuIVcGpwIZPK1wxb6ui?mode=ac_t")?.focus()}
                                 fullWidth
                                 sx={{
                                     background: 'linear-gradient(to right, #00C851, #FFEB3B)', // green to yellow

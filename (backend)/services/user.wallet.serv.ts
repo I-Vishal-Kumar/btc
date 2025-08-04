@@ -14,8 +14,9 @@ import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
-import { handleAutoWithdraw2 } from "@/lib/helpers/handleAuthWithdraw2";
+// import { handleAutoWithdraw2 } from "@/lib/helpers/handleAuthWithdraw2";
 import { DateTime } from "luxon";
+import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 
 
 const requiredDetails = {
@@ -173,11 +174,11 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const METHOD = identifier === WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER ? 'LOCAL' : 'USDT';
         let DbWithdrawalPassKey = 'LocalWithdrawPassword';
 
-        const now = DateTime.now().setZone("Asia/Kolkata");
-        const isSunday = now.weekday === 7;
-        const isBetween9and11 = now.hour >= 9 && now.hour < 11;
+        // const now = DateTime.now().setZone("Asia/Kolkata");
+        // const isSunday = now.weekday === 7;
+        // const isBetween9and11 = now.hour >= 9 && now.hour < 11;
 
-        if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
+        // if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
 
         const Amount = Number(data.Amount);
         if(Amount < 600) throw new Error("Minimum withdrawal amount is 600");
@@ -213,12 +214,11 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const userInfo = await USER.findOne({PhoneNumber});
 
         const tax = userInfo.HoldingScore > 600 ? 15 : 20  // if more than 600 then 15% tax else 20% tax.
-        const taxableAmount = (Number(Amount) / 100) * Number(tax);
         
         // check if user has enough balance.
-        const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount + taxableAmount}});
+        const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount }});
         
-        if(!isSufficientBalance) throw new Error(`You dont have enough balance. Required ₹ ${Amount + taxableAmount}.`);
+        if(!isSufficientBalance) throw new Error(`You dont have enough balance. Required ₹ ${Amount}.`);
 
         // check if withdrawal password is correct.
         const isPassCorrect = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : data.WithdrawPassword});
@@ -229,7 +229,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         // 1. deduct user balance.
         const isDeducted = await USER.findOneAndUpdate({PhoneNumber}, {
-            $inc : {Balance : -(Number(Amount) + taxableAmount)}
+            $inc : {Balance : -(Number(Amount))}
         }, {session});
 
         if(!isDeducted) throw new Error("Could not process withdrawal this time.");
@@ -294,10 +294,10 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
             throw new Error("[processAutoWithdrawal] failed to process auto withdraw bank details not available");
         }
 
-        const res = await handleAutoWithdraw2({
+        const res = await handleAutoWithdraw3({
             payout: {
                 AccountNo: bankDetails.AccNumber,
-                Amount: Number(withdrawData.Amount),
+                Amount: Number(withdrawData.Amount) - (Number(withdrawData.Amount) / 100) * Number(withdrawData.Tax),
                 IFSC: bankDetails.IfscCode?.toUpperCase(),
                 BeneName: bankDetails.AccHolderName,
                 BeneMobile: withdrawData.PhoneNumber,

@@ -34,7 +34,16 @@ import { INCOME } from "../(modals)/schema/incomeConfig.schema";
 import { DateTime } from "luxon";
 import { VIDEOS } from "../(modals)/schema/videos.schema";
 import { VIDEO_EARNING } from "../(modals)/schema/videoEarning.schema";
+// import axios from "axios";
 
+// axios.post('https://rmstrade.online/api/add-money/v2/check-status', {
+//     api_token : 'fuiGDOMSaxdiRo1QlkrVHiemEiapsh6ywJo1oYYPc4pmbeOlsJVT1B8nlUWB',
+//     client_id : 'bc9f0c7de4e3122c2699b37b0359d77d'
+// }).then(d => {
+//     console.log(d.data);
+// }).catch(err => {
+//     console.log(err);
+// })
 // VERIFY ADMIN PASS ===============================
 
 export const verifyAdminPass = async (Password: string): ServiceReturnType => {
