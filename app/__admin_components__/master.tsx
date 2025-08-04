@@ -13,6 +13,7 @@ import { QrUploadSection } from "./master_components/qrUploadSection"
 import { ToggleWithdrawalType } from "./master_components/toggleWithdrawalTypeSection"
 import { EditAvailableVideosSection } from "./master_components/editAvailableVideos"
 import { PopupImageUploadSection } from "./master_components/popupImageUploadSection"
+import { EditHomePageCarouselVideos } from "./master_components/homePageCarousel"
 
 export const MasterPage: React.FC = () => {
 
@@ -97,6 +98,10 @@ export const MasterPage: React.FC = () => {
                     <Box mt={3}>
                         <Typography variant="overline" fontWeight={600} sx={{ my: 2 }}>Popup Image upload section</Typography>
                         <PopupImageUploadSection />
+                    </Box>
+                    <Box mt={3}>
+                        <Typography variant="overline" fontWeight={600} sx={{ my: 2 }}>Home Page Carousel section</Typography>
+                        <EditHomePageCarouselVideos />
                     </Box>
                 </div>
 

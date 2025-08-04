@@ -9,7 +9,6 @@ import { enqueueSnackbar } from "notistack"
 import { useMutation } from "@tanstack/react-query"
 import { claimGift } from "@/(backend)/services/user.service.serv"
 import { Icon } from '@iconify/react';
-import Image from "next/image"
 
 const QuickAccess = ({ icon, isPending, label, onClick }: { isPending: boolean, icon: ReactNode, label: string, onClick?: VoidFunction }) => {
     return (
@@ -31,7 +30,6 @@ export const QuickAccessSection = () => {
     const router = useRouter();
     const { setUserInfo, userInfo } = useContext(USER_CONTEXT);
     const pdfRef = useRef<HTMLAnchorElement>(null);
-    const btcRef = useRef<HTMLAnchorElement>(null);
     const { data, isPending, isSuccess, mutate } = useMutation({
         mutationFn: claimGift
     })
@@ -52,11 +50,11 @@ export const QuickAccessSection = () => {
     const quickLinks = [
         { label: "Recharge", icon: <Icon height={25} width={25} icon={'noto-v1:bank'} />, onClick: () => { router.push('/recharge') } },
         { label: "PDF", icon: <Icon height={25} width={25} icon={'icon-park:file-pdf'} />, onClick: () => { if (pdfRef?.current) pdfRef.current.click() } },
-        { label: "Application", icon: <Icon height={25} width={25} icon={'devicon:androidstudio'} />, onClick: () => btcRef?.current && btcRef.current.click() },
+        { label: "Application", icon: <Icon height={25} width={25} icon={'devicon:androidstudio'} />, onClick: () => router.push('/download') },
         { label: "Gift", icon: <Icon height={25} width={25} icon={'noto:wrapped-gift'} />, onClick: () => handleGiftClaim() },
         { label: "Support", icon: <Icon height={25} width={25} icon={'streamline-plump-color:customer-support-7'} />, onClick: () => { router.push('/profile/support') } },
-        { label: "Coming Soon", icon: <Image alt="coming soon" src={"/assets/coming-soon.png"} height={16} width={16} /> },
-        { label: "Coming soon", icon: <Image alt="coming soon" src={"/assets/coming-soon.png"} height={16} width={16} /> },
+        { label: "Watch Video", icon: <Icon height={25} width={25} icon={'ep:video-play'} />, onClick: () => { router.push('/profile/watch_to_earn') } },
+        { label: "Create Video", icon: <Icon height={25} width={25} icon={'fluent-color:video-32'} />, onClick: () => { router.push('/profile/upload_content') } },
     ]
 
     useEffect(() => {
@@ -76,7 +74,7 @@ export const QuickAccessSection = () => {
 
     return (
 
-        <div className='absolute p-2 bg-gray-400 bg-opacity-30 backdrop-blur-md shadow-sm shadow-gray-200  w-[80%] left-1/2 -translate-x-1/2 rounded-2xl -bottom-25 border border-white/20'>
+        <div className='p-2 my-4 bg-gray-400 bg-opacity-30 backdrop-blur-md shadow-sm shadow-gray-200 w-[80%] mx-auto rounded-2xl border border-white/20'>
 
             <Typography fontSize={11} fontWeight={600}>Quick Access</Typography>
 
@@ -84,7 +82,6 @@ export const QuickAccessSection = () => {
                 {quickLinks.map(details => <QuickAccess isPending={isPending} key={details.label} label={details.label} icon={details.icon} {...(details.onClick ? { onClick: details.onClick } : {})} />)}
             </Box>
             <a ref={pdfRef} hidden href="/assets/btcindia_pdf.pdf" download={'btcIndia'} />
-            <a ref={btcRef} hidden href="./BTC-India.apk" download={'BTC'} />
             <RenderInvitationLink />
         </div>
 

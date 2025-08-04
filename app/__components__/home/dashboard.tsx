@@ -9,7 +9,16 @@ import { memo, useContext, useState } from 'react';
 import { RenderBalance } from '../_commonComponents/RenderBalance';
 import Image from 'next/image';
 import { Close } from '@mui/icons-material';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, EffectCoverflow } from 'swiper/modules';
 
+import 'swiper/css';
+import 'swiper/css/autoplay';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
+import { getAdminConfig } from '@/(backend)/services/admin.service.serve';
+import { useQuery } from '@tanstack/react-query';
 
 const MemoizedVideo = memo(Video);
 const MemoizedUserDetails = memo(RenderUserDetails);
@@ -18,22 +27,50 @@ const MemoizedQuickAccess = memo(QuickAccessSection);
 const TermDepositDashboard = ({ homePopupImage }: { homePopupImage?: string }) => {
 
     const [showModel, setModel] = useState(true);
+    const { isPending, data, isSuccess } = useQuery({
+        queryFn: getAdminConfig,
+        queryKey: []
+    })
+
+    if (isPending || !isSuccess) return (
+        <div className='grid place-content-center p-12'>
+            Loading...
+        </div>
+    )
 
     return (
-        <Container sx={{ background: 'url(/assets/home_bg.jpg) center no-repeat', height: '100%' }} disableGutters maxWidth="md">
-            <Box height={'60%'} position={'relative'}>
+        <Container sx={{ background: 'url(/assets/home_bg2.jpg) 60% no-repeat', backgroundSize: 'cover', height: '150vh' }} disableGutters maxWidth="md">
+            <Box position={'relative'} pb={'280px'}>
                 <MemoizedUserDetails />
-                <MemoizedVideo />
+                <MemoizedVideo src={data.data?.HomePageImg || "/assets/home_crypto.jpg"} />
                 <MemoizedQuickAccess />
             </Box>
 
             <Box sx={{
                 bgcolor: 'whitesmoke',
                 p: 4,
-                pt: 13,
+                pt: 10,
+                position: 'relative',
                 borderTopRightRadius: 40,
                 borderTopLeftRadius: 40
             }}>
+                <div className=' absolute -top-[280px] left-1/2 -translate-x-1/2 w-[350px] max-w-[80%] mx-auto'>
+                    <HomeCarousel images={data.data?.HomePageCarousel || []} />
+                    <div
+                        className='absolute bottom-4 rounded-b-xl left-0 w-full'
+                        style={{
+                            padding: '10px',
+                            marginTop: -25,
+                            zIndex: 1,
+                            textAlign: 'center',
+                            fontWeight: 'bold',
+                            color: 'white',
+                            background: 'linear-gradient(to right, #ffa500, #ff4500)',
+                        }}
+                    >
+                        Events & Partners Feedback
+                    </div>
+                </div>
                 <div className="p-[2px] flex justify-center items-center rounded-[1rem] bg-gradient-to-r from-red-500/80 to-orange-400/80">
                     <div className="bg-[#fef0e6] flex-1 p-8 rounded-[0.9rem]">
                         <Typography variant="body2" fontWeight={600}>
@@ -122,7 +159,7 @@ const TermDepositDashboard = ({ homePopupImage }: { homePopupImage?: string }) =
 };
 
 
-function Video() {
+function Video({ src }: { src: string }) {
     return (
         <Box
             position="relative"
@@ -136,7 +173,7 @@ function Video() {
             }}
         >
             <Image
-                src="/assets/home_crypto.jpg"
+                src={src}
                 alt="crypto coming soon"
                 fill
                 style={{
@@ -173,4 +210,53 @@ function RenderUserDetails() {
     )
 }
 
+
+function HomeCarousel({ images }: { images: string[] }) {
+
+    if (!images.length) return null;
+
+    return (
+        <Swiper
+            modules={[Autoplay, EffectCoverflow]}
+            effect="coverflow"
+            loop={true}
+            autoplay={{ reverseDirection: true }}
+            spaceBetween={-100}
+            slidesPerView={1.9}
+            centeredSlides={true}
+            coverflowEffect={{
+                rotate: 0,
+                depth: 300,
+                modifier: 2,
+                slideShadows: false,
+            }}
+            style={{ padding: "1rem" }}
+        >
+            {images.map((item, index) => (
+                <SwiperSlide
+                    key={index}>
+                    <div
+                        style={{
+                            borderRadius: 20,
+                            overflow: 'hidden',
+                            backgroundColor: '#ddd',
+                            height: 300,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'flex-end',
+                            position: 'relative',
+                        }}
+                    >
+                        <Image
+                            src={item}
+                            fill
+                            alt='carousel image'
+                        />
+                    </div>
+                </SwiperSlide>
+
+            ))}
+        </Swiper>
+    )
+}
 export default TermDepositDashboard;

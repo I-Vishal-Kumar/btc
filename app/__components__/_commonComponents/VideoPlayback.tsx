@@ -52,7 +52,7 @@ export function VideoPlayback({
 
         // Try to play (sometimes needed due to autoplay policy)
         // player.mute(); // ensures autoplay works
-        player.playVideo();
+        // player.playVideo();
 
         // Stop after X seconds
         setTimeout(() => {
@@ -91,7 +91,7 @@ export function VideoPlayback({
         height: '100%',
         width: '100%',
         playerVars: {
-            autoplay: 1,
+            autoplay: 0,
             controls: 0,
             disablekb: 1,
             modestbranding: 1,
@@ -120,7 +120,9 @@ export function VideoPlayback({
                     onStateChange={onStateChange}
                 />
                 <div className="absolute bottom-2 left-2 bg-black/60 text-white px-3 py-1 text-xs rounded">
-                    {remaining}s left
+                    {Math.floor(remaining / 60) > 0
+                        ? `${ Math.floor(remaining / 60) }m ${ remaining % 60 }s left`
+                        : `${ remaining }s left`}
                 </div>
             </div>
         </Modal>

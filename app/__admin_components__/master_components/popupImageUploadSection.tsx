@@ -32,7 +32,7 @@ export function PopupImageUploadSection() {
 
     }, [data, isPending]);
 
-    const handleChange = async (e: ChangeEvent<HTMLInputElement>, type: 'HistoryPopImage' | 'HomePopImage') => {
+    const handleChange = async (e: ChangeEvent<HTMLInputElement>, type: 'HomePageImg' | 'HomePopImage') => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -63,9 +63,9 @@ export function PopupImageUploadSection() {
             <Box textAlign={'center'} >
                 <Button variant="outlined" component="label">
                     <FileUpload />
-                    <input onChange={_ => handleChange(_, 'HistoryPopImage')} type="file" accept="image/*" hidden />
+                    <input onChange={_ => handleChange(_, 'HomePageImg')} type="file" accept="image/*" hidden />
                 </Button>
-                <Typography fontWeight={500}>History Popup</Typography>
+                <Typography fontWeight={500}>Home Top Section</Typography>
             </Box>
         </div>
     )

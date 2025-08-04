@@ -97,7 +97,7 @@ export const WatchToEarn: React.FC = () => {
                 playableVideo ? (
                     <VideoPlayback onFinish={() => {
                         setPlayableVideo(undefined);
-                    }} open id={playableVideo._id.toString()} duration={12} videoSource={extractYouTubeID(playableVideo.VideoSource.toString()) || ""} />
+                    }} open id={playableVideo._id.toString()} duration={Number(playableVideo.Duration)} videoSource={extractYouTubeID(playableVideo.VideoSource.toString()) || ""} />
                 ) : null
             }
         </div>
@@ -120,7 +120,7 @@ function VideoDetails({ video }: { video: VideoType }) {
                     height={200}
                 />
             </div>}
-            title={'Sample Video'}
+            title={'Video'}
             subheader={<div>
                 <Typography sx={{ fontSize: 10 }} mt={1}>Estimated Reward For Full Watch:</Typography>
                 <Typography sx={{ fontSize: 13, fontWeight: 600 }}>INR {video.DailyRates}</Typography>
