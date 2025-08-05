@@ -3,6 +3,7 @@
 import { _walletOperation } from "@/(backend)/services/user.wallet.serv";
 import { WithdrawalOperationIdentifier, WithdrawalOperationIdentifierType } from "@/__types__/ui_types/profil.types";
 import { UserWallet } from "@/__types__/user.types";
+import { USER_CONTEXT } from "@/lib/hooks/user.context";
 import { WALLET_CONTEXT } from "@/lib/hooks/userWallet.context";
 import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
@@ -25,7 +26,7 @@ export const Section: React.FC<{
     const { data, isPending, isSuccess, mutate } = useMutation({
         mutationFn: _walletOperation,
     })
-
+    const { userInfo } = useContext(USER_CONTEXT);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -38,6 +39,23 @@ export const Section: React.FC<{
             if (value) data[field.formFieldName] = value.toString();
         });
 
+        if (_identifier === WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER) {
+
+            if (Number(data.Amount) / 100 !== 0) {
+                enqueueSnackbar("Enter a amount multiple of 100 eg. 600, 700 etc.", { variant: 'warning' });
+                return;
+            }
+
+            const taxPercent = userInfo.HoldingScore > 600 ? 15 : 20
+            const tax = Math.ceil((taxPercent / 100) * Number(data.Amount));
+            const totalAmount = Number(data.Amount) + tax;
+            const procede = window.confirm(`
+                    ${ totalAmount } will be deducted from your account
+                    Base Amount - ${ data.Amount }
+                    Tax Amount - ${ tax }
+                    `);
+            if (!procede) return;
+        }
         mutate({ data, _identifier });
 
     };

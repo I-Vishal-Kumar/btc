@@ -24,7 +24,7 @@ export const TermDepositForm = () => {
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 
         const newValue = [min, Number(event.target.value)];
-
+        console.log(newValue);
         // only update if its less than max amount
         if (newValue[1] <= maxAmount) {
             setValue(newValue);
@@ -46,6 +46,12 @@ export const TermDepositForm = () => {
                         startAdornment: value[1] ? <MdOutlineCurrencyRupee /> : null
                     }
                 }}
+                error={!!value[1] && Number(value[1]) < 500}
+                helperText={
+                    !!value[1] && Number(value[1]) < 500
+                        ? "Minimum amount should be ₹500"
+                        : ""
+                }
                 value={value[1] ? value[1] : ""}
                 onChange={handleInputChange}
                 sx={{
@@ -99,9 +105,15 @@ export const TermDepositForm = () => {
 
             </div>
 
-            <Button onClick={() => mutate()} disabled={isPending} fullWidth sx={{
+            <Button onClick={() => mutate()} disabled={
+                isPending || !!(value[1] && Number(value[1]) < 500)
+            } fullWidth sx={{
                 mt: 3, borderRadius: '100vw', textTransform: 'initial',
-                background: 'linear-gradient(to right, #f3c45c,#e43905)'
+                background: 'linear-gradient(to right, #f3c45c,#e43905)',
+                "&.Mui-disabled": {
+                    opacity: 0.5,
+                    background: 'linear-gradient(to right, #f3c45c,#e43905)',
+                },
             }} variant="contained">
                 {isPending ? "Loading...." : 'Submit'}
             </Button>

@@ -57,4 +57,5 @@ export type CommissionPageDetailType = {
     todayNewRegistration: number;
     directActiveMembers: number;
     TotalActiveMembers : number;
+    totalBookedFd : number;
 }

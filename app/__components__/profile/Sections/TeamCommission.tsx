@@ -21,6 +21,7 @@ const SectionWithDetails = (data: CommissionPageDetailType) => {
             { name: "Today New Registration", value: data.todayNewRegistration, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_REGISTRATION }?activeTab=today` },
             { name: "Direct Active Members", value: data.directActiveMembers },
             { name: "Total Active Members", value: data.TotalActiveMembers },
+            { name: "Total Booked FD", value: data.totalBookedFd },
         ]
     };
 };

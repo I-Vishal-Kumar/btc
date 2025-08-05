@@ -12,6 +12,7 @@ import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 import {
     db_schema,
     EarningType,
+    FdStatus,
     TransactionStatusType,
     TransactionType,
     VideoApprovalStatusType,
@@ -27,6 +28,7 @@ import { INCOME } from "../(modals)/schema/incomeConfig.schema";
 import { VIDEO_EARNING } from "../(modals)/schema/videoEarning.schema";
 import mongoose from "mongoose";
 import { VIDEOS } from "../(modals)/schema/videos.schema";
+import { FD } from "../(modals)/schema/fixedDeposit.schema";
 
 export const getUserDetails = async (): ServiceReturnType<UserType> => {
     try {
@@ -225,15 +227,16 @@ export const getCommissionPageDetails =
             if (!userDetails) throw new Error("Could not find the user");
 
             // get total deposit and withdrawal data up to 6 level's
-            const [details, memberDetails] = await Promise.all([
+            const [details, memberDetails, bookedFD] = await Promise.all([
                 getTotalDetails(userDetails.InvitationCode),
                 getMemberDetails(userDetails.InvitationCode),
+                getBookedFD(userDetails.InvitationCode)
             ]);
 
             if (!details || !memberDetails)
                 throw new Error("Something went wrong");
 
-            return { valid: true, data: { ...details, ...memberDetails } };
+            return { valid: true, data: { ...details, ...memberDetails, totalBookedFd : bookedFD || 0 } };
         } catch (error) {
             if (error instanceof Error)
                 return {
@@ -328,6 +331,54 @@ export async function getTotalDetails(invitationCode: string) {
     }
 }
 
+export async function getBookedFD(invitationCode: string) {
+    try {
+
+        // Object to store totals (passed recursively to avoid extra iteration)
+        let total = 0;
+
+        async function fetchTransactions(invCodes: string[], level: number) {
+            if (level > 6 || invCodes.length === 0) return;
+
+            // Fetch transactions at this level
+            const thisLevel = await FD.find({
+                Parent: { $in: invCodes },
+                FdStatus : FdStatus.HALTED,
+            }).countDocuments();
+
+            // Prepare next level invitation codes
+            const nextLevelInvites: string[] = [];
+
+            total += Number(thisLevel);
+
+            const nextLevelUsers = await USER.find(
+                {
+                    Parent: { $in: invCodes },
+                    $or: [{ Deposited: true }, { ReferalCount: { $gte: 1 } }],
+                },
+                { InvitationCode: 1 }
+            );
+
+            if (!nextLevelUsers?.length || level === 6) return;
+
+            nextLevelUsers.forEach((user) =>
+                nextLevelInvites.push(user.InvitationCode)
+            );
+
+            // Recursively fetch the next level
+            await fetchTransactions(nextLevelInvites, level + 1);
+        }
+
+        // Start recursion from Level 1
+        await fetchTransactions([invitationCode], 1);
+
+        return total;
+    } catch (error) {
+        console.error("Error fetching transactions:", error);
+        return null;
+    }
+}
+
 async function getMemberDetails(invitationCode: string) {
     try {
         const details = {
@@ -339,12 +390,12 @@ async function getMemberDetails(invitationCode: string) {
 
         async function getDetails(invitationCodes: string[], level: number) {
             if (level > 6 || !invitationCodes.length) return;
-            console.time("userQuery");
+
             const users = await USER.find(
                 { Parent: { $in: invitationCodes } },
                 { createdAt: 1, InvitationCode: 1, Deposited: 1 }
             );
-            console.timeEnd("userQuery");
+
             if (!users || !users.length) return;
 
             const nextLevelInvites: string[] = [];

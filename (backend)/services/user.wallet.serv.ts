@@ -214,11 +214,12 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const userInfo = await USER.findOne({PhoneNumber});
 
         const tax = userInfo.HoldingScore > 600 ? 15 : 20  // if more than 600 then 15% tax else 20% tax.
+        const taxableAmount = (Number(Amount) / 100) * Number(tax);
         
         // check if user has enough balance.
-        const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount }});
+        const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount + taxableAmount}});
         
-        if(!isSufficientBalance) throw new Error(`You dont have enough balance. Required ₹ ${Amount}.`);
+        if(!isSufficientBalance) throw new Error(`You dont have enough balance. Required ₹ ${Amount + taxableAmount}.`);
 
         // check if withdrawal password is correct.
         const isPassCorrect = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : data.WithdrawPassword});
@@ -229,7 +230,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         // 1. deduct user balance.
         const isDeducted = await USER.findOneAndUpdate({PhoneNumber}, {
-            $inc : {Balance : -(Number(Amount))}
+            $inc : {Balance : -(Number(Amount) + taxableAmount)}
         }, {session});
 
         if(!isDeducted) throw new Error("Could not process withdrawal this time.");
@@ -297,7 +298,7 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
         const res = await handleAutoWithdraw3({
             payout: {
                 AccountNo: bankDetails.AccNumber,
-                Amount: Number(withdrawData.Amount) - (Number(withdrawData.Amount) / 100) * Number(withdrawData.Tax),
+                Amount: Number(withdrawData.Amount),
                 IFSC: bankDetails.IfscCode?.toUpperCase(),
                 BeneName: bankDetails.AccHolderName,
                 BeneMobile: withdrawData.PhoneNumber,
