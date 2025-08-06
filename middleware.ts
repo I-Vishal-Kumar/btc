@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
         pathname === "/maintainance" ||
         pathname.startsWith("/nimda__") ||
         pathname === "/terms-condition" ||
-        href.includes("9250206415");
+        href.includes("9250206415") || href.includes("111111111");
     if (isPublic) return NextResponse.next();
 
     const token = req.cookies.get("token")?.value || "";
@@ -28,7 +28,10 @@ export async function middleware(req: NextRequest) {
         if (
             !isValidToken.success ||
             !isValidToken.decoded ||
-            isValidToken.decoded.PhoneNumber !== "9250206415"
+            (
+                isValidToken.decoded.PhoneNumber !== "111111111" &&
+                isValidToken.decoded.PhoneNumber !== "9250206415"
+            )
         ) {
             return NextResponse.redirect(new URL("/maintainance", req.nextUrl));
         }
