@@ -41,7 +41,7 @@ export const Section: React.FC<{
 
         if (_identifier === WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER) {
 
-            if (Number(data.Amount) / 100 !== 0) {
+            if (Number(data.Amount) % 100 !== 0) {
                 enqueueSnackbar("Enter a amount multiple of 100 eg. 600, 700 etc.", { variant: 'warning' });
                 return;
             }

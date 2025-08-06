@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
     const params = new URLSearchParams(rawBody);
     const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
 
-    console.log('parsed body', parsedBody);
+    console.log('parsed body  ', Date.now(), parsedBody);
     
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
         
         // Validate the request body
-        if (parsedBody.status !== 'credit') throw new Error("Transaction Failed");
+        if (['credit', 'success'].includes(parsedBody.status)) throw new Error("Transaction Failed");
 
         // Connect to DB
         await CONNECT();
