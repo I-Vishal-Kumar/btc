@@ -37,21 +37,19 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [countdown, setCountdown] = useState(120); // 2 minutes
     const [loadingStage, setLoadingStage] = useState("🪄 Starting...");
-    const [isWaitingDelay, setIsWaitingDelay] = useState(false);
+    // const [isWaitingDelay, setIsWaitingDelay] = useState(false);
     const mutationRef = useRef(false);
     const hasClaimedRef = useRef(false);
 
     const handleClaimStart = () => {
-        setIsWaitingDelay(true);
+        // setIsWaitingDelay(true);
 
-        setTimeout(() => {
-            mutationRef.current = false;
-            hasClaimedRef.current = false;
-            setIsModalOpen(true);
-            setCountdown(120);
-            setLoadingStage("Claim process started");
-            setIsWaitingDelay(false);
-        }, 12000)
+        mutationRef.current = false;
+        hasClaimedRef.current = false;
+        setIsModalOpen(true);
+        setCountdown(120);
+        setLoadingStage("Claim process started");
+        // setIsWaitingDelay(false);
     }
     // Handle countdown and stage updates
     useEffect(() => {
@@ -95,9 +93,9 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
         }
     }, [isSuccess, data]);
 
-    if (isSuccess && !isPending || isLoadingAdminData ) return null;
+    if (isSuccess && !isPending || isLoadingAdminData) return null;
 
-    if(new Date().getDay() === 0 && fd.FdStatus !== FdStatus.HALTED){
+    if (new Date().getDay() === 0 && fd.FdStatus !== FdStatus.HALTED) {
         return (
             <div className="flex justify-center border-2 border-solid border-green-500">
                 <Typography variant="overline">You can claim tomorrow</Typography>
@@ -111,7 +109,7 @@ export function ClaimButton({ _id, fd }: { _id: string; fd: FD_type }) {
         <Box width={"90%"} maxWidth={420} margin="0 auto" py={1} pb={2}>
             <Button
                 onClick={handleClaimStart}
-                disabled={isPending || isWaitingDelay}
+                disabled={isPending}
                 sx={{
                     bgcolor: "#98bbffe8",
                     color: "black",

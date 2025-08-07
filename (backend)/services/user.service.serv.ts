@@ -341,15 +341,25 @@ export async function getBookedFD(invitationCode: string) {
             if (level > 6 || invCodes.length === 0) return;
 
             // Fetch transactions at this level
-            const thisLevel = await FD.find({
-                Parent: { $in: invCodes },
-                FdStatus : FdStatus.HALTED,
-            }).countDocuments();
+            const thisLevel = await FD.aggregate([
+                {
+                    $match : {
+                            Parent: { $in: invCodes },
+                            FdStatus : FdStatus.HALTED,
+                    }
+                },{
+                    $group : {
+                        _id : '$PhoneNumber'
+                    }
+                },{
+                    $count : 'uniquePhoneCount'
+                }
+            ])
 
             // Prepare next level invitation codes
             const nextLevelInvites: string[] = [];
 
-            total += Number(thisLevel);
+            total += Number(thisLevel[0]?.uniquePhoneCount || 0);
 
             const nextLevelUsers = await USER.find(
                 {
