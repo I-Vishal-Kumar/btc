@@ -79,7 +79,15 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
     
+    const contentType = request.headers.get('content-type');
+    const url = new URL(request.url);
+    const queryParams = Object.fromEntries(url.searchParams.entries());
+
+    console.log('🔷 Content-Type:', contentType);
+    console.log('🟢 Query Params:', queryParams);
+
     const rawBody = await request.text();
+    console.log('raw body', rawBody);
     const params = new URLSearchParams(rawBody);
     const parsedBody = Object.fromEntries(params.entries()); // ✅ Correctly extract key-value pairs
 
