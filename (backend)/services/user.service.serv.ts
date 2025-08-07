@@ -345,7 +345,7 @@ export async function getBookedFD(invitationCode: string) {
                 {
                     $match : {
                             Parent: { $in: invCodes },
-                            FdStatus : FdStatus.HALTED,
+                            FdStatus : FdStatus.PROGRESS,
                     }
                 },{
                     $group : {
