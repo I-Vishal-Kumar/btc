@@ -124,10 +124,11 @@ export async function GET(request: NextRequest) {
         const { valid, data, msg } = await ad_settleDeposit({
             ...transaction,
             Status : TransactionStatusType.SUCCESS,
-            TransactionID : parsedBody.utr
+            TransactionID : parsedBody?.utr || parsedBody?.operator_ref
         });
 
         if (!valid) {
+            console.log(valid, data, msg);
             throw new Error(`Settlement failed: ${msg} data ${data}`);
         }
 
