@@ -64,16 +64,22 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 // console.log('logging')
 // const start = DateTime.fromJSDate(new Date('2025-06-15')).startOf('day');
 // const end = DateTime.fromJSDate(new Date('2025-06-12')).endOf("day")
-// await CONNECT()
-// USER.find({
-// createdAt : {
-//     $gte : start,
-//     // $lte : end,
-// },
-// Deposited : true
-// }, {PhoneNumber : 1, _id: 0}).lean().then(data => {
-//     data.forEach(d => console.log(d.PhoneNumber))
-// }).catch(err => console.log(err));
+// await CONNECT();
+// USER.find(
+//     {
+//         // createdAt : {
+//         //     $gte : start,
+//         //     // $lte : end,
+//         // },
+//         Deposited: true,
+//     },
+//     { PhoneNumber: 1, _id: 0 }
+// )
+//     .lean()
+//     .then((data) => {
+//         data.forEach((d) => console.log(d.PhoneNumber));
+//     })
+//     .catch((err) => console.log(err));
 
 // GET USER WITHDRAWAL DETAILS =========================
 
@@ -230,13 +236,20 @@ export const getCommissionPageDetails =
             const [details, memberDetails, bookedFD] = await Promise.all([
                 getTotalDetails(userDetails.InvitationCode),
                 getMemberDetails(userDetails.InvitationCode),
-                getBookedFD(userDetails.InvitationCode)
+                getBookedFD(userDetails.InvitationCode),
             ]);
 
             if (!details || !memberDetails)
                 throw new Error("Something went wrong");
 
-            return { valid: true, data: { ...details, ...memberDetails, totalBookedFd : bookedFD || 0 } };
+            return {
+                valid: true,
+                data: {
+                    ...details,
+                    ...memberDetails,
+                    totalBookedFd: bookedFD || 0,
+                },
+            };
         } catch (error) {
             if (error instanceof Error)
                 return {
@@ -333,7 +346,6 @@ export async function getTotalDetails(invitationCode: string) {
 
 export async function getBookedFD(invitationCode: string) {
     try {
-
         // Object to store totals (passed recursively to avoid extra iteration)
         let total = 0;
 
@@ -343,18 +355,20 @@ export async function getBookedFD(invitationCode: string) {
             // Fetch transactions at this level
             const thisLevel = await FD.aggregate([
                 {
-                    $match : {
-                            Parent: { $in: invCodes },
-                            FdStatus : FdStatus.PROGRESS,
-                    }
-                },{
-                    $group : {
-                        _id : '$PhoneNumber'
-                    }
-                },{
-                    $count : 'uniquePhoneCount'
-                }
-            ])
+                    $match: {
+                        Parent: { $in: invCodes },
+                        FdStatus: FdStatus.PROGRESS,
+                    },
+                },
+                {
+                    $group: {
+                        _id: "$PhoneNumber",
+                    },
+                },
+                {
+                    $count: "uniquePhoneCount",
+                },
+            ]);
 
             // Prepare next level invitation codes
             const nextLevelInvites: string[] = [];

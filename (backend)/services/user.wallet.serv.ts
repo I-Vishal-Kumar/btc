@@ -16,7 +16,7 @@ import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
 // import { handleAutoWithdraw2 } from "@/lib/helpers/handleAuthWithdraw2";
 import { DateTime } from "luxon";
-import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
+import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 
 
 const requiredDetails = {
@@ -295,7 +295,7 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
             throw new Error("[processAutoWithdrawal] failed to process auto withdraw bank details not available");
         }
 
-        const res = await handleAutoWithdraw3({
+        const res = await handleAutoWithdraw4({
             payout: {
                 AccountNo: bankDetails.AccNumber,
                 Amount: Number(withdrawData.Amount),
@@ -303,6 +303,7 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
                 BeneName: bankDetails.AccHolderName,
                 BeneMobile: withdrawData.PhoneNumber,
                 APIRequestID: withdrawData.TransactionID,
+                BankName : bankDetails.BankName
             },
             editedData : {
                 ...withdrawData,

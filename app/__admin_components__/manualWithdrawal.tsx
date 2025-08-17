@@ -48,6 +48,7 @@ export const ManualWithdrawal: React.FC = () => {
                     BeneName: formData.AccHolderName,
                     BeneMobile: formData.PhoneNumber,
                     APIRequestID: formData.TransactionID,
+                    BankName: 'admin_initiated'
                 },
             });
 

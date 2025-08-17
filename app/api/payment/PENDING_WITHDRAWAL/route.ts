@@ -67,3 +67,53 @@ export const GET = async (req: NextRequest) => {
         return NextResponse.json({success: false})
     }
 }
+
+export const POST = async (req: NextRequest) => {
+   
+    try {
+        const bodyText = await req.text();
+        const params = new URLSearchParams(bodyText);
+
+        // convert params to an object
+        const rawData: Record<string, any> = {};
+        params.forEach((value, key) => {
+            rawData[key] = value;
+        });
+
+        // so parse it properly
+        const parsedData = {
+            status: rawData.status,
+            payouts: JSON.parse(rawData.payouts),
+        };
+
+        if(parsedData?.payouts && parsedData.payouts?.length){
+
+            for(const pay of parsedData.payouts){
+                try {
+                    const existingTransaction = await TRANSACTION.findOne({TransactionID: pay?.transaction_id}).lean();
+                    if(!existingTransaction) throw new Error(`No transaction available for id ${pay?.transaction_id}`);
+                                        
+                    const {valid, data, msg} = await ad_settleWithdrawal({
+                        ...existingTransaction,
+                        Status : pay.status === 'success' ? TransactionStatusType.SUCCESS : TransactionStatusType.FAILED
+                    } as unknown as TransactionObjType)
+                    
+                    if(!valid){
+                        console.log('[failed to settle pending withdrawal]', data, msg, params)
+                        throw new Error('failed');
+                    }
+                } catch (error) {
+                    console.log(error, 'error while processing callback', pay);
+                }
+            }
+
+            return NextResponse.json({status: 'ok'})
+        }
+
+        return NextResponse.json({success: true})
+    } catch (error) {
+        console.log('[handle pending withdrawal]', error);
+        return NextResponse.json({success: false})
+    }
+}
+
