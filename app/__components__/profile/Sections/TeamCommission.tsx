@@ -14,8 +14,10 @@ const SectionWithDetails = (data: CommissionPageDetailType) => {
         "Team Transaction": [
             { name: "Total Deposit", value: `₹ ${ formatNumber(data?.totalDeposit) }` },
             { name: "Total Withdrawal", value: `₹ ${ formatNumber(data.totalWithdrawal) }` },
-            { name: "Today Deposit", value: `₹ ${ formatNumber(data?.todayDeposit) }`, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_DEPOSIT }?activeTab=today` },
-            { name: "Today Withdrawal", value: `₹ ${ formatNumber(data?.todayWithdrawal) }`, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_WITHDRAWAL }?activeTab=today` },
+            // { name: "Today Deposit", value: `₹ ${ formatNumber(data?.todayDeposit) }`, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_DEPOSIT }?activeTab=today` },
+            // { name: "Today Withdrawal", value: `₹ ${ formatNumber(data?.todayWithdrawal) }`, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_WITHDRAWAL }?activeTab=today` },
+            { name: "Today Deposit", value: `₹ ${ formatNumber(data?.todayDeposit) }` },
+            { name: "Today Withdrawal", value: `₹ ${ formatNumber(data?.todayWithdrawal) }` },
         ],
         "Team Report": [
             { name: "Today New Registration", value: data.todayNewRegistration, pathTo: `/profile/team_commission/${ SubSectionsAvailable.TODAY_REGISTRATION }?activeTab=today` },
