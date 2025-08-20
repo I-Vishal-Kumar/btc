@@ -52,7 +52,7 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
             { _id: 0, Session: 0, Password: 0, createdAt: 0, updatedAt: 0 }
         );
 
-        if (!dbUser) return { valid: false };
+        if (!dbUser || dbUser.Blocked) return { valid: false };
 
         return { valid: true, data: dbUser?.toObject() };
     } catch (error) {
@@ -65,6 +65,28 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 // const start = DateTime.fromJSDate(new Date('2025-06-15')).startOf('day');
 // const end = DateTime.fromJSDate(new Date('2025-06-12')).endOf("day")
 // await CONNECT();
+// const updated = await USER.updateMany({
+//     PhoneNumber : {$in : [
+//         '9250206422',
+//         '9250206888',
+//         '9250206999',
+//         '9250201411',
+//         '9250201455',
+//         '9250201466',
+//         '9250206495',
+//         "9250201766",
+//         "9250203366",
+//         "9250205555",
+//         "9250201788",
+//         "9250201799",
+//         "9250201666",
+//     ]}
+// }, {
+//     $set: {
+//         Blocked : true
+//     }
+// })
+// console.log(updated);
 // USER.find(
 //     {
 //         // createdAt : {
