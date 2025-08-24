@@ -193,8 +193,19 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
         const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
         
+        const startOfMonth = now.startOf("month").toJSDate();
+        const endOfMonth = now.endOf("month").toJSDate();
+
         await CONNECT();
 
+        const withdrawalCount = await TRANSACTION.countDocuments({
+            PhoneNumber,
+            Type: TransactionType.WITHDRAWAL,
+            createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+        });
+
+        if(withdrawalCount >= 3) throw new Error("Withdrawal limit exceeded. You've withdrawn 3 times this month.");
+        
         const existingTransaction = await TRANSACTION.findOne({
             PhoneNumber,
             Type: TransactionType.WITHDRAWAL,
