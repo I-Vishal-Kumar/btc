@@ -187,7 +187,7 @@ export async function handleAutoWithdraw4(
         console.log("[UNKNOWN RESPONSE PAYOUT]", response.data, body);
         return { valid: false, msg: "Unknown response state" };
     } catch (error: any) {
-        console.error("[handleAutoWithdraw] Internal error:", error);
+        console.error(JSON.stringify(error, Object.getOwnPropertyNames(error), 3));
         return {
             valid: false,
             msg: "Internal error occurred while processing payout.",
