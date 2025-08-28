@@ -136,7 +136,7 @@ export async function handleAutoWithdraw4(
             const finalPayload = { ...payload, sign: sign(payload) };
         console.log(finalPayload);
             const response = await axios.post(
-            "https://api.rs-pay.cc/apii/out/createOrder",
+            "https://api.rs-pay.cc/api/out/createOrder",
             finalPayload,
             { headers: { "Content-Type": "application/json; charset=utf-8" } }
         );
