@@ -64,7 +64,8 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 // console.log('logging')
 // const start = DateTime.fromJSDate(new Date('2025-06-15')).startOf('day');
 // const end = DateTime.fromJSDate(new Date('2025-06-12')).endOf("day")
-// await CONNECT();
+await CONNECT();
+
 // const updated = await USER.updateMany({
 //     PhoneNumber : {$in : [
 //         '9250206422',
@@ -93,7 +94,7 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 //         //     $gte : start,
 //         //     // $lte : end,
 //         // },
-//         Deposited: true,
+//         // Deposited: true,
 //     },
 //     { PhoneNumber: 1, _id: 0 }
 // )
