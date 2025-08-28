@@ -96,16 +96,16 @@ export async function handleAutoWithdraw4(
             }
         }
 
-        console.log("api request rms payout", {
-            mobile_number: payout.BeneMobile,
-            email: "btccompanyind@gmail.com",
-            beneficiary_name: payout.BeneName,
-            ifsc_code: payout.IFSC,
-            account_number: payout.AccountNo,
-            amount: Math.floor(Number(payout.Amount)),
-            channel_id: "2",
-            client_id: payout.APIRequestID,
-        });
+        // console.log("api request rms payout", {
+        //     mobile_number: payout.BeneMobile,
+        //     email: "btccompanyind@gmail.com",
+        //     beneficiary_name: payout.BeneName,
+        //     ifsc_code: payout.IFSC,
+        //     account_number: payout.AccountNo,
+        //     amount: Math.floor(Number(payout.Amount)),
+        //     channel_id: "2",
+        //     client_id: payout.APIRequestID,
+        // });
 
         // const payload = {
         //     merchantId: "INR222814",
@@ -133,10 +133,12 @@ export async function handleAutoWithdraw4(
                 merchantOrderId: payout.APIRequestID,
                 bankName: "Punjab National",
             }
-
-        const response = await axios.post(
+            const finalPayload = { ...payload, sign: sign(payload) };
+        console.log(finalPayload);
+            const response = await axios.post(
             "https://api.rs-pay.cc/apii/out/createOrder",
-            { ...payload, sign: sign(payload) }
+            finalPayload,
+            { headers: { "Content-Type": "application/json; charset=utf-8" } }
         );
         console.log(response?.data);
         if (response.data?.status === "pending") {
