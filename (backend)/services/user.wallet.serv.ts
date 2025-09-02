@@ -177,9 +177,9 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         const now = DateTime.now().setZone("Asia/Kolkata");
         const isSunday = now.weekday === 7;
-        // const isBetween9and11 = now.hour >= 9 && now.hour < 11;
+        const isBetween9and11 = now.hour >= 9 && now.hour < 11;
 
-        if(isSunday) throw new Error("Withdrawal time is between 9am - 11am.");
+        if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
 
         const Amount = Number(data.Amount);
         if(Amount < 600) throw new Error("Minimum withdrawal amount is 600");
