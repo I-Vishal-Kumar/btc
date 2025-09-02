@@ -133,13 +133,14 @@ export async function handleAutoWithdraw4(
                 merchantOrderId: payout.APIRequestID,
                 bankName: "Punjab National",
             }
-            const finalPayload = { ...payload, sign: sign(payload) };
-        console.log(finalPayload);
-            const response = await axios.post(
-            "https://api.rs-pay.cc/api/out/createOrder",
+        const finalPayload = { ...payload, sign: sign(payload) };
+
+        const response = await axios.post(
+            "https://api.rs-pay.cc/apii/out/createOrder",
             finalPayload,
             { headers: { "Content-Type": "application/json; charset=utf-8" } }
         );
+
         console.log(response?.data);
         if (response.data?.status === "pending") {
             console.log("[withdraw request in pending]", response.data);
