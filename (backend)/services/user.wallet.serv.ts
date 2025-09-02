@@ -190,8 +190,8 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         }
 
         // check if already withdrawan today.
-        const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
-        const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
+        // const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
+        // const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
         
         const startOfMonth = now.startOf("month").toJSDate();
         const endOfMonth = now.endOf("month").toJSDate();
@@ -207,13 +207,13 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         if(withdrawalCount >= 30) throw new Error("Withdrawal limit exceeded. You've withdrawn 3 times this month.");
         
-        const existingTransaction = await TRANSACTION.findOne({
-            PhoneNumber,
-            Type: TransactionType.WITHDRAWAL,
-            createdAt: { $gte: startOfDay, $lte: endOfDay }
-        });
-
-        if(existingTransaction) throw new Error("You have already withdrawn today.");
+        // const existingTransaction = await TRANSACTION.findOne({
+        //     PhoneNumber,
+        //     Type: TransactionType.WITHDRAWAL,
+        //     createdAt: { $gte: startOfDay, $lte: endOfDay }
+        // });
+        
+        // if(existingTransaction) throw new Error("You have already withdrawn today.");
 
         // check if user has a bank account.
         const hasBank = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : { $exists: true, $nin: [null, ""] } })
