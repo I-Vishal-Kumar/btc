@@ -201,10 +201,11 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         const withdrawalCount = await TRANSACTION.countDocuments({
             PhoneNumber,
             Type: TransactionType.WITHDRAWAL,
+            Status : TransactionStatusType.SUCCESS,
             createdAt: { $gte: startOfMonth, $lte: endOfMonth }
         });
 
-        if(withdrawalCount >= 3) throw new Error("Withdrawal limit exceeded. You've withdrawn 3 times this month.");
+        if(withdrawalCount >= 30) throw new Error("Withdrawal limit exceeded. You've withdrawn 3 times this month.");
         
         const existingTransaction = await TRANSACTION.findOne({
             PhoneNumber,
