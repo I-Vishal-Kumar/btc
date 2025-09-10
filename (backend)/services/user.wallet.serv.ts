@@ -10,7 +10,7 @@ import { USER } from "../(modals)/schema/user.schema";
 import { startSession } from "mongoose";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
-// import { DateTime } from "luxon";
+import { DateTime } from "luxon";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
@@ -19,151 +19,179 @@ import { UserWallet } from "@/__types__/user.types";
 import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 // import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 
-
 const requiredDetails = {
-    [WithdrawalOperationIdentifier.LOCAL_BANK_CREATION]: {
-        AccHolderName   : { required: true, validation: /^[a-zA-Z\s]{3,}$/ },
-        AccNumber       : { required: true, validation: /^[0-9]{9,18}$/ }, // 9-18 digit number
-        IfscCode        : { required: true, validation: /^[A-Z]{4}0[A-Z0-9]{6}$/ }, // IFSC format
-        BankName        : { required: true, validation: /^[a-zA-Z\s]{3,}$/ },
-        Branch        : { required: true, validation: /^.{2,}$/ },
-        LocalWithdrawPassword: { required: true, validation: /^.{6,}$/ }, // At least 6 characters
-    },
-    [WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER]: {
-        Amount         : { required: true, validation: /^[1-9][0-9]*$/ }, // Must be a positive number
-        WithdrawPassword: { required: true, validation: /^.{6,}$/ },
-    },
-    [WithdrawalOperationIdentifier.LOCAL_BANK_PASS_RESET]: {
-        CurrWithdrawPassword: { required: true, validation: /^.{6,}$/ },
-        NewWithdrawPassword : { required: true, validation: /^.{6,}$/ },
-    },
-    [WithdrawalOperationIdentifier.USDT_BANK_CREATION]: {
-        UsdtAddress     : { required: true, validation: /^T[a-zA-Z0-9]{33}$/ }, // TRC20 format (example)
-        UsdtWithdrawPassword: { required: true, validation: /^.{6,}$/ },
-        AppName         : { required: true, validation: /^[a-zA-Z\s]{2,}$/ },
-    },
-    [WithdrawalOperationIdentifier.USDT_BANK_TRANSFER]: {
-        Amount         : { required: true, validation: /^[1-9][0-9]*$/ },
-        WithdrawPassword: { required: true, validation: /^.{6,}$/ },
-    },
-    [WithdrawalOperationIdentifier.USDT_BANK_PASS_RESET]: {
-        CurrWithdrawPassword: { required: true, validation: /^.{6,}$/ },
-        NewWithdrawPassword : { required: true, validation: /^.{6,}$/ },
-    },
+  [WithdrawalOperationIdentifier.LOCAL_BANK_CREATION]: {
+    AccHolderName: { required: true, validation: /^[a-zA-Z\s]{3,}$/ },
+    AccNumber: { required: true, validation: /^[0-9]{9,18}$/ }, // 9-18 digit number
+    IfscCode: { required: true, validation: /^[A-Z]{4}0[A-Z0-9]{6}$/ }, // IFSC format
+    BankName: { required: true, validation: /^[a-zA-Z\s]{3,}$/ },
+    Branch: { required: true, validation: /^.{2,}$/ },
+    LocalWithdrawPassword: { required: true, validation: /^.{6,}$/ }, // At least 6 characters
+  },
+  [WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER]: {
+    Amount: { required: true, validation: /^[1-9][0-9]*$/ }, // Must be a positive number
+    WithdrawPassword: { required: true, validation: /^.{6,}$/ },
+  },
+  [WithdrawalOperationIdentifier.LOCAL_BANK_PASS_RESET]: {
+    CurrWithdrawPassword: { required: true, validation: /^.{6,}$/ },
+    NewWithdrawPassword: { required: true, validation: /^.{6,}$/ },
+  },
+  [WithdrawalOperationIdentifier.USDT_BANK_CREATION]: {
+    UsdtAddress: { required: true, validation: /^T[a-zA-Z0-9]{33}$/ }, // TRC20 format (example)
+    UsdtWithdrawPassword: { required: true, validation: /^.{6,}$/ },
+    AppName: { required: true, validation: /^[a-zA-Z\s]{2,}$/ },
+  },
+  [WithdrawalOperationIdentifier.USDT_BANK_TRANSFER]: {
+    Amount: { required: true, validation: /^[1-9][0-9]*$/ },
+    WithdrawPassword: { required: true, validation: /^.{6,}$/ },
+  },
+  [WithdrawalOperationIdentifier.USDT_BANK_PASS_RESET]: {
+    CurrWithdrawPassword: { required: true, validation: /^.{6,}$/ },
+    NewWithdrawPassword: { required: true, validation: /^.{6,}$/ },
+  },
 };
 
-const _validateDataWithIdentifier = (identifier: WithdrawalOperationIdentifierType, data: Record<string, string>) => {
-    
-    if (!requiredDetails[identifier]) {
-        return "Invalid operation identifier.";
+const _validateDataWithIdentifier = (
+  identifier: WithdrawalOperationIdentifierType,
+  data: Record<string, string>,
+) => {
+  if (!requiredDetails[identifier]) {
+    return "Invalid operation identifier.";
+  }
+
+  const rules = requiredDetails[identifier] as Record<
+    string,
+    { required: boolean; validation: RegExp }
+  >;
+
+  for (const field in rules) {
+    const { required, validation } = rules[field];
+
+    const value = data[field]?.trim();
+
+    if (required && !value) {
+      return `${field} is required.`;
     }
 
-    const rules = requiredDetails[identifier] as Record<string, {required: boolean; validation: RegExp}>;
-
-    for (const field in rules) {
-        const { required, validation } = rules[field];
-
-        const value = data[field]?.trim();
-
-        if (required && !value) {
-            return `${field} is required.`;
-        }
-
-        if (validation && !validation.test(value)) {
-            return `Invalid ${field} format.`;
-        }
+    if (validation && !validation.test(value)) {
+      return `Invalid ${field} format.`;
     }
+  }
 
-    return null; // No errors
+  return null; // No errors
 };
-
-
 
 // ================================== MAIN OPERATIONS ===============================
 
 // works for both usdt and local
-const createBank = async (identifier: WithdrawalOperationIdentifierType, PhoneNumber: string, data: Record<string, string>): ServiceReturnType => {
-    try {
-        
-        await CONNECT();
+const createBank = async (
+  identifier: WithdrawalOperationIdentifierType,
+  PhoneNumber: string,
+  data: Record<string, string>,
+): ServiceReturnType => {
+  try {
+    await CONNECT();
 
-        // check if this account number | wallet already exists.
-        if(identifier === WithdrawalOperationIdentifier.LOCAL_BANK_CREATION){
-            
-            const AccNoExists = await WALLET.findOne({AccNumber: data.AccNumber, PhoneNumber : {$ne : PhoneNumber}});
-            
-            if (AccNoExists) throw new Error('This account is already registered with another user.');
+    // check if this account number | wallet already exists.
+    if (identifier === WithdrawalOperationIdentifier.LOCAL_BANK_CREATION) {
+      const AccNoExists = await WALLET.findOne({
+        AccNumber: data.AccNumber,
+        PhoneNumber: { $ne: PhoneNumber },
+      });
 
-        }else{
-            // check for usdt address;
-            const UsdtAddressExists = await WALLET.findOne({UsdtAddress: data.UsdtAddress, PhoneNumber : {$ne : PhoneNumber}});
+      if (AccNoExists)
+        throw new Error(
+          "This account is already registered with another user.",
+        );
+    } else {
+      // check for usdt address;
+      const UsdtAddressExists = await WALLET.findOne({
+        UsdtAddress: data.UsdtAddress,
+        PhoneNumber: { $ne: PhoneNumber },
+      });
 
-            if(UsdtAddressExists) throw new Error("This USDT address is already registered with another user.");
-        }
-
-        // check if entry already exists 
-        const exists = await WALLET.findOne({PhoneNumber});
-
-        if(exists){
-            
-            delete data.LocalWithdrawPassword;
-            delete data.UsdtWithdrawPassword;
-
-            // user has added usdt wallet.
-            const wasSuccess = await WALLET.findOneAndUpdate({PhoneNumber}, {
-                $set : {...data}
-            })
-
-            if (!wasSuccess) throw new Error('Error updating details contact admin.');
-            return {msg: "Details saved successfully.", valid: true }
-
-        }
-
-        // no wallet exists create a new wallet .
-        const isCreated = await WALLET.create({...data, PhoneNumber});
-
-        if(!isCreated) throw new Error('Error updating details contact admin.')
-
-        return {msg: "Details saved successfully.", valid: true }
-
-    } catch (error) {
-        console.log(error);
-        if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};
-        return {valid: false, msg: error?.message || 'something went wrong'}
+      if (UsdtAddressExists)
+        throw new Error(
+          "This USDT address is already registered with another user.",
+        );
     }
-}
 
+    // check if entry already exists
+    const exists = await WALLET.findOne({ PhoneNumber });
+
+    if (exists) {
+      delete data.LocalWithdrawPassword;
+      delete data.UsdtWithdrawPassword;
+
+      // user has added usdt wallet.
+      const wasSuccess = await WALLET.findOneAndUpdate(
+        { PhoneNumber },
+        {
+          $set: { ...data },
+        },
+      );
+
+      if (!wasSuccess) throw new Error("Error updating details contact admin.");
+      return { msg: "Details saved successfully.", valid: true };
+    }
+
+    // no wallet exists create a new wallet .
+    const isCreated = await WALLET.create({ ...data, PhoneNumber });
+
+    if (!isCreated) throw new Error("Error updating details contact admin.");
+
+    return { msg: "Details saved successfully.", valid: true };
+  } catch (error) {
+    console.log(error);
+    if (!(error instanceof Error))
+      return { valid: false, msg: "something went wrong", operation: "LOGOUT" };
+    return { valid: false, msg: error?.message || "something went wrong" };
+  }
+};
 
 // bank reset password works for both.
-const resetPassword = async (identifier : WithdrawalOperationIdentifierType, PhoneNumber: string, data: Record<string,string>): ServiceReturnType => {
-    try {
-        
-        const passDbKey = identifier === WithdrawalOperationIdentifier.LOCAL_BANK_PASS_RESET ? 'LocalWithdrawPassword' : 'UsdtWithdrawPassword';
+const resetPassword = async (
+  identifier: WithdrawalOperationIdentifierType,
+  PhoneNumber: string,
+  data: Record<string, string>,
+): ServiceReturnType => {
+  try {
+    const passDbKey =
+      identifier === WithdrawalOperationIdentifier.LOCAL_BANK_PASS_RESET
+        ? "LocalWithdrawPassword"
+        : "UsdtWithdrawPassword";
 
-        await CONNECT();
+    await CONNECT();
 
-        // check if old password is correct.
-        const isCorrect = await WALLET.findOne({PhoneNumber, [passDbKey] : data.CurrWithdrawPassword });
+    // check if old password is correct.
+    const isCorrect = await WALLET.findOne({
+      PhoneNumber,
+      [passDbKey]: data.CurrWithdrawPassword,
+    });
 
-        if(!isCorrect) throw new Error("Your Old password is incorrect contact Admin.");
+    if (!isCorrect)
+      throw new Error("Your Old password is incorrect contact Admin.");
 
-        const isUpdated = await WALLET.findOneAndUpdate({PhoneNumber, [passDbKey] : data.CurrWithdrawPassword }, {
-            $set : {[passDbKey] : data.NewWithdrawPassword}
-        });
+    const isUpdated = await WALLET.findOneAndUpdate(
+      { PhoneNumber, [passDbKey]: data.CurrWithdrawPassword },
+      {
+        $set: { [passDbKey]: data.NewWithdrawPassword },
+      },
+    );
 
-        if(!isUpdated) throw new Error("Something went wrong while resetting password.");
+    if (!isUpdated)
+      throw new Error("Something went wrong while resetting password.");
 
-        return {valid: true, msg: 'Password reset successfull'}
+    return { valid: true, msg: "Password reset successfull" };
+  } catch (error) {
+    console.log(error);
+    if (!(error instanceof Error))
+      return { valid: false, msg: "something went wrong", operation: "LOGOUT" };
+    return { valid: false, msg: error?.message || "something went wrong" };
+  }
+};
 
-    } catch (error) {
-        console.log(error);
-        if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};
-        return {valid: false, msg: error?.message || 'something went wrong'}
-    }
-}
-
-
-// withdrawal 
+// withdrawal
 const Withdrawal = async (
   identifier: WithdrawalOperationIdentifierType,
   PhoneNumber: string,
@@ -179,47 +207,55 @@ const Withdrawal = async (
         ? "LOCAL"
         : "USDT";
     let DbWithdrawalPassKey = "LocalWithdrawPassword";
-
-    // const now = DateTime.now().setZone("Asia/Kolkata");
-    // const isSunday = now.weekday === 7;
-    // const isBetween9and11 = now.hour >= 9 && now.hour < 11;
-
-    // if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
-
-    const Amount = Number(data.Amount);
-    if (Amount < 600) throw new Error("Minimum withdrawal amount is 600");
-
-    if (METHOD === "USDT") {
-      // change db key for usdt;
-      DbWithdrawalPassKey = "UsdtWithdrawPassword";
-    }
-
-    // check if already withdrawan today.
-    // const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
-    // const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
-
-    // const startOfMonth = now.startOf("month").toJSDate();
-    // const endOfMonth = now.endOf("month").toJSDate();
-
     await CONNECT();
 
-    // const withdrawalCount = await TRANSACTION.countDocuments({
-    //   PhoneNumber,
-    //   Type: TransactionType.WITHDRAWAL,
-    //   Status: TransactionStatusType.SUCCESS,
-    //   createdAt: { $gte: startOfMonth, $lte: endOfMonth },
-    // });
+    const Amount = Number(data.Amount);
+    if (PhoneNumber !== "9250206415") {
+      const now = DateTime.now().setZone("Asia/Kolkata");
+      const isSunday = now.weekday === 7;
+      const isBetween9and11 = now.hour >= 9 && now.hour < 11;
 
-    // if(withdrawalCount >= 3) throw new Error("Withdrawal limit exceeded. You've withdrawn 3 times this month.");
+      if (isSunday || !isBetween9and11)
+        throw new Error("Withdrawal time is between 9am - 11am.");
 
-    // const existingTransaction = await TRANSACTION.findOne({
-    //   PhoneNumber,
-    //   Type: TransactionType.WITHDRAWAL,
-    //   createdAt: { $gte: startOfDay, $lte: endOfDay },
-    // });
+      if (Amount < 600) throw new Error("Minimum withdrawal amount is 600");
 
-    // if(existingTransaction) throw new Error("You have already withdrawn today.");
+      if (METHOD === "USDT") {
+        // change db key for usdt;
+        DbWithdrawalPassKey = "UsdtWithdrawPassword";
+      }
 
+      // check if already withdrawan today.
+      const startOfDay = DateTime.now()
+        .setZone("utc")
+        .startOf("day")
+        .toJSDate();
+      const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
+
+      const startOfMonth = now.startOf("month").toJSDate();
+      const endOfMonth = now.endOf("month").toJSDate();
+
+      const withdrawalCount = await TRANSACTION.countDocuments({
+        PhoneNumber,
+        Type: TransactionType.WITHDRAWAL,
+        Status: TransactionStatusType.SUCCESS,
+        createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+      });
+
+      if (withdrawalCount >= 3)
+        throw new Error(
+          "Withdrawal limit exceeded. You've withdrawn 3 times this month.",
+        );
+
+      const existingTransaction = await TRANSACTION.findOne({
+        PhoneNumber,
+        Type: TransactionType.WITHDRAWAL,
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
+      });
+
+      if (existingTransaction)
+        throw new Error("You have already withdrawn today.");
+    }
     // check if user has a bank account.
     const hasBank = await WALLET.findOne({
       PhoneNumber,

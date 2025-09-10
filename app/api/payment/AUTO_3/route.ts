@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
     delete userWithTransaction.userInfo;
 
     const transaction = JSON.parse(JSON.stringify(userWithTransaction));
-
+    console.log("transaction ", transaction);
     if (!userInfo || !transaction) throw new Error("Tampered request body");
 
     const { valid, data, msg } = await ad_settleDeposit({
@@ -129,7 +129,8 @@ export async function GET(request: NextRequest) {
       Status: TransactionStatusType.SUCCESS,
       TransactionID: parsedBody?.utr || parsedBody?.operator_ref,
     });
-
+    console.log("settlement respon - ", valid, data, msg);
+    
     if (!valid) {
       console.log(valid, data, msg);
       throw new Error(`Settlement failed: ${msg} data ${data}`);
