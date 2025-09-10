@@ -70,7 +70,7 @@ export async function handleAutoWithdraw3(body: PayoutRequestBody): Promise<{ va
         channel_id: '2',
         client_id: payout.APIRequestID
     });
-    console.log(response);
+
     if (response.data?.status === 'pending'){
         console.log('[withdraw request in pending]', response.data);
         return { valid: false, msg: "PENDING Do not send withdrawal from your side." };

@@ -1,5 +1,8 @@
 import { TRANSACTION } from "@/(backend)/(modals)/schema/transaction.schema";
-import { ad_settleDeposit } from "@/(backend)/services/admin.service.serve";
+import {
+  ad_settleDeposit,
+  ad_settleWithdrawal,
+} from "@/(backend)/services/admin.service.serve";
 import { db_schema, TransactionStatusType } from "@/__types__/db.types";
 import { CONNECT } from "@/lib/_db/db.config";
 import mongoose from "mongoose";
@@ -121,16 +124,26 @@ export async function GET(request: NextRequest) {
     delete userWithTransaction.userInfo;
 
     const transaction = JSON.parse(JSON.stringify(userWithTransaction));
-    console.log("transaction ", transaction);
+
     if (!userInfo || !transaction) throw new Error("Tampered request body");
 
-    const { valid, data, msg } = await ad_settleDeposit({
-      ...transaction,
-      Status: TransactionStatusType.SUCCESS,
-      TransactionID: parsedBody?.utr || parsedBody?.operator_ref,
-    });
-    console.log("settlement respon - ", valid, data, msg);
-    
+    const isWithdrawalProcessing =
+      parsedBody?.wallet_type === "1" &&
+      parsedBody?.payid &&
+      parsedBody?.client_id;
+
+    const { valid, data, msg } = await (isWithdrawalProcessing
+      ? ad_settleWithdrawal({
+          ...transaction,
+          Status: TransactionStatusType.SUCCESS,
+          TransactionID: parsedBody?.utr || parsedBody?.operator_ref,
+        })
+      : ad_settleDeposit({
+          ...transaction,
+          Status: TransactionStatusType.SUCCESS,
+          TransactionID: parsedBody?.utr || parsedBody?.operator_ref,
+        }));
+
     if (!valid) {
       console.log(valid, data, msg);
       throw new Error(`Settlement failed: ${msg} data ${data}`);
