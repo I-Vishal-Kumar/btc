@@ -210,52 +210,49 @@ const Withdrawal = async (
     await CONNECT();
 
     const Amount = Number(data.Amount);
-    if (PhoneNumber !== "9250206415") {
-      const now = DateTime.now().setZone("Asia/Kolkata");
-      const isSunday = now.weekday === 7;
-      const isBetween9and11 = now.hour >= 9 && now.hour < 11;
+    // if (PhoneNumber !== "9250206415") {
+    const now = DateTime.now().setZone("Asia/Kolkata");
+    const isSunday = now.weekday === 7;
+    const isBetween9and11 = now.hour >= 9 && now.hour < 11;
 
-      if (isSunday || !isBetween9and11)
-        throw new Error("Withdrawal time is between 9am - 11am.");
+    if (isSunday || !isBetween9and11)
+      throw new Error("Withdrawal time is between 9am - 11am.");
 
-      if (Amount < 600) throw new Error("Minimum withdrawal amount is 600");
+    if (Amount < 600) throw new Error("Minimum withdrawal amount is 600");
 
-      if (METHOD === "USDT") {
-        // change db key for usdt;
-        DbWithdrawalPassKey = "UsdtWithdrawPassword";
-      }
-
-      // check if already withdrawan today.
-      const startOfDay = DateTime.now()
-        .setZone("utc")
-        .startOf("day")
-        .toJSDate();
-      const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
-
-      const startOfMonth = now.startOf("month").toJSDate();
-      const endOfMonth = now.endOf("month").toJSDate();
-
-      const withdrawalCount = await TRANSACTION.countDocuments({
-        PhoneNumber,
-        Type: TransactionType.WITHDRAWAL,
-        Status: TransactionStatusType.SUCCESS,
-        createdAt: { $gte: startOfMonth, $lte: endOfMonth },
-      });
-
-      if (withdrawalCount >= 3)
-        throw new Error(
-          "Withdrawal limit exceeded. You've withdrawn 3 times this month.",
-        );
-
-      const existingTransaction = await TRANSACTION.findOne({
-        PhoneNumber,
-        Type: TransactionType.WITHDRAWAL,
-        createdAt: { $gte: startOfDay, $lte: endOfDay },
-      });
-
-      if (existingTransaction)
-        throw new Error("You have already withdrawn today.");
+    if (METHOD === "USDT") {
+      // change db key for usdt;
+      DbWithdrawalPassKey = "UsdtWithdrawPassword";
     }
+
+    // check if already withdrawan today.
+    const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
+    const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
+
+    const startOfMonth = now.startOf("month").toJSDate();
+    const endOfMonth = now.endOf("month").toJSDate();
+
+    const withdrawalCount = await TRANSACTION.countDocuments({
+      PhoneNumber,
+      Type: TransactionType.WITHDRAWAL,
+      Status: TransactionStatusType.SUCCESS,
+      createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+    });
+
+    if (withdrawalCount >= 3)
+      throw new Error(
+        "Withdrawal limit exceeded. You've withdrawn 3 times this month.",
+      );
+
+    const existingTransaction = await TRANSACTION.findOne({
+      PhoneNumber,
+      Type: TransactionType.WITHDRAWAL,
+      createdAt: { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    if (existingTransaction)
+      throw new Error("You have already withdrawn today.");
+    // }
     // check if user has a bank account.
     const hasBank = await WALLET.findOne({
       PhoneNumber,

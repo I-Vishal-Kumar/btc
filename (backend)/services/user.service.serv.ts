@@ -65,6 +65,10 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 // const start = DateTime.fromJSDate(new Date('2025-06-15')).startOf('day');
 // const end = DateTime.fromJSDate(new Date('2025-06-12')).endOf("day")
 // await CONNECT();
+// const users = await USER.find({}, { PhoneNumber: 1 });
+// for (const u of users) {
+//   console.log(u.PhoneNumber);
+// }
 // const user = await WALLET.findOne({ PhoneNumber: "9250206415" });
 // console.log(user);
 // USER.find({Parent : user.InvitationCode, Deposited: true}).then(d => {
