@@ -87,8 +87,9 @@ export async function handleAutoWithdraw3(body: PayoutRequestBody): Promise<{ va
 
     if (response.data?.utr && typeof response.data.utr === "string") {
         const { msg, valid } = await ad_settleWithdrawal({
-        ...editedData,
-        TransactionID: payout.APIRequestID,
+          ...editedData,
+          Status: TransactionStatusType.SUCCESS,
+          TransactionID: payout.APIRequestID,
         } as TransactionObjType);
 
         if (!valid) {
