@@ -28,7 +28,7 @@ export async function handleAutoWithdraw3(body: PayoutRequestBody): Promise<{ va
     }
 
     const { payout, editedData } = body;
-
+    console.log("edited data we got", editedData);
     if (editedData) {
         const { PhoneNumber, TransactionID } = editedData;
 

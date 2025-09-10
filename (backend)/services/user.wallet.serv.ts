@@ -15,7 +15,7 @@ import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
 // import { handleAutoWithdraw2 } from "@/lib/helpers/handleAuthWithdraw2";
-import { DateTime } from "luxon";
+// import { DateTime } from "luxon";
 import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 // import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 
@@ -164,176 +164,234 @@ const resetPassword = async (identifier : WithdrawalOperationIdentifierType, Pho
 
 
 // withdrawal 
-const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneNumber: string, data: Record<string, string> ): ServiceReturnType => {
-    
-    const session = await startSession();
-    session.startTransaction();
+const Withdrawal = async (
+  identifier: WithdrawalOperationIdentifierType,
+  PhoneNumber: string,
+  data: Record<string, string>,
+): ServiceReturnType => {
+  const session = await startSession();
+  session.startTransaction();
 
-    try {
+  try {
+    // used to determine and convert amount.
+    const METHOD =
+      identifier === WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER
+        ? "LOCAL"
+        : "USDT";
+    let DbWithdrawalPassKey = "LocalWithdrawPassword";
 
-        // used to determine and convert amount.
-        const METHOD = identifier === WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER ? 'LOCAL' : 'USDT';
-        let DbWithdrawalPassKey = 'LocalWithdrawPassword';
+    // const now = DateTime.now().setZone("Asia/Kolkata");
+    // const isSunday = now.weekday === 7;
+    // const isBetween9and11 = now.hour >= 9 && now.hour < 11;
 
-        const now = DateTime.now().setZone("Asia/Kolkata");
-        const isSunday = now.weekday === 7;
-        const isBetween9and11 = now.hour >= 9 && now.hour < 11;
+    // if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
 
-        if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
+    const Amount = Number(data.Amount);
+    if (Amount < 600) throw new Error("Minimum withdrawal amount is 600");
 
-        const Amount = Number(data.Amount);
-        if(Amount < 600) throw new Error("Minimum withdrawal amount is 600");
-        
-        if(METHOD === 'USDT'){
-            // change db key for usdt;
-            DbWithdrawalPassKey = 'UsdtWithdrawPassword';
-        }
-
-        // check if already withdrawan today.
-        const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
-        const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
-        
-        const startOfMonth = now.startOf("month").toJSDate();
-        const endOfMonth = now.endOf("month").toJSDate();
-
-        await CONNECT();
-
-        const withdrawalCount = await TRANSACTION.countDocuments({
-            PhoneNumber,
-            Type: TransactionType.WITHDRAWAL,
-            Status : TransactionStatusType.SUCCESS,
-            createdAt: { $gte: startOfMonth, $lte: endOfMonth }
-        });
-
-        if(withdrawalCount >= 3) throw new Error("Withdrawal limit exceeded. You've withdrawn 3 times this month.");
-        
-        const existingTransaction = await TRANSACTION.findOne({
-            PhoneNumber,
-            Type: TransactionType.WITHDRAWAL,
-            createdAt: { $gte: startOfDay, $lte: endOfDay }
-        });
-        
-        if(existingTransaction) throw new Error("You have already withdrawn today.");
-
-        // check if user has a bank account.
-        const hasBank = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : { $exists: true, $nin: [null, ""] } })
-        
-        if(!hasBank) throw new Error("You don't have a bank account.");
-
-        const isBlocked = await USER.findOne({PhoneNumber, BlockWithdrawal: true});
-        
-        if(isBlocked) throw new Error("You cannot withdraw.");
-        
-        const userInfo = await USER.findOne({PhoneNumber});
-
-        const tax = userInfo.HoldingScore > 600 ? 15 : 20  // if more than 600 then 15% tax else 20% tax.
-        const taxableAmount = (Number(Amount) / 100) * Number(tax);
-        
-        // check if user has enough balance.
-        const isSufficientBalance = await USER.findOne({PhoneNumber, Balance: {$gte : Amount + taxableAmount}});
-        
-        if(!isSufficientBalance) throw new Error(`You dont have enough balance. Required ₹ ${Amount + taxableAmount}.`);
-
-        // check if withdrawal password is correct.
-        const isPassCorrect = await WALLET.findOne({PhoneNumber, [DbWithdrawalPassKey] : data.WithdrawPassword});
-
-        if(!isPassCorrect) throw new Error("Incorrect withdrawal password");
-
-        // Process withdrawal --------------------------------------------------.
-
-        // 1. deduct user balance.
-        const isDeducted = await USER.findOneAndUpdate({PhoneNumber}, {
-            $inc : {Balance : -(Number(Amount) + taxableAmount)}
-        }, {session});
-
-        if(!isDeducted) throw new Error("Could not process withdrawal this time.");
-
-        // 2. increment parent level1 withdrawal.
-        if(isSufficientBalance.Parent){
-
-            const isIncremented = await USER.findOneAndUpdate({InvitationCode: isDeducted.Parent}, {
-                $inc : {Level1Withdrawal: Amount}
-            }, {session});
-            
-            if(!isIncremented) throw new Error('Could not process withdrawal this time.');
-        
-        }
-
-        // 3. Create new withdrawal
-        const isCreated = await TRANSACTION.create([{
-            PhoneNumber,
-            Method          : METHOD,
-            TransactionID   : `${Date.now()}`,
-            Amount          : Amount,
-            Parent          : isDeducted.Parent,
-            Type            : TransactionType.WITHDRAWAL,
-            InvitationCode  : isDeducted.InvitationCode,
-            Tax             : tax
-        }],{session});
-
-
-        if(!isCreated) throw new Error("Could not process withdrawal this time.")
-
-        await session.commitTransaction();
-
-        // after commiting the transaction check if auto withdraw is on
-        // if yes then give withdraway asynchronously.
-        const {AutoWithdraw} = await ADMIN_CONFIG.findOne({}, {AutoWithdraw : 1, _id : 0});
-
-        if(AutoWithdraw && METHOD === 'LOCAL') processAutoWithdrawal(JSON.parse(JSON.stringify(isCreated[0])))
-
-        return {valid: true, msg: 'Your Withdrawal is in processing.'}
-
-    } catch (error) {
-        console.log("Error while withdrawal", error);
-        await session.abortTransaction();
-
-        if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};
-        return {valid: false, msg: error?.message || 'something went wrong'}
-    
-    }  finally {
-        await session.endSession();
-
+    if (METHOD === "USDT") {
+      // change db key for usdt;
+      DbWithdrawalPassKey = "UsdtWithdrawPassword";
     }
-}
 
-const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
-    try {
-        await CONNECT();
-        // get wallet details of this user check if has a valid bank account or not.
-        const bankDetails = await WALLET.findOne({PhoneNumber: withdrawData.PhoneNumber}) as UserWallet
+    // check if already withdrawan today.
+    // const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
+    // const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
 
-        if(!bankDetails.AccNumber || !bankDetails.AccHolderName || !bankDetails.BankName || !bankDetails.IfscCode) {
-            console.warn('[processAutoWithdrawal]', bankDetails)
-            throw new Error("[processAutoWithdrawal] failed to process auto withdraw bank details not available");
-        }
-        console.log('auto withdrawal 3');
-        const res = await handleAutoWithdraw3({
-            payout: {
-                AccountNo: bankDetails.AccNumber,
-                Amount: Number(withdrawData.Amount),
-                IFSC: bankDetails.IfscCode?.toUpperCase(),
-                BeneName: bankDetails.AccHolderName,
-                BeneMobile: withdrawData.PhoneNumber,
-                APIRequestID: withdrawData.TransactionID,
-                // BankName : bankDetails.BankName
-            },
-            editedData : {
-                ...withdrawData,
-                Status : TransactionStatusType.SUCCESS
-            }
-        })
+    // const startOfMonth = now.startOf("month").toJSDate();
+    // const endOfMonth = now.endOf("month").toJSDate();
 
-        if (res.valid) {
-            console.log('[processAutoWithdrawal] Auto withdrawal processed at ', new Date().toDateString(), res);
-        } else{
-            console.log('[processAutoWithdrawal] post request failed', res, withdrawData);
-        }
+    await CONNECT();
 
-    } catch (error) {
-        console.error('[processAutoWithdrawal] Error while processing auto withdrawal', error, withdrawData)
+    // const withdrawalCount = await TRANSACTION.countDocuments({
+    //   PhoneNumber,
+    //   Type: TransactionType.WITHDRAWAL,
+    //   Status: TransactionStatusType.SUCCESS,
+    //   createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+    // });
+
+    // if(withdrawalCount >= 3) throw new Error("Withdrawal limit exceeded. You've withdrawn 3 times this month.");
+
+    // const existingTransaction = await TRANSACTION.findOne({
+    //   PhoneNumber,
+    //   Type: TransactionType.WITHDRAWAL,
+    //   createdAt: { $gte: startOfDay, $lte: endOfDay },
+    // });
+
+    // if(existingTransaction) throw new Error("You have already withdrawn today.");
+
+    // check if user has a bank account.
+    const hasBank = await WALLET.findOne({
+      PhoneNumber,
+      [DbWithdrawalPassKey]: { $exists: true, $nin: [null, ""] },
+    });
+
+    if (!hasBank) throw new Error("You don't have a bank account.");
+
+    const isBlocked = await USER.findOne({
+      PhoneNumber,
+      BlockWithdrawal: true,
+    });
+
+    if (isBlocked) throw new Error("You cannot withdraw.");
+
+    const userInfo = await USER.findOne({ PhoneNumber });
+
+    const tax = userInfo.HoldingScore > 600 ? 15 : 20; // if more than 600 then 15% tax else 20% tax.
+    const taxableAmount = (Number(Amount) / 100) * Number(tax);
+    console.log("taxables -------------", tax, taxableAmount);
+    // check if user has enough balance.
+    const isSufficientBalance = await USER.findOne({
+      PhoneNumber,
+      Balance: { $gte: Amount + taxableAmount },
+    });
+
+    if (!isSufficientBalance)
+      throw new Error(
+        `You dont have enough balance. Required ₹ ${Amount + taxableAmount}.`,
+      );
+
+    // check if withdrawal password is correct.
+    const isPassCorrect = await WALLET.findOne({
+      PhoneNumber,
+      [DbWithdrawalPassKey]: data.WithdrawPassword,
+    });
+
+    if (!isPassCorrect) throw new Error("Incorrect withdrawal password");
+
+    // Process withdrawal --------------------------------------------------.
+
+    // 1. deduct user balance.
+    const isDeducted = await USER.findOneAndUpdate(
+      { PhoneNumber },
+      {
+        $inc: { Balance: -(Number(Amount) + taxableAmount) },
+      },
+      { session },
+    );
+    console.log("is deducated", isDeducted, -(Number(Amount) + taxableAmount));
+
+    if (!isDeducted) throw new Error("Could not process withdrawal this time.");
+
+    // 2. increment parent level1 withdrawal.
+    if (isSufficientBalance.Parent) {
+      const isIncremented = await USER.findOneAndUpdate(
+        { InvitationCode: isDeducted.Parent },
+        {
+          $inc: { Level1Withdrawal: Amount },
+        },
+        { session },
+      );
+
+      if (!isIncremented)
+        throw new Error("Could not process withdrawal this time.");
     }
-}
+
+    // 3. Create new withdrawal
+    const isCreated = await TRANSACTION.create(
+      [
+        {
+          PhoneNumber,
+          Method: METHOD,
+          TransactionID: `${Date.now()}`,
+          Amount: Amount,
+          Parent: isDeducted.Parent,
+          Type: TransactionType.WITHDRAWAL,
+          InvitationCode: isDeducted.InvitationCode,
+          Tax: tax,
+        },
+      ],
+      { session },
+    );
+
+    if (!isCreated) throw new Error("Could not process withdrawal this time.");
+
+    await session.commitTransaction();
+
+    // after commiting the transaction check if auto withdraw is on
+    // if yes then give withdraway asynchronously.
+    const { AutoWithdraw } = await ADMIN_CONFIG.findOne(
+      {},
+      { AutoWithdraw: 1, _id: 0 },
+    );
+
+    if (AutoWithdraw && METHOD === "LOCAL")
+      processAutoWithdrawal(JSON.parse(JSON.stringify(isCreated[0])));
+
+    return { valid: true, msg: "Your Withdrawal is in processing." };
+  } catch (error) {
+    console.log("Error while withdrawal", error);
+    await session.abortTransaction();
+
+    if (!(error instanceof Error))
+      return {
+        valid: false,
+        msg: "something went wrong",
+        operation: "LOGOUT",
+      };
+    return { valid: false, msg: error?.message || "something went wrong" };
+  } finally {
+    await session.endSession();
+  }
+};
+
+const processAutoWithdrawal = async (withdrawData: TransactionObjType) => {
+  try {
+    await CONNECT();
+    // get wallet details of this user check if has a valid bank account or not.
+    const bankDetails = (await WALLET.findOne({
+      PhoneNumber: withdrawData.PhoneNumber,
+    })) as UserWallet;
+
+    if (
+      !bankDetails.AccNumber ||
+      !bankDetails.AccHolderName ||
+      !bankDetails.BankName ||
+      !bankDetails.IfscCode
+    ) {
+      console.warn("[processAutoWithdrawal]", bankDetails);
+      throw new Error(
+        "[processAutoWithdrawal] failed to process auto withdraw bank details not available",
+      );
+    }
+    console.log("auto withdrawal 3");
+    const res = await handleAutoWithdraw3({
+      payout: {
+        AccountNo: bankDetails.AccNumber,
+        Amount: Number(withdrawData.Amount),
+        IFSC: bankDetails.IfscCode?.toUpperCase(),
+        BeneName: bankDetails.AccHolderName,
+        BeneMobile: withdrawData.PhoneNumber,
+        APIRequestID: withdrawData.TransactionID,
+        // BankName : bankDetails.BankName
+      },
+      editedData: {
+        ...withdrawData,
+        Status: TransactionStatusType.SUCCESS,
+      },
+    });
+    console.log("response from handleAutoWithdraw3", res);
+    if (res.valid) {
+      console.log(
+        "[processAutoWithdrawal] Auto withdrawal processed at ",
+        new Date().toDateString(),
+        res,
+      );
+    } else {
+      console.log(
+        "[processAutoWithdrawal] post request failed",
+        res,
+        withdrawData,
+      );
+    }
+  } catch (error) {
+    console.error(
+      "[processAutoWithdrawal] Error while processing auto withdrawal",
+      error,
+      withdrawData,
+    );
+  }
+};
 // ===================================================================================
 
 
