@@ -20,11 +20,11 @@ export const useAuto_5 = () => {
                 merchantId: "INR222814",
                 merchantOrderId: `${ transactionId }`,
                 amount: Number(100).toFixed(2),
-                type: 2,
+                type: '2',
                 paymentCurrency: "INR",
                 notifyUrl: "https://btcindia.bond/api/payment/AUTO_5",
                 userName: userInfo.Name,
-                ext: userInfo.PhoneNumber,
+                ext: `${ userInfo.PhoneNumber }`,
                 redirectUrl: "https://btcindia.bond/",
             }
 
