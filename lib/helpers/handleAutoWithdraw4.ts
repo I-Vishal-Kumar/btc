@@ -5,7 +5,7 @@ import { TransactionObjType } from "@/__types__/transaction.types";
 import axios from "axios";
 import crypto from "crypto";
 
-const KEY = "rspay_token_1755057556340";
+const KEY = process.env.RS_PAY_REQUEST_TOKEN!;
 
 // Generate MD5 hash for signing
 export const sign = (params: Record<string, any>, key: string = KEY) => {

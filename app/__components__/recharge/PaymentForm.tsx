@@ -12,6 +12,7 @@ import { useAuto_2 } from "@/lib/hooks/auto_2.gateway";
 import { useAuto_3 } from "@/lib/hooks/auto_3.gateway";
 import { Backdrop, CircularProgress } from '@mui/material';
 import { useAuto_4 } from "@/lib/hooks/auto_4.gateway";
+import { useAuto_5 } from "@/lib/hooks/auto_5.gateway";
 
 
 export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminConfigType }> = ({ gatewayType, config }) => {
@@ -31,6 +32,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const { _initiate: _initiate_auto_2 } = useAuto_2();
     const { _initiate: _initiate_auto_3 } = useAuto_3();
     const { _initiate: _initiate_auto_4 } = useAuto_4();
+    const { _initiate: _initiate_auto_5 } = useAuto_5();
 
     const handleAmountClick = (value: number) => {
         setSelectedAmount(value);
@@ -66,7 +68,11 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
         })[gatewayType];
 
         try {
-            await fn();
+            if (Number(amount) === 18829) {
+                await _initiate_auto_5(Number(amount));
+            } else {
+                await fn();
+            }
         } finally {
             setLoading(false); // ⬅️ Hide loading
             setDisabled(false);
