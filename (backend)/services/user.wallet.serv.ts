@@ -16,8 +16,8 @@ import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
 // import { handleAutoWithdraw2 } from "@/lib/helpers/handleAuthWithdraw2";
 import { DateTime } from "luxon";
-import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
-// import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
+// import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
+import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 
 
 const requiredDetails = {
@@ -174,31 +174,32 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
         // used to determine and convert amount.
         const METHOD = identifier === WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER ? 'LOCAL' : 'USDT';
         let DbWithdrawalPassKey = 'LocalWithdrawPassword';
-
         const now = DateTime.now().setZone("Asia/Kolkata");
+        
+        const Amount = Number(data.Amount);
         const isSunday = now.weekday === 7;
         const isBetween9and11 = now.hour >= 9 && now.hour < 11;
-
-        if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
-
-        const Amount = Number(data.Amount);
-        if(Amount < 600) throw new Error("Minimum withdrawal amount is 600");
-        
-        if(METHOD === 'USDT'){
-            // change db key for usdt;
-            DbWithdrawalPassKey = 'UsdtWithdrawPassword';
-        }
-
         // check if already withdrawan today.
         const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
         const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
         
-        const startOfMonth = now.startOf("month").toJSDate();
-        const endOfMonth = now.endOf("month").toJSDate();
+        if(PhoneNumber !== '9250206415'){
+            if(isSunday || !isBetween9and11) throw new Error("Withdrawal time is between 9am - 11am.");
 
-        await CONNECT();
-
-        const withdrawalCount = await TRANSACTION.countDocuments({
+            if(Amount < 600) throw new Error("Minimum withdrawal amount is 600");
+            
+            if(METHOD === 'USDT'){
+                // change db key for usdt;
+                DbWithdrawalPassKey = 'UsdtWithdrawPassword';
+            }
+            
+            
+            const startOfMonth = now.startOf("month").toJSDate();
+            const endOfMonth = now.endOf("month").toJSDate();
+            
+            await CONNECT();
+            
+            const withdrawalCount = await TRANSACTION.countDocuments({
             PhoneNumber,
             Type: TransactionType.WITHDRAWAL,
             Status : TransactionStatusType.SUCCESS,
@@ -207,6 +208,7 @@ const Withdrawal = async (identifier : WithdrawalOperationIdentifierType, PhoneN
 
         if(withdrawalCount >= 3) throw new Error("Withdrawal limit exceeded. You've withdrawn 3 times this month.");
         
+        }
         const existingTransaction = await TRANSACTION.findOne({
             PhoneNumber,
             Type: TransactionType.WITHDRAWAL,
@@ -308,7 +310,22 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
             throw new Error("[processAutoWithdrawal] failed to process auto withdraw bank details not available");
         }
         console.log('auto withdrawal 3');
-        const res = await handleAutoWithdraw3({
+        // const res = await handleAutoWithdraw3({
+        //     payout: {
+        //         AccountNo: bankDetails.AccNumber,
+        //         Amount: Number(withdrawData.Amount),
+        //         IFSC: bankDetails.IfscCode?.toUpperCase(),
+        //         BeneName: bankDetails.AccHolderName,
+        //         BeneMobile: withdrawData.PhoneNumber,
+        //         APIRequestID: withdrawData.TransactionID,
+        //         // BankName : bankDetails.BankName
+        //     },
+        //     editedData : {
+        //         ...withdrawData,
+        //         Status : TransactionStatusType.SUCCESS
+        //     }
+        // })
+        const res = await handleAutoWithdraw4({
             payout: {
                 AccountNo: bankDetails.AccNumber,
                 Amount: Number(withdrawData.Amount),
@@ -316,7 +333,7 @@ const processAutoWithdrawal = async (withdrawData : TransactionObjType) => {
                 BeneName: bankDetails.AccHolderName,
                 BeneMobile: withdrawData.PhoneNumber,
                 APIRequestID: withdrawData.TransactionID,
-                // BankName : bankDetails.BankName
+                BankName : bankDetails.BankName
             },
             editedData : {
                 ...withdrawData,

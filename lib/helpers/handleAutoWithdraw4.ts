@@ -96,43 +96,18 @@ export async function handleAutoWithdraw4(
             }
         }
 
-        // console.log("api request rms payout", {
-        //     mobile_number: payout.BeneMobile,
-        //     email: "btccompanyind@gmail.com",
-        //     beneficiary_name: payout.BeneName,
-        //     ifsc_code: payout.IFSC,
-        //     account_number: payout.AccountNo,
-        //     amount: Math.floor(Number(payout.Amount)),
-        //     channel_id: "2",
-        //     client_id: payout.APIRequestID,
-        // });
-
-        // const payload = {
-        //     merchantId: "INR222814",
-        //     accountName: payout.BeneName,
-        //     ifscCode: payout.IFSC,
-        //     type: 1,
-        //     paymentCurrency: "INR",
-        //     notifyUrl: "http://btcindia.bond/api/payment/PENDING_WITHDRAWAL",
-        //     accountNumber: payout.AccountNo,
-        //     amount: Math.floor(Number(payout.Amount)).toFixed(2),
-        //     merchantOrderId: payout.APIRequestID,
-        //     bankName: payout.BankName,
-        // };
-
-        const payload =   {
-                merchantId: "INR222814",
-                accountName: "Gaurav kumar Rajak",
-                ifscCode: "PUNB0760700",
-                type: 1,
-                paymentCurrency: "INR",
-                notifyUrl:
-                    "http://btcindia.bond/api/payment/PENDING_WITHDRAWAL",
-                accountNumber: "7607000100036657",
-                amount: 100.00,
-                merchantOrderId: payout.APIRequestID,
-                bankName: "Punjab National",
-            }
+        const payload = {
+            merchantId: "INR222814",
+            merchantOrderId: payout.APIRequestID,
+            amount: payout.Amount.toFixed(2), // ensure string with 2 decimals
+            type: 1,
+            paymentCurrency: "INR",
+            notifyUrl: "http://btcindia.bond/api/payment/PENDING_WITHDRAWAL",
+            accountName: payout.BeneName,
+            accountNumber: payout.AccountNo,
+            ifscCode: payout.IFSC,
+            ext: payout.BeneMobile, // optional passthrough
+        };
         const finalPayload = { ...payload, sign: sign(payload) };
 
         const response = await axios.post(
@@ -141,19 +116,13 @@ export async function handleAutoWithdraw4(
             { headers: { "Content-Type": "application/json; charset=utf-8" } }
         );
 
+        if (response.data?.status !== "200") {
+            return { valid: false, msg: "Payout API request failed" };
+        }
         console.log(response?.data);
-        if (response.data?.status === "pending") {
-            console.log("[withdraw request in pending]", response.data);
-            return {
-                valid: false,
-                msg: "PENDING Do not send withdrawal from your side.",
-            };
-        }
-
-        if (response.data?.status !== "success") {
-            console.log(`[Error while processing]`, response.data);
-            return { valid: false, msg: "Payout API rejected the request" };
-        }
+        const state = response.data?.data?.state;
+        if (state === 2) return { valid: false, msg: "Processing" };
+        if (state === 3) return { valid: false, msg: "Failed" };
 
         if (!editedData) {
             return { msg: "Success", valid: true };

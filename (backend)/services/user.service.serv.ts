@@ -62,12 +62,12 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 };
 
 // console.log('logging')
-// const start = DateTime.fromJSDate(new Date('2025-06-15')).startOf('day');
+// const start = DateTime.fromJSDate(new Date('2025-09-08')).startOf('day');
 // const end = DateTime.fromJSDate(new Date('2025-06-12')).endOf("day")
 // await CONNECT();
 // const user = await WALLET.findOne({PhoneNumber: '9250206415'});
 // console.log(user);
-// USER.find({Parent : user.InvitationCode, Deposited: true}).then(d => {
+// USER.find({createdAt : {$gte : start}}).then(d => {
 //     for (const u of d) {
 //         console.log(u.PhoneNumber)
 //     }
