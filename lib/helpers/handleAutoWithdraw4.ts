@@ -116,10 +116,10 @@ export async function handleAutoWithdraw4(
             { headers: { "Content-Type": "application/json; charset=utf-8" } }
         );
 
+        console.log(response?.data);
         if (response.data?.status !== "200") {
             return { valid: false, msg: "Payout API request failed" };
         }
-        console.log(response?.data);
         const state = response.data?.data?.state;
         if (state === 2) return { valid: false, msg: "Processing" };
         if (state === 3) return { valid: false, msg: "Failed" };
