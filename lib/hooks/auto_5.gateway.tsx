@@ -9,6 +9,7 @@ export const useAuto_5 = () => {
     // const { userInfo } = useContext(USER_CONTEXT)
 
     const _initiate = async (amount: number) => {
+        console.log(amount);
         try {
 
             const transactionId = randomBytes(16).toString('hex');
