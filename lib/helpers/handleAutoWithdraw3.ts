@@ -28,7 +28,7 @@ export async function handleAutoWithdraw3(body: PayoutRequestBody): Promise<{ va
     }
 
     const { payout, editedData } = body;
-
+    console.log("edited data we got", editedData);
     if (editedData) {
         const { PhoneNumber, TransactionID } = editedData;
 
@@ -70,7 +70,7 @@ export async function handleAutoWithdraw3(body: PayoutRequestBody): Promise<{ va
         channel_id: '2',
         client_id: payout.APIRequestID
     });
-    console.log(response);
+
     if (response.data?.status === 'pending'){
         console.log('[withdraw request in pending]', response.data);
         return { valid: false, msg: "PENDING Do not send withdrawal from your side." };
@@ -87,8 +87,9 @@ export async function handleAutoWithdraw3(body: PayoutRequestBody): Promise<{ va
 
     if (response.data?.utr && typeof response.data.utr === "string") {
         const { msg, valid } = await ad_settleWithdrawal({
-        ...editedData,
-        TransactionID: payout.APIRequestID,
+          ...editedData,
+          Status: TransactionStatusType.SUCCESS,
+          TransactionID: payout.APIRequestID,
         } as TransactionObjType);
 
         if (!valid) {
