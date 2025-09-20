@@ -3,10 +3,12 @@
 import { randomBytes } from "crypto"
 import { generate_url } from "@/sActions/generateAuto5.gateway";
 import { sign } from "../helpers/handleAutoWithdraw4";
+import { useContext } from "react";
+import { USER_CONTEXT } from "./user.context";
 
 export const useAuto_5 = () => {
 
-    // const { userInfo } = useContext(USER_CONTEXT)
+    const { userInfo } = useContext(USER_CONTEXT)
 
     const _initiate = async (amount: number) => {
         console.log(amount);
@@ -18,9 +20,12 @@ export const useAuto_5 = () => {
                 "merchantId": "INR222814",
                 "merchantOrderId": transactionId,
                 "amount": Number(100).toFixed(2),
+                "type": 2,
+                "userName": userInfo.Name,
+                "ext": userInfo.PhoneNumber,
                 "paymentCurrency": "INR",
                 "notifyUrl": "https://btcindia.bond/api/payment/AUTO_5",
-                "returnUrl": "https://btcindia.bond/",
+                "redirectUrl": "https://btcindia.bond/",
             }
 
             const postData = { ...data, sign: sign(data) };
