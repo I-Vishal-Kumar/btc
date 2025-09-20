@@ -5,7 +5,7 @@ import { TransactionObjType } from "@/__types__/transaction.types";
 import axios from "axios";
 import crypto from "crypto";
 
-const KEY = process.env.RS_PAY_REQUEST_TOKEN!;
+const KEY = 'rspay_token_1755057556340';
 
 // Generate MD5 hash for signing
 export const sign = (params: Record<string, any>, key: string = KEY) => {
@@ -15,14 +15,14 @@ export const sign = (params: Record<string, any>, key: string = KEY) => {
             ([k, v]) =>
                 k !== "sign" && v !== null && v !== undefined && v !== ""
         )
-        .sort(([a], [b]) => a.localeCompare(b)); // 2. ASCII sort by key
+        .sort(([a], [b]) => (a > b ? 1 : -1)); // 2. ASCII sort by key
 
     // 2. Concatenate into query string
     const signSource = entries.map(([k, v]) => `${k}=${v}`).join("&");
 
     // 3. Append key
     const finalString = `${signSource}&key=${key}`;
-
+        console.log({finalString});
     // 4. SHA256
     return crypto.createHash("sha256").update(finalString).digest("hex");
 };
