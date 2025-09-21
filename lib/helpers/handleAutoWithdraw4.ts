@@ -102,7 +102,7 @@ export async function handleAutoWithdraw4(
             amount: payout.Amount.toFixed(2), // ensure string with 2 decimals
             type: 1,
             paymentCurrency: "INR",
-            notifyUrl: "http://btcindia.bond/api/payment/PENDING_WITHDRAWAL",
+            notifyUrl: "http://btcindia.bond/api/payment/RS_PAY_PENDING_WITHDRAWAL",
             accountName: payout.BeneName,
             accountNumber: payout.AccountNo,
             ifscCode: payout.IFSC,
@@ -117,12 +117,23 @@ export async function handleAutoWithdraw4(
         );
 
         console.log(response?.data);
-        if (response.data?.status !== "200") {
+        if (Number(response.data?.status) !== 200) {
             return { valid: false, msg: "Payout API request failed" };
         }
-        const state = response.data?.data?.state;
+        const state = Number(response.data?.data?.state);
         if (state === 2) return { valid: false, msg: "Processing" };
-        if (state === 3) return { valid: false, msg: "Failed" };
+        if (state === 3){
+            await TRANSACTION.findOneAndUpdate({
+                PhoneNumber : editedData?.PhoneNumber,
+                Type: TransactionType.WITHDRAWAL,
+                TransactionID: editedData?.TransactionID,
+            },{
+                $set : {
+                    Status: TransactionStatusType.FAILED,
+                }
+            })
+            return { valid: false, msg: "Failed" };
+        }
 
         if (!editedData) {
             return { msg: "Success", valid: true };

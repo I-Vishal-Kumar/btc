@@ -5,9 +5,9 @@ import { generate_url } from "@/sActions/generateAuto5.gateway";
 import { sign } from "../helpers/handleAutoWithdraw4";
 import { useContext } from "react";
 import { USER_CONTEXT } from "./user.context";
-import { CREATE_TRANSACTION } from "@/(backend)/services/transaction.service.serve";
-import { enqueueSnackbar } from "notistack";
-import { GatewayTypes } from "@/__types__/db.types";
+// import { CREATE_TRANSACTION } from "@/(backend)/services/transaction.service.serve";
+// import { enqueueSnackbar } from "notistack";
+// import { GatewayTypes } from "@/__types__/db.types";
 
 export const useAuto_5 = () => {
 
@@ -33,8 +33,8 @@ export const useAuto_5 = () => {
 
             const postData = { ...data, sign: sign(data) };
 
-            const { valid } = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.RMS_2)
-            if (!valid) return enqueueSnackbar('Failed to process request', { variant: "error" });
+            // const { valid } = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.RMS_2)
+            // if (!valid) return enqueueSnackbar('Failed to process request', { variant: "error" });
 
             // transaction is created procede.
             const slug = await generate_url(postData);

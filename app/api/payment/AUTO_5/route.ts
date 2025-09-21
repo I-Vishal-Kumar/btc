@@ -17,7 +17,8 @@ const RS_PAY_KEY = process.env.RS_PAY_REQUEST_TOKEN!; // Your secret key
 
 import { TRANSACTION } from '@/(backend)/(modals)/schema/transaction.schema';
 import { ad_settleDeposit } from '@/(backend)/services/admin.service.serve';
-import { db_schema, TransactionStatusType } from '@/__types__/db.types';
+import { CREATE_TRANSACTION } from '@/(backend)/services/transaction.service.serve';
+import { db_schema, GatewayTypes, TransactionStatusType } from '@/__types__/db.types';
 import { CONNECT } from '@/lib/_db/db.config';
 // Function to create SHA256 signature
 import crypto from 'crypto';
@@ -51,9 +52,10 @@ export const POST = async (req: Request) => {
         }
         
         await CONNECT();
-
+        await CREATE_TRANSACTION(Number(dataWithoutSign.amount), dataWithoutSign.merchantOrderId, GatewayTypes.RMS_2)
+        
         // Handle payment based on state
-        if (body.state !== 1) {
+        if (Number(body.state) !== 1) {
             console.log(
                 `[${new Date().toISOString()}] Payment not successful. State: ${body.state}, Response:`,
                 body

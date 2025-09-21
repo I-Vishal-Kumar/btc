@@ -10,8 +10,8 @@ export const generate_url = async (postData: Record<string, string | number>) =>
     try {
         const res = await axios.post(reqUrl, postData);
         console.log(res);
-        if (res.data?.status === 'success') {
-            return res.data?.data?.paymentUrl
+        if (res.data?.message === 'success') {
+            return res.data?.data?.payUrl
         }
 
         return false;

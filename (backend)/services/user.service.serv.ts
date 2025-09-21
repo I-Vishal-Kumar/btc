@@ -62,7 +62,7 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 };
 
 // console.log('logging')
-// const start = DateTime.fromJSDate(new Date('2025-09-08')).startOf('day');
+// const start = DateTime.fromJSDate(new Date('2025-08-08')).startOf('day');
 // const end = DateTime.fromJSDate(new Date('2025-06-12')).endOf("day")
 // await CONNECT();
 // const users = await USER.find({}, { PhoneNumber: 1 });
