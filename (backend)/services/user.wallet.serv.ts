@@ -14,11 +14,9 @@ import { DateTime } from "luxon";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
-import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
-// import { handleAutoWithdraw2 } from "@/lib/helpers/handleAuthWithdraw2";
-// import { DateTime } from "luxon";
-// import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 // import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
+import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
+// import { DateTime } from "luxon";
 
 const requiredDetails = {
   [WithdrawalOperationIdentifier.LOCAL_BANK_CREATION]: {
@@ -389,7 +387,7 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType) => {
       );
     }
     console.log("auto withdrawal 3");
-    const res = await handleAutoWithdraw4({
+    const res = await handleAutoWithdraw3({
       payout: {
         AccountNo: bankDetails.AccNumber,
         Amount: Number(withdrawData.Amount),
@@ -397,7 +395,7 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType) => {
         BeneName: bankDetails.AccHolderName,
         BeneMobile: withdrawData.PhoneNumber,
         APIRequestID: withdrawData.TransactionID,
-        BankName : bankDetails.BankName
+        // BankName : bankDetails.BankName
       },
       editedData: {
         ...withdrawData,
