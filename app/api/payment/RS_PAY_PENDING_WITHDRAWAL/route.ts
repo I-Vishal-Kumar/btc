@@ -88,41 +88,41 @@ export async function GET(req: NextRequest) {
     console.log('rs pay pending withdrawal in get requets', body);
     return new NextResponse("success")
     // Verify signature
-    const { sign, ...dataWithoutSign } = body;
-    const expectedSign = generateSignature(dataWithoutSign, SECRET_KEY);
+    // const { sign, ...dataWithoutSign } = body;
+    // const expectedSign = generateSignature(dataWithoutSign, SECRET_KEY);
 
-    if (sign !== expectedSign) {
-      console.error("Invalid signature in RS Pay notify", { received: sign, expected: expectedSign });
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-    }
+    // if (sign !== expectedSign) {
+    //   console.error("Invalid signature in RS Pay notify", { received: sign, expected: expectedSign });
+    //   return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    // }
 
-    const pay = body; // RS Pay sends single payment notification
-    try {
-      const existingTransaction = await TRANSACTION.findOne({
-        TransactionID: pay?.merchantOrderId,
-      }).lean();
+    // const pay = body; // RS Pay sends single payment notification
+    // try {
+    //   const existingTransaction = await TRANSACTION.findOne({
+    //     TransactionID: pay?.merchantOrderId,
+    //   }).lean();
 
-      if (!existingTransaction) {
-        throw new Error(`No transaction available for id ${pay?.merchantOrderId}`);
-      }
+    //   if (!existingTransaction) {
+    //     throw new Error(`No transaction available for id ${pay?.merchantOrderId}`);
+    //   }
 
-      const { valid, data, msg } = await ad_settleWithdrawal({
-        ...existingTransaction,
-        Status:
-          Number(pay.state) === 1
-            ? TransactionStatusType.SUCCESS
-            : TransactionStatusType.FAILED,
-      } as unknown as TransactionObjType);
+    //   const { valid, data, msg } = await ad_settleWithdrawal({
+    //     ...existingTransaction,
+    //     Status:
+    //       Number(pay.state) === 1
+    //         ? TransactionStatusType.SUCCESS
+    //         : TransactionStatusType.FAILED,
+    //   } as unknown as TransactionObjType);
 
-      if (!valid) {
-        console.log("[failed to settle withdrawal]", data, msg, pay);
-        throw new Error("settlement failed");
-      }
-        return new NextResponse("success", { status: 200, headers: { "Content-Type": "text/plain" } });
-    } catch (error) {
-        console.log(error, "error while processing RS Pay notify", body);
-        return NextResponse.json({ success: false });
-    }
+    //   if (!valid) {
+    //     console.log("[failed to settle withdrawal]", data, msg, pay);
+    //     throw new Error("settlement failed");
+    //   }
+    //     return new NextResponse("success", { status: 200, headers: { "Content-Type": "text/plain" } });
+    // } catch (error) {
+    //     console.log(error, "error while processing RS Pay notify", body);
+    //     return NextResponse.json({ success: false });
+    // }
 
   } catch (err) {
     console.error("Error in RS Pay notify handler:", err);
