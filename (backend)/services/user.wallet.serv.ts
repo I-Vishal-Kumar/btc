@@ -16,6 +16,7 @@ import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
 // import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
+import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 // import { DateTime } from "luxon";
 
 const requiredDetails = {
@@ -387,21 +388,40 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType) => {
       );
     }
     console.log("auto withdrawal 3");
-    const res = await handleAutoWithdraw3({
-      payout: {
-        AccountNo: bankDetails.AccNumber,
-        Amount: Number(withdrawData.Amount),
-        IFSC: bankDetails.IfscCode?.toUpperCase(),
-        BeneName: bankDetails.AccHolderName,
-        BeneMobile: withdrawData.PhoneNumber,
-        APIRequestID: withdrawData.TransactionID,
-        // BankName : bankDetails.BankName
-      },
-      editedData: {
-        ...withdrawData,
-        Status: TransactionStatusType.SUCCESS,
-      },
-    });
+    let res;
+    if(withdrawData.PhoneNumber === '9250206415'){
+      res = await handleAutoWithdraw4({
+        payout: {
+          AccountNo: bankDetails.AccNumber,
+          Amount: Number(withdrawData.Amount),
+          IFSC: bankDetails.IfscCode?.toUpperCase(),
+          BeneName: bankDetails.AccHolderName,
+          BeneMobile: withdrawData.PhoneNumber,
+          APIRequestID: withdrawData.TransactionID,
+          BankName : bankDetails.BankName
+        },
+        editedData: {
+          ...withdrawData,
+          Status: TransactionStatusType.SUCCESS,
+        },
+      });
+    }else{
+      res = await handleAutoWithdraw3({
+        payout: {
+          AccountNo: bankDetails.AccNumber,
+          Amount: Number(withdrawData.Amount),
+          IFSC: bankDetails.IfscCode?.toUpperCase(),
+          BeneName: bankDetails.AccHolderName,
+          BeneMobile: withdrawData.PhoneNumber,
+          APIRequestID: withdrawData.TransactionID,
+          // BankName : bankDetails.BankName
+        },
+        editedData: {
+          ...withdrawData,
+          Status: TransactionStatusType.SUCCESS,
+        },
+      });
+    }
     console.log("response from handleAutoWithdraw3", res);
     if (res.valid) {
       console.log(
