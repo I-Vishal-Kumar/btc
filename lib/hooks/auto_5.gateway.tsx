@@ -1,8 +1,8 @@
 "use client"
 
 import { randomBytes } from "crypto"
-import { generate_url } from "@/sActions/generateAuto5.gateway";
-import { sign } from "../helpers/handleAutoWithdraw4";
+// import { generate_url } from "@/sActions/generateAuto5.gateway";
+// import { sign } from "../helpers/handleAutoWithdraw4";
 import { useContext } from "react";
 import { USER_CONTEXT } from "./user.context";
 // import { CREATE_TRANSACTION } from "@/(backend)/services/transaction.service.serve";
@@ -30,16 +30,16 @@ export const useAuto_5 = () => {
                 ext: `${ userInfo.PhoneNumber }`,
                 redirectUrl: "https://btcindia.bond/",
             }
-
-            const postData = { ...data, sign: sign(data) };
+            console.log(data)
+            // const postData = { ...data, sign: sign(data) };
 
             // const { valid } = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.RMS_2)
             // if (!valid) return enqueueSnackbar('Failed to process request', { variant: "error" });
 
             // transaction is created procede.
-            const slug = await generate_url(postData);
+            // const slug = await generate_url(postData);
 
-            console.log(slug);
+            // console.log(slug);
 
         } catch (error) {
             console.log('error in auto 3', error);
