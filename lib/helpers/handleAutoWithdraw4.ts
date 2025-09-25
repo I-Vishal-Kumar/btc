@@ -6,26 +6,39 @@ import axios from "axios";
 import crypto from "crypto";
 
 const KEY = 'rspay_token_1755057556340';
-
+const accessKey = 'Soa+5HVbQE2gtZ3eQbgSXg';
+const accessSecret = 'C9Z3RPDmfE6YX3WM4xcFSw';
 // Generate MD5 hash for signing
-export const sign = (params: Record<string, any>, key: string = KEY) => {
-    // 1. Filter out empty/null/undefined and the "sign" field
-    const entries = Object.entries(params)
-        .filter(
-            ([k, v]) =>
-                k !== "sign" && v !== null && v !== undefined && v !== ""
-        )
-        .sort(([a], [b]) => (a > b ? 1 : -1)); // 2. ASCII sort by key
+function generateRandomString(length = 6) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
 
-    // 2. Concatenate into query string
-    const signSource = entries.map(([k, v]) => `${k}=${v}`).join("&");
+function sign({
+    method = "POST",
+    requestPath = "/api/v2/pay/create",
+    key = accessKey,
+    secret = accessSecret,
+    timestamp = Math.floor(Date.now() / 1000).toString(),
+    nonce = generateRandomString()
+} : Record<string, string>) {
+    // Build the raw string
+    const raw = `${method}&${requestPath}&${key}&${timestamp}&${nonce}&${secret}`;
 
-    // 3. Append key
-    const finalString = `${signSource}&key=${key}`;
-        console.log({finalString});
-    // 4. SHA256
-    return crypto.createHash("sha256").update(finalString).digest("hex");
-};
+    // Hash with MD5
+    const md5 = crypto.createHash("md5").update(raw, "utf8").digest("hex");
+
+    return {
+        sign: md5,
+        raw,       // same as your C# return tuple
+        timestamp,
+        nuncio: nonce
+    };
+}
 
 // Validate a signature
 export const validateSignByKey = (
@@ -96,57 +109,65 @@ export async function handleAutoWithdraw4(
             }
         }
 
+        // Cola Pay required params
+        const timestamp = Math.floor(Date.now() / 1000).toString(); // 10 digit
+        const nonce = Math.floor(Math.random() * 100000000).toString(); // random string
+
         const payload = {
-            merchantId: "INR222814",
-            merchantOrderId: payout.APIRequestID,
-            amount: payout.Amount.toFixed(2), // ensure string with 2 decimals
-            type: 1,
-            paymentCurrency: "INR",
-            notifyUrl: "http://btcindia.bond/api/payment/RS_PAY_PENDING_WITHDRAWAL",
-            accountName: payout.BeneName,
-            accountNumber: payout.AccountNo,
-            ifscCode: payout.IFSC,
-            ext: payout.BeneMobile, // optional passthrough
+            McorderNo: `${timestamp}`, // merchant order number
+            Amount: payout.Amount.toFixed(2), // ensure max 2 decimals
+            Type: "inr",
+            ChannelCode: "71001", // must be bound channel code
+            name: payout.BeneName,
+            BankName: payout.BankName,
+            BankAccount: payout.AccountNo,
+            ifsc: payout.IFSC,
+            NotifyUrl: "http://btcindia.bond/api/payment/COLA_PAY_WITHDRAWAL", // replace with live notify
         };
-        const finalPayload = { ...payload, sign: sign(payload) };
+
+        // sign generation based on Cola Pay docs
+        const headers = {
+            accessKey: accessKey,
+            timestamp,
+            nonce,
+        };
+        const {sign: signValue} = sign({
+            nonce,
+            timestamp
+        }); // assumes you have same `sign` util adapted for ColaPay
+        const finalHeaders = {
+            ...headers,
+            sign: signValue,
+            "Content-Type": "application/json",
+        };
 
         const response = await axios.post(
-            "https://api.rs-pay.cc/apii/out/createOrder",
-            finalPayload,
-            { headers: { "Content-Type": "application/json; charset=utf-8" } }
+            "https://mcapi.colapayppp.com/api/v2/pay/create", // replace with actual Cola Pay URL
+            payload,
+            { headers: finalHeaders }
         );
 
         console.log(response?.data);
-        if (Number(response.data?.status) !== 200) {
+
+        if (Number(response.data?.code) !== 200) {
             return { valid: false, msg: "Payout API request failed" };
         }
-        const state = Number(response.data?.data?.state);
-        if (state === 2) return { valid: false, msg: "Processing" };
-        if (state === 3){
-            await TRANSACTION.findOneAndUpdate({
-                PhoneNumber : editedData?.PhoneNumber,
-                Type: TransactionType.WITHDRAWAL,
-                TransactionID: editedData?.TransactionID,
-            },{
-                $set : {
-                    Status: TransactionStatusType.FAILED,
-                }
-            })
-            return { valid: false, msg: "Failed" };
+
+        const status = response.data?.result?.status;
+        if (status === "created") {
+            // mark processing state
+            return { valid: true, msg: "Withdrawal created successfully" };
         }
 
         if (!editedData) {
             return { msg: "Success", valid: true };
         }
 
-        if (
-            response.data?.transaction_id &&
-            typeof response.data.transaction_id === "string"
-        ) {
+        if (response.data?.result?.orderNo) {
             const { msg, valid } = await ad_settleWithdrawal({
                 ...editedData,
                 TransactionID:
-                    response.data?.transaction_id || payout.APIRequestID,
+                    response.data?.result?.orderNo || payout.APIRequestID,
             } as TransactionObjType);
 
             if (!valid) {
@@ -162,7 +183,7 @@ export async function handleAutoWithdraw4(
                 };
             }
 
-            return { valid: true, msg: `Withdrawal successful` };
+            return { valid: true, msg: "Withdrawal successful" };
         }
 
         console.log("[UNKNOWN RESPONSE PAYOUT]", response.data, body);
@@ -175,3 +196,4 @@ export async function handleAutoWithdraw4(
         };
     }
 }
+
