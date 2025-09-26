@@ -29,7 +29,7 @@ import { VIDEO_EARNING } from "../(modals)/schema/videoEarning.schema";
 import mongoose from "mongoose";
 import { VIDEOS } from "../(modals)/schema/videos.schema";
 import { FD } from "../(modals)/schema/fixedDeposit.schema";
-// import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
+import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 
 handleAutoWithdraw4({
     payout : {
