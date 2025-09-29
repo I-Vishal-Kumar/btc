@@ -22,8 +22,9 @@ export type PayoutRequestBody = {
     };
 };
 
+const secret = process.env.LGPAY_SECRET_KEY!;
 
-function generateLGPaySign(params: Record<string, any>, secretKey: string) {
+export function generateLGPaySign(params: Record<string, any>, secretKey: string = secret) {
     // 1. Remove empty values AND remove 'sign' if present
     const filtered = Object.fromEntries(
         Object.entries(params).filter(
