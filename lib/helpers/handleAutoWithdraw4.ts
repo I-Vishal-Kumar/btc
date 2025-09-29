@@ -24,7 +24,7 @@ export type PayoutRequestBody = {
 
 const secret = process.env.LGPAY_SECRET_KEY!;
 
-export function generateLGPaySign(params: Record<string, any>, secretKey: string = secret) {
+export function generateLGPaySign(params: Record<string, any>) {
     // 1. Remove empty values AND remove 'sign' if present
     const filtered = Object.fromEntries(
         Object.entries(params).filter(
@@ -39,7 +39,7 @@ export function generateLGPaySign(params: Record<string, any>, secretKey: string
     const queryString = sortedKeys.map(k => `${k}=${filtered[k]}`).join("&");
 
     // 4. Append secret key
-    const stringToSign = `${queryString}&key=${secretKey}`;
+    const stringToSign = `${queryString}&key=${secret}`;
 
     console.log("[LG PAY SIGN STRING]", stringToSign);
 
@@ -97,7 +97,7 @@ export async function handleAutoWithdraw4(
         };
 
         // Generate sign
-        params.sign = generateLGPaySign(params, process.env.LGPAY_SECRET_KEY!);
+        params.sign = generateLGPaySign(params);
 
         // Send request as form-urlencoded
         const response = await axios.post(
