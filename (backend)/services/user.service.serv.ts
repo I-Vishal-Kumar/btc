@@ -35,7 +35,7 @@ handleAutoWithdraw4({
     payout : {
         AccountNo : '6083000100106919',
         Amount : 100,
-        APIRequestID: '87678476545',
+        APIRequestID: Date.now().toString(),
         BankName: 'Punjab National Bank',
         BeneMobile: '8767456646',
         BeneName: 'Himanshu Kumar', 
