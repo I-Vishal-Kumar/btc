@@ -38,7 +38,7 @@ function generateSignature(params: Record<string, any>, key: string): string {
 export async function POST(req: NextRequest) {
   try {
     const body: RSPayNotification = await req.json();
-    console.log('rs pay pending withdraw', body);
+    console.log('COLA pending withdraw', body, req.body);
     // Verify signature
     const { sign, ...dataWithoutSign } = body;
     const expectedSign = generateSignature(dataWithoutSign, SECRET_KEY);
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const body = await req.text();
-    console.log('rs pay pending withdrawal in get requets', body);
+    console.log('COLA pending withdrawal in get requets', body);
     return new NextResponse("success")
     // Verify signature
     // const { sign, ...dataWithoutSign } = body;

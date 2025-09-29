@@ -3,58 +3,7 @@ import { ad_settleWithdrawal } from "@/(backend)/services/admin.service.serve";
 import { TransactionType, TransactionStatusType } from "@/__types__/db.types";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import axios from "axios";
-import crypto from "crypto";
-
-const KEY = 'rspay_token_1755057556340';
-const accessKey = 'Soa+5HVbQE2gtZ3eQbgSXg';
-const accessSecret = 'C9Z3RPDmfE6YX3WM4xcFSw';
-// Generate MD5 hash for signing
-function generateRandomString(length = 6) {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-}
-
-function sign({
-    method = "POST",
-    requestPath = "/api/v2/pay/create",
-    key = accessKey,
-    secret = accessSecret,
-    timestamp = Math.floor(Date.now() / 1000).toString(),
-    nonce = generateRandomString()
-} : Record<string, string>) {
-    // Build the raw string
-    const raw = `${method}&${requestPath}&${key}&${timestamp}&${nonce}&${secret}`;
-
-    // Hash with MD5
-    const md5 = crypto.createHash("md5").update(raw, "utf8").digest("hex");
-
-    return {
-        sign: md5,
-        raw,       // same as your C# return tuple
-        timestamp,
-        nuncio: nonce
-    };
-}
-
-// Validate a signature
-export const validateSignByKey = (
-    signSource: string,
-    key: string = KEY,
-    providedSign: string
-) => {
-    if (key) {
-        signSource += `&key=${key}`;
-    }
-    const generatedSign = crypto
-        .createHash("SHA256")
-        .update(signSource)
-        .digest("hex");
-    return generatedSign === providedSign;
-};
+import { createHash } from "crypto";
 
 export type PayoutRequestBody = {
     payout: {
@@ -72,6 +21,26 @@ export type PayoutRequestBody = {
         [key: string]: any;
     };
 };
+
+
+function generateLGPaySign(params: Record<string, any>, secretKey: string) {
+    // 1. Remove empty values
+    const filtered = Object.fromEntries(
+        Object.entries(params).filter(([_, v]) => v !== null && v !== undefined && v !== "")
+    );
+
+    // 2. Sort keys ASCII ascending
+    const sortedKeys = Object.keys(filtered).sort();
+
+    // 3. Build query string
+    const queryString = sortedKeys.map(k => `${k}=${filtered[k]}`).join("&");
+
+    // 4. Append secret key
+    const stringToSign = `${queryString}&key=${secretKey}`;
+
+    // 5. MD5 uppercase
+    return createHash("md5").update(stringToSign).digest("hex").toUpperCase();
+}
 
 //   rms withdrawal
 export async function handleAutoWithdraw4(
@@ -109,85 +78,57 @@ export async function handleAutoWithdraw4(
             }
         }
 
-        // Cola Pay required params
-        const timestamp = Math.floor(Date.now() / 1000).toString(); // 10 digit
-        const nonce = Math.floor(Math.random() * 100000000).toString(); // random string
-
-        const payload = {
-            McorderNo: `${timestamp}`, // merchant order number
-            Amount: payout.Amount.toFixed(2), // ensure max 2 decimals
-            Type: "inr",
-            ChannelCode: "71001", // must be bound channel code
-            name: payout.BeneName,
-            BankName: payout.BankName,
-            BankAccount: payout.AccountNo,
-            ifsc: payout.IFSC,
-            NotifyUrl: "http://btcindia.bond/api/payment/COLA_PAY_WITHDRAWAL", // replace with live notify
+        // ---- LG Pay required params ----
+        const params: Record<string, any> = {
+            app_id: "YD4489",
+            order_sn: payout.APIRequestID,
+            currency: 'INR', // e.g., "INR"
+            money: Math.floor(payout.Amount * 100),
+            name : payout.BeneName,
+            bank_name : payout.BankName,
+            addon1 : payout.IFSC,
+            card_number : payout.AccountNo,
+            notify_url: "https://btcindia.bond/payment/COLA_PAY_WITHDRAWAL",
         };
 
-        // sign generation based on Cola Pay docs
-        const headers = {
-            accessKey: accessKey,
-            timestamp,
-            nonce,
-        };
-        const {sign: signValue} = sign({
-            nonce,
-            timestamp
-        }); // assumes you have same `sign` util adapted for ColaPay
-        const finalHeaders = {
-            ...headers,
-            sign: signValue,
-            "Content-Type": "application/json",
-        };
+        // Generate sign
+        params.sign = generateLGPaySign(params, process.env.LGPAY_SECRET_KEY!);
 
+        // Send request as form-urlencoded
         const response = await axios.post(
-            "https://mcapi.colapayppp.com/api/v2/pay/create", // replace with actual Cola Pay URL
-            payload,
-            { headers: finalHeaders }
+            "https://www.lg-pay.com/api/deposit/create",
+            new URLSearchParams(params).toString(),
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
         );
 
-        console.log(response?.data);
+        console.log("[LG PAY RESPONSE]", response?.data);
 
-        if (Number(response.data?.code) !== 200) {
-            return { valid: false, msg: "Payout API request failed" };
+        if (response.data?.status !== 1) {
+            return {
+                valid: false,
+                msg: response.data?.msg || "Payout API request failed",
+            };
         }
 
-        const status = response.data?.result?.status;
-        if (status === "created") {
-            // mark processing state
-            return { valid: true, msg: "Withdrawal created successfully" };
-        }
-
+        // Accepted (status=1), final result will come via notify_url callback
         if (!editedData) {
-            return { msg: "Success", valid: true };
+            return { msg: "Payout request submitted", valid: true };
         }
 
-        if (response.data?.result?.orderNo) {
-            const { msg, valid } = await ad_settleWithdrawal({
-                ...editedData,
-                TransactionID:
-                    response.data?.result?.orderNo || payout.APIRequestID,
-            } as TransactionObjType);
+        const { msg, valid } = await ad_settleWithdrawal({
+            ...editedData,
+            TransactionID: payout.APIRequestID,
+        } as TransactionObjType);
 
-            if (!valid) {
-                console.error(
-                    "Settlement update failed:",
-                    msg,
-                    editedData,
-                    response.data
-                );
-                return {
-                    valid: false,
-                    msg: "Amount debited but failed to update transaction.",
-                };
-            }
-
-            return { valid: true, msg: "Withdrawal successful" };
+        if (!valid) {
+            console.error("Settlement update failed:", msg, editedData, response.data);
+            return {
+                valid: false,
+                msg: "Payout request accepted but failed to update transaction.",
+            };
         }
 
-        console.log("[UNKNOWN RESPONSE PAYOUT]", response.data, body);
-        return { valid: false, msg: "Unknown response state" };
+        return { valid: true, msg: "Payout request accepted" };
     } catch (error: any) {
         console.error(JSON.stringify(error, Object.getOwnPropertyNames(error), 3));
         return {
@@ -196,4 +137,3 @@ export async function handleAutoWithdraw4(
         };
     }
 }
-
