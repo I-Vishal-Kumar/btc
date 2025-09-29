@@ -24,7 +24,7 @@ export const useAuto_5 = () => {
                 app_id: "YD4489",
                 trade_type: `INRUPI`,
                 order_sn: `${ transactionId }`,
-                money: Number(100) * 100,
+                money: Number(200) * 100,
                 notify_url: "https://btcindia.bond/api/payment/AUTO_5",
                 ip: '0.0.0.0',
                 remark: `${ userInfo.PhoneNumber }`,
