@@ -22,7 +22,7 @@ export type PayoutRequestBody = {
     };
 };
 
-const secret = process.env.LGPAY_SECRET_KEY!;
+const secret = process.env.NEXT_PUBLIC_LGPAY_SECRET_KEY!;
 
 export function generateLGPaySign(params: Record<string, any>) {
     // 1. Remove empty values AND remove 'sign' if present
