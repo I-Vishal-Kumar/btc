@@ -92,7 +92,7 @@ export async function handleAutoWithdraw4(
             bank_name : payout.BankName,
             addon1 : payout.IFSC,
             card_number : payout.AccountNo,
-            notify_url: "https://btcindia.bond/payment/COLA_PAY_WITHDRAWAL",
+            notify_url: "https://btcindia.bond/payment/LG_PAY_WITHDRAWAL",
         };
 
         // Generate sign
