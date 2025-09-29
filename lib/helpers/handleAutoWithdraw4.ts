@@ -24,9 +24,11 @@ export type PayoutRequestBody = {
 
 
 function generateLGPaySign(params: Record<string, any>, secretKey: string) {
-    // 1. Remove empty values
+    // 1. Remove empty values AND remove 'sign' if present
     const filtered = Object.fromEntries(
-        Object.entries(params).filter(([_, v]) => v !== null && v !== undefined && v !== "")
+        Object.entries(params).filter(
+            ([k, v]) => k !== "sign" && v !== null && v !== undefined && v !== ""
+        )
     );
 
     // 2. Sort keys ASCII ascending
@@ -37,6 +39,8 @@ function generateLGPaySign(params: Record<string, any>, secretKey: string) {
 
     // 4. Append secret key
     const stringToSign = `${queryString}&key=${secretKey}`;
+
+    console.log("[LG PAY SIGN STRING]", stringToSign);
 
     // 5. MD5 uppercase
     return createHash("md5").update(stringToSign).digest("hex").toUpperCase();
