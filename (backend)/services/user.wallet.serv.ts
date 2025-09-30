@@ -15,7 +15,6 @@ import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
 // import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
-import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 // import { DateTime } from "luxon";
 
