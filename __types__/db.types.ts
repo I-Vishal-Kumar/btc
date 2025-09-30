@@ -42,6 +42,7 @@ export const GatewayTypes = {
     DEFAULT: "BTC",
     RMS_1: "RMS_1",
     RMS_2: "RMS_2",
+    AUTO_3: 'AUTO-3', // lg pay
 } as const;
 
 export type GatewayTypes = (typeof GatewayTypes)[keyof typeof GatewayTypes];

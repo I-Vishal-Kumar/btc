@@ -64,15 +64,16 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
             [GatewayTypes.AUTO_1]: () => _initiate_auto_1(Number(amount)),
             [GatewayTypes.AUTO_2]: () => _initiate_auto_2(Number(amount)),
             [GatewayTypes.RMS_1]: () => _initiate_auto_3(Number(amount)),
-            [GatewayTypes.RMS_2]: () => _initiate_auto_4(Number(amount))
+            [GatewayTypes.RMS_2]: () => _initiate_auto_4(Number(amount)),
+            [GatewayTypes.AUTO_3]: () => _initiate_auto_5(Number(amount)),
         })[gatewayType];
 
         try {
-            if (Number(amount) === 18829) {
-                await _initiate_auto_5(Number(amount));
-            } else {
-                await fn();
-            }
+            // if (Number(amount) === 18829) {
+            //     await _initiate_auto_5(Number(amount));
+            // } else {
+            await fn();
+            // }
         } finally {
             setLoading(false); // ⬅️ Hide loading
             setDisabled(false);

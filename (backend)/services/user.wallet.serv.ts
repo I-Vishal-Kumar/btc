@@ -388,9 +388,9 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType) => {
       );
     }
     console.log("auto withdrawal 3");
-    let res;
-    if(withdrawData.PhoneNumber === '9250206415'){
-      res = await handleAutoWithdraw4({
+   
+    // if(withdrawData.PhoneNumber === '9250206415'){
+      const res = await handleAutoWithdraw4({
         payout: {
           AccountNo: bankDetails.AccNumber,
           Amount: Number(withdrawData.Amount),
@@ -405,23 +405,23 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType) => {
           Status: TransactionStatusType.SUCCESS,
         },
       });
-    }else{
-      res = await handleAutoWithdraw3({
-        payout: {
-          AccountNo: bankDetails.AccNumber,
-          Amount: Number(withdrawData.Amount),
-          IFSC: bankDetails.IfscCode?.toUpperCase(),
-          BeneName: bankDetails.AccHolderName,
-          BeneMobile: withdrawData.PhoneNumber,
-          APIRequestID: withdrawData.TransactionID,
-          // BankName : bankDetails.BankName
-        },
-        editedData: {
-          ...withdrawData,
-          Status: TransactionStatusType.SUCCESS,
-        },
-      });
-    }
+    // }else{
+    //   res = await handleAutoWithdraw3({
+    //     payout: {
+    //       AccountNo: bankDetails.AccNumber,
+    //       Amount: Number(withdrawData.Amount),
+    //       IFSC: bankDetails.IfscCode?.toUpperCase(),
+    //       BeneName: bankDetails.AccHolderName,
+    //       BeneMobile: withdrawData.PhoneNumber,
+    //       APIRequestID: withdrawData.TransactionID,
+    //       // BankName : bankDetails.BankName
+    //     },
+    //     editedData: {
+    //       ...withdrawData,
+    //       Status: TransactionStatusType.SUCCESS,
+    //     },
+    //   });
+    // }
     console.log("response from handleAutoWithdraw3", res);
     if (res.valid) {
       console.log(

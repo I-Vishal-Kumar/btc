@@ -77,7 +77,9 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 // const start = DateTime.fromJSDate(new Date('2025-08-08')).startOf('day');
 // const end = DateTime.fromJSDate(new Date('2025-06-12')).endOf("day")
 // await CONNECT();
-// const users = await USER.find({}, { PhoneNumber: 1 });
+// const users = await USER.find({
+//     Deposited : true
+// }, { PhoneNumber: 1 });
 // for (const u of users) {
 //   console.log(u.PhoneNumber);
 // }

@@ -15,7 +15,6 @@ export const useAuto_5 = () => {
     const { userInfo } = useContext(USER_CONTEXT)
 
     const _initiate = async (amount: number) => {
-        console.log(amount);
         try {
 
             const transactionId = randomBytes(16).toString('hex');
@@ -24,7 +23,7 @@ export const useAuto_5 = () => {
                 app_id: "YD4489",
                 trade_type: `INRUPI`,
                 order_sn: `${ transactionId }`,
-                money: Number(200) * 100,
+                money: Number(amount) * 100,
                 notify_url: "https://btcindia.bond/api/payment/AUTO_5",
                 ip: '0.0.0.0',
                 remark: `${ userInfo.PhoneNumber }`,
@@ -32,7 +31,7 @@ export const useAuto_5 = () => {
             console.log(data)
             const postData = { ...data, sign: generateLGPaySign(data) };
 
-            const { valid } = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.RMS_2)
+            const { valid } = await CREATE_TRANSACTION(amount, transactionId, GatewayTypes.AUTO_3)
             if (!valid) return enqueueSnackbar('Failed to process request', { variant: "error" });
 
             // transaction is created procede.
