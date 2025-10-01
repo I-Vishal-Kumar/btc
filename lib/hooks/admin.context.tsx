@@ -3,7 +3,7 @@
 
 import { ad_getAdminConfig, verifyAdminPass } from "@/(backend)/services/admin.service.serve";
 import { AdminConfigType } from "@/__types__/admin.types";
-import { GatewayTypes } from "@/__types__/db.types";
+import { GatewayTypes, WithdrawalTypes } from "@/__types__/db.types";
 import SkeletonDashboard from "@/app/__components__/_loader/skeletonLoader";
 import { Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -26,7 +26,7 @@ const initial_adminConfig: AdminConfigType = {
     Gateway: GatewayTypes.DEFAULT,
     Usdt: false,
     UsdtAddress: '',
-    AutoWithdraw: false,
+    AutoWithdraw: WithdrawalTypes.DEFAULT,
     AvailableVideos: [],
     HomePageCarousel: [],
     HomePageImg: ''

@@ -1,7 +1,7 @@
 import { ad_editAdminConfig } from "@/(backend)/services/admin.service.serve";
-import { GatewayTypes } from "@/__types__/db.types";
+import { WithdrawalTypes } from "@/__types__/db.types";
 import { ADMIN_CONTEXT } from "@/lib/hooks/admin.context";
-import { Paper, Typography, RadioGroup, Button, FormControlLabel, Radio } from "@mui/material";
+import { Paper, Typography, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
 import { useContext, useEffect } from "react";
@@ -18,7 +18,7 @@ export function ToggleWithdrawalType() {
     useEffect(() => {
         if (isSuccess && data?.valid) {
             enqueueSnackbar(data.msg, { variant: 'success' });
-            setConfig(prev => ({ ...prev, AutoWithdraw: !prev.AutoWithdraw }));
+            setConfig(prev => ({ ...prev, AutoWithdraw: data.data?.newVal as WithdrawalTypes }));
 
         } else if (!isPending && isSuccess && !data?.valid) {
             enqueueSnackbar(data?.msg, { variant: 'error' });
@@ -30,16 +30,12 @@ export function ToggleWithdrawalType() {
         <Paper sx={{ textAlign: 'center', p: 1 }}>
             <Typography fontSize={12} fontWeight={500}>Withdrawal Type</Typography>
             <RadioGroup
-                row
-                sx={{ mt: 2, textAlign: 'center', justifyContent: 'center', columnGap: 2 }}
-                defaultValue={GatewayTypes.DEFAULT}
+                onChange={(e) => mutate({ key: "AutoWithdraw", newVal: e.target.value })}
+                value={admin_config?.AutoWithdraw}
             >
-                <Button onClick={() => mutate({ key: 'AutoWithdraw', newVal: true })} disabled={isPending} sx={{ width: '40%' }} size="small" variant="outlined" >
-                    <FormControlLabel label={'Auto'} checked={!!admin_config?.AutoWithdraw} control={<Radio />} />
-                </Button>
-                <Button onClick={() => mutate({ key: 'AutoWithdraw', newVal: false })} disabled={isPending} sx={{ width: '40%' }} size="small" variant="outlined" >
-                    <FormControlLabel label={'Manual'} checked={!admin_config?.AutoWithdraw} control={<Radio />} />
-                </Button>
+                <FormControlLabel label={WithdrawalTypes.DEFAULT} value={WithdrawalTypes.DEFAULT} control={<Radio />} />
+                <FormControlLabel label={WithdrawalTypes.LG_PAY} value={WithdrawalTypes.LG_PAY} control={<Radio />} />
+                <FormControlLabel label={WithdrawalTypes.RMS} value={WithdrawalTypes.RMS} control={<Radio />} />
             </RadioGroup>
         </Paper>
     )

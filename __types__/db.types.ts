@@ -47,6 +47,14 @@ export const GatewayTypes = {
 
 export type GatewayTypes = (typeof GatewayTypes)[keyof typeof GatewayTypes];
 
+export const WithdrawalTypes = {
+    RMS: "RMS",
+    LG_PAY: "LG-PAY",
+    DEFAULT: "MANUAL",
+} as const;
+
+export type WithdrawalTypes = (typeof WithdrawalTypes)[keyof typeof WithdrawalTypes];
+
 // ========= common schema types.
 
 export const InvitationCodeType = {

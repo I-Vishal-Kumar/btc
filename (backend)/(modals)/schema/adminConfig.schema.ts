@@ -1,4 +1,4 @@
-import { GatewayTypes, db_schema } from "@/__types__/db.types";
+import { GatewayTypes, WithdrawalTypes, db_schema } from "@/__types__/db.types";
 import { Schema, model, models } from "mongoose";
 
 const ADMIN_CONFIG_SCHEMA = new Schema({
@@ -25,8 +25,12 @@ const ADMIN_CONFIG_SCHEMA = new Schema({
     },
 
     Usdt: { type: Boolean, default: false },
-
-    AutoWithdraw: { type: Boolean, default: false },
+    
+    AutoWithdraw: {
+        type: String,
+        enum: Object.values(WithdrawalTypes),
+        default: WithdrawalTypes.DEFAULT,
+    },
 
     UsdtAddress: {
         type: String,

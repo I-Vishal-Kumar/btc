@@ -1,4 +1,4 @@
-import { GatewayTypes } from "./db.types";
+import { GatewayTypes, WithdrawalTypes } from "./db.types";
 
 export type AdminConfigType = {
     QrCode: string;
@@ -8,7 +8,7 @@ export type AdminConfigType = {
     Gateway: GatewayTypes;
     Usdt: boolean;
     UsdtAddress: string;
-    AutoWithdraw: boolean;
+    AutoWithdraw: WithdrawalTypes;
     AvailableVideos: string[];
     HomePageImg: string;
     HomePageCarousel: string[];

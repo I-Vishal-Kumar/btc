@@ -9,13 +9,14 @@ import { WALLET } from "../(modals)/schema/userWalled.schema";
 import { USER } from "../(modals)/schema/user.schema";
 import { startSession } from "mongoose";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
-import { TransactionStatusType, TransactionType } from "@/__types__/db.types";
+import { TransactionStatusType, TransactionType, WithdrawalTypes } from "@/__types__/db.types";
 import { DateTime } from "luxon";
 import { ADMIN_CONFIG } from "../(modals)/schema/adminConfig.schema";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import { UserWallet } from "@/__types__/user.types";
 // import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
+import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 // import { DateTime } from "luxon";
 
 const requiredDetails = {
@@ -347,8 +348,8 @@ const Withdrawal = async (
       { AutoWithdraw: 1, _id: 0 },
     );
 
-    if (AutoWithdraw && METHOD === "LOCAL")
-      processAutoWithdrawal(JSON.parse(JSON.stringify(isCreated[0])));
+    if (AutoWithdraw !== WithdrawalTypes.DEFAULT && METHOD === "LOCAL")
+      processAutoWithdrawal(JSON.parse(JSON.stringify(isCreated[0])), AutoWithdraw);
 
     return { valid: true, msg: "Your Withdrawal is in processing." };
   } catch (error) {
@@ -367,7 +368,7 @@ const Withdrawal = async (
   }
 };
 
-const processAutoWithdrawal = async (withdrawData: TransactionObjType) => {
+const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithdrawGateway : WithdrawalTypes = WithdrawalTypes.DEFAULT) => {
   try {
     await CONNECT();
     // get wallet details of this user check if has a valid bank account or not.
@@ -386,41 +387,48 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType) => {
         "[processAutoWithdrawal] failed to process auto withdraw bank details not available",
       );
     }
-    console.log("auto withdrawal 3");
-    // let res; 
-    // if(withdrawData.PhoneNumber === '9250206415'){
-      // res = await handleAutoWithdraw4({
-      //   payout: {
-      //     AccountNo: bankDetails.AccNumber,
-      //     Amount: Number(withdrawData.Amount),
-      //     IFSC: bankDetails.IfscCode?.toUpperCase(),
-      //     BeneName: bankDetails.AccHolderName,
-      //     BeneMobile: withdrawData.PhoneNumber,
-      //     APIRequestID: withdrawData.TransactionID,
-      //     BankName : bankDetails.BankName
-      //   },
-      //   editedData: {
-      //     ...withdrawData,
-      //     Status: TransactionStatusType.SUCCESS,
-      //   },
-      // });
-    // }else{
-      const res = await handleAutoWithdraw3({
-        payout: {
-          AccountNo: bankDetails.AccNumber,
-          Amount: Number(withdrawData.Amount),
-          IFSC: bankDetails.IfscCode?.toUpperCase(),
-          BeneName: bankDetails.AccHolderName,
-          BeneMobile: withdrawData.PhoneNumber,
-          APIRequestID: withdrawData.TransactionID,
-          // BankName : bankDetails.BankName
-        },
-        editedData: {
-          ...withdrawData,
-          Status: TransactionStatusType.SUCCESS,
-        },
-      });
-    // }
+
+    let res; 
+    switch (autoWithdrawGateway) {
+      case WithdrawalTypes.RMS :
+        res = await handleAutoWithdraw3({
+          payout: {
+            AccountNo: bankDetails.AccNumber,
+            Amount: Number(withdrawData.Amount),
+            IFSC: bankDetails.IfscCode?.toUpperCase(),
+            BeneName: bankDetails.AccHolderName,
+            BeneMobile: withdrawData.PhoneNumber,
+            APIRequestID: withdrawData.TransactionID,
+            // BankName : bankDetails.BankName
+          },
+          editedData: {
+            ...withdrawData,
+            Status: TransactionStatusType.SUCCESS,
+          },
+        });
+        break;
+        case WithdrawalTypes.LG_PAY:
+        res = await handleAutoWithdraw4({
+          payout: {
+            AccountNo: bankDetails.AccNumber,
+            Amount: Number(withdrawData.Amount),
+            IFSC: bankDetails.IfscCode?.toUpperCase(),
+            BeneName: bankDetails.AccHolderName,
+            BeneMobile: withdrawData.PhoneNumber,
+            APIRequestID: withdrawData.TransactionID,
+            BankName : bankDetails.BankName
+          },
+          editedData: {
+            ...withdrawData,
+            Status: TransactionStatusType.SUCCESS,
+          },
+        });
+        break;
+      default:
+        res = {valid: false}
+        console.log('invalid withdrawal gateway ', autoWithdrawGateway);
+    }
+
     console.log("response from handleAutoWithdraw3", res);
     if (res.valid) {
       console.log(
