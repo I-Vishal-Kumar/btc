@@ -10,7 +10,7 @@ import { FD } from "../(modals)/schema/fixedDeposit.schema";
 import { USER } from "../(modals)/schema/user.schema";
 import { FD_type } from "@/__types__/fd.types";
 import { DateTime } from "luxon";
-import { FdStatus, FdStatusType } from "@/__types__/db.types";
+import { FdStatus, FdStatusType, TransactionType } from "@/__types__/db.types";
 import { INCOME } from "../(modals)/schema/incomeConfig.schema";
 import { IncomeType } from "@/__types__/transaction.types";
 import { TRANSACTION } from "../(modals)/schema/transaction.schema";
@@ -115,7 +115,7 @@ export const getFD = async () : ServiceReturnType<FD_type[]> => {
         const hasDeposited = await TRANSACTION.countDocuments({createdAt : {
             $gte : closingDate,
             $lte : endOf12th,
-        }, PhoneNumber: decoded.PhoneNumber});
+        }, PhoneNumber: decoded.PhoneNumber, Type: TransactionType.DEPOSIT});
 
         if(hasDeposited){
             const oldFds = await FD.find({PhoneNumber: decoded.PhoneNumber, createdAt : {$lt : endOf12th}}).sort({createdAt: -1}).lean() as unknown as FD_type[]; 
