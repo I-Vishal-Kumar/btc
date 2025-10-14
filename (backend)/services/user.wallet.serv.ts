@@ -218,7 +218,7 @@ const Withdrawal = async (
         if (isSunday || !isBetween9and11)
         throw new Error("Withdrawal time is between 9am - 11am.");
 
-        if (Amount < 600) throw new Error("Minimum withdrawal amount is 600");
+        if (Amount < 200) throw new Error("Minimum withdrawal amount is 200");
 
         if (METHOD === "USDT") {
         // change db key for usdt;

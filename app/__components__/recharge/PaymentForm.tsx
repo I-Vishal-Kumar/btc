@@ -46,8 +46,8 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
 
     const handleSubmit = async () => {
 
-        if (Number(amount) < 500) {
-            enqueueSnackbar("Minimum deposit amount is 500", { variant: 'warning' });
+        if (Number(amount) < 100) {
+            enqueueSnackbar("Minimum deposit amount is 100", { variant: 'warning' });
             return;
         }
 

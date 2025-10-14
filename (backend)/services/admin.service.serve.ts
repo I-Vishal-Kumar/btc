@@ -301,7 +301,8 @@ export const ad_getDepositTransactions = async ({
 // SETTLE DEPOSIT ===================================================================
 
 const REFERAL_PERCENT = 8 / 100;
-const FIRST_DEPOSIT_BONUS_PERCENT = 5 / 100;
+const FIRST_DEPOSIT_BONUS_PERCENT = 10 / 100;
+const DEFAULT_DEPOSIT_BONUS_PERCENT = 5 / 100;
 
 export const ad_settleDeposit = async (
     editedDetails: TransactionObjType
@@ -392,7 +393,7 @@ export const ad_settleDeposit = async (
                             amount +
                             (!user.Deposited
                                 ? amount * FIRST_DEPOSIT_BONUS_PERCENT
-                                : 0),
+                                : amount * DEFAULT_DEPOSIT_BONUS_PERCENT),
                     },
                 },
             },
