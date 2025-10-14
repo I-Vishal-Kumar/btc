@@ -77,11 +77,18 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 // const start = DateTime.fromJSDate(new Date('2025-08-08')).startOf('day');
 // const end = DateTime.fromJSDate(new Date('2025-06-12')).endOf("day")
 // await CONNECT();
-// const users = await USER.find({
-//     Deposited : true
-// }, { PhoneNumber: 1 });
+// const endOf12th = DateTime.fromJSDate(new Date("2025-10-12")).endOf('day');
+// const closingDate = DateTime.fromJSDate(new Date("2025-08-09")).startOf('day');
+
+// const users = await TRANSACTION.distinct("PhoneNumber", {
+//     Type: TransactionType.DEPOSIT,
+//     createdAt : {
+//         $gte : closingDate,
+//         $lte : endOf12th,
+//     }
+// });
 // for (const u of users) {
-//   console.log(u.PhoneNumber);
+//   console.log(u);
 // }
 // const user = await WALLET.findOne({ PhoneNumber: "9250206415" });
 // console.log(user);

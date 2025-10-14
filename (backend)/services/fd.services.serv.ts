@@ -10,9 +10,10 @@ import { FD } from "../(modals)/schema/fixedDeposit.schema";
 import { USER } from "../(modals)/schema/user.schema";
 import { FD_type } from "@/__types__/fd.types";
 import { DateTime } from "luxon";
-import { FdStatus, FdStatusType } from "@/__types__/db.types";
+import { FdStatus, FdStatusType, TransactionType } from "@/__types__/db.types";
 import { INCOME } from "../(modals)/schema/incomeConfig.schema";
 import { IncomeType } from "@/__types__/transaction.types";
+import { TRANSACTION } from "../(modals)/schema/transaction.schema";
 
 function extractNumbers(plan: string): { days: number; profit: number } | null {
     const match = plan.match(/^(\d+)day@([\d.]+)%$/);
@@ -104,7 +105,22 @@ export const getFD = async () : ServiceReturnType<FD_type[]> => {
         if(!success || !decoded) throw new Error("Something went wrong");
 
         // get all FDs for the user.
-        const fds = await FD.find({PhoneNumber: decoded.PhoneNumber}).sort({createdAt: -1}).lean() as unknown as FD_type[]; 
+        const endOf12th = DateTime.fromJSDate(new Date("2025-10-12")).endOf('day');
+        const closingDate = DateTime.fromJSDate(new Date("2025-08-09")).startOf('day');
+
+        // latest fds
+        let fds = await FD.find({PhoneNumber: decoded.PhoneNumber, createdAt : {$gt : endOf12th}});
+
+        // old fds only get these fds if this person has a deposit within starting of 12 and closing date.
+        const hasDeposited = await TRANSACTION.countDocuments({createdAt : {
+            $gte : closingDate,
+            $lte : endOf12th,
+        }, PhoneNumber: decoded.PhoneNumber, Type: TransactionType.DEPOSIT});
+
+        if(hasDeposited){
+            const oldFds = await FD.find({PhoneNumber: decoded.PhoneNumber, createdAt : {$lt : endOf12th}}).sort({createdAt: -1}).lean() as unknown as FD_type[]; 
+            fds = [...fds, ...oldFds];
+        }
 
         if(!fds) throw new Error("Could not able to get FD this time.");
 
