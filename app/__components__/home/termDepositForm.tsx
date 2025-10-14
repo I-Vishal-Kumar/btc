@@ -46,10 +46,10 @@ export const TermDepositForm = () => {
                         startAdornment: value[1] ? <MdOutlineCurrencyRupee /> : null
                     }
                 }}
-                error={!!value[1] && Number(value[1]) < 500}
+                error={!!value[1] && Number(value[1]) < 100}
                 helperText={
-                    !!value[1] && Number(value[1]) < 500
-                        ? "Minimum amount should be ₹500"
+                    !!value[1] && Number(value[1]) < 100
+                        ? "Minimum amount should be ₹100"
                         : ""
                 }
                 value={value[1] ? value[1] : ""}
@@ -106,7 +106,7 @@ export const TermDepositForm = () => {
             </div>
 
             <Button onClick={() => mutate()} disabled={
-                isPending || !!(value[1] && Number(value[1]) < 500)
+                isPending || !!(value[1] && Number(value[1]) < 100)
             } fullWidth sx={{
                 mt: 3, borderRadius: '100vw', textTransform: 'initial',
                 background: 'linear-gradient(to right, #f3c45c,#e43905)',

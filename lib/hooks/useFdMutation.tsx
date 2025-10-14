@@ -24,9 +24,9 @@ export const useFdMutation = ({ selectedPlan }: UseFdMutationProps) => {
     const { isSuccess, isError, isPending, data, mutate } = useMutation({
         mutationFn: async () => {
             const fdAmount = Math.max(value[0], value[1]);
-            if (fdAmount < 500) {
-                enqueueSnackbar("Minimum amount is 500", { variant: 'warning' })
-                return Promise.resolve({ valid: false, msg: "Minimum amount is 500" });
+            if (fdAmount < 100) {
+                enqueueSnackbar("Minimum amount is 100", { variant: 'warning' })
+                return Promise.resolve({ valid: false, msg: "Minimum amount is 100" });
             }
             if (OPTIONS[selectedPlan] && fdAmount >= minAmount) {
                 return createFD({ FD_amount: fdAmount, duration: selectedPlan });
