@@ -79,16 +79,12 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 // await CONNECT();
 // const endOf12th = DateTime.fromJSDate(new Date("2025-10-12")).endOf('day');
 // const closingDate = DateTime.fromJSDate(new Date("2025-08-09")).startOf('day');
-
-// const users = await TRANSACTION.distinct("PhoneNumber", {
-//     Type: TransactionType.DEPOSIT,
-//     createdAt : {
-//         $gte : closingDate,
-//         $lte : endOf12th,
-//     }
-// });
+// const dt = DateTime.now().minus({days: 20});
+// const users = await USER.find({
+//     createdAt : {$gte: dt}
+// }, {PhoneNumber: true});
 // for (const u of users) {
-//   console.log(u);
+//   console.log(u.PhoneNumber);
 // }
 // const user = await WALLET.findOne({ PhoneNumber: "9250206415" });
 // console.log(user);
@@ -228,7 +224,7 @@ export const claimGift = async (): ServiceReturnType<{
         return {
             valid: true,
             data: { GIFT_AMOUNT },
-            msg: `You have won ${GIFT_AMOUNT} 🎉`,
+            msg: `You have won ${ GIFT_AMOUNT } 🎉`,
         };
     } catch (error) {
         if (error instanceof Error) return { valid: false, msg: error.message };
@@ -727,7 +723,7 @@ export const getWatchBonus = async (
         await session.commitTransaction();
         return {
             valid: true,
-            msg: `Bonus Added INR ${reward} .`,
+            msg: `Bonus Added INR ${ reward } .`,
             data: { reward: Number(reward) },
         };
     } catch (error) {

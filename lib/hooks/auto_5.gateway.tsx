@@ -5,7 +5,7 @@ import { generate_url } from "@/sActions/generateAuto5.gateway";
 // import { sign } from "../helpers/handleAutoWithdraw4";
 import { useContext } from "react";
 import { USER_CONTEXT } from "./user.context";
-import { CREATE_TRANSACTION } from "@/(backend)/services/transaction.service.serve";
+import { CREATE_TRANSACTION, deleteTransaction } from "@/(backend)/services/transaction.service.serve";
 import { enqueueSnackbar } from "notistack";
 import { GatewayTypes } from "@/__types__/db.types";
 import { generateLGPaySign } from "../helpers/handleAutoWithdraw4";
@@ -37,7 +37,11 @@ export const useAuto_5 = () => {
             // transaction is created procede.
             const slug = await generate_url(postData);
 
-            console.log(slug);
+            if (slug) {
+                window.open(slug);
+            } else {
+                deleteTransaction(transactionId);
+            }
 
         } catch (error) {
             console.log('error in auto 3', error);
