@@ -49,7 +49,7 @@ export type GatewayTypes = (typeof GatewayTypes)[keyof typeof GatewayTypes];
 
 export const WithdrawalTypes = {
     RMS: "RMS",
-    LG_PAY: "LG-PAY",
+    LG_PAY: "L-pay",
     DEFAULT: "MANUAL",
 } as const;
 
