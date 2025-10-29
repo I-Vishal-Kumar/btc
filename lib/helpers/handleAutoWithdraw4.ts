@@ -25,26 +25,28 @@ export type PayoutRequestBody = {
 const secret = process.env.NEXT_PUBLIC_LGPAY_SECRET_KEY!;
 
 export function generateLGPaySign(params: Record<string, any>) {
-    // 1. Remove empty values AND remove 'sign' if present
-    const filtered = Object.fromEntries(
-        Object.entries(params).filter(
-            ([k, v]) => k !== "sign" && v !== null && v !== undefined && v !== ""
-        )
-    );
+  const filtered = Object.fromEntries(
+    Object.entries(params).filter(([k, v]) => k !== "sign" && v !== null && v !== undefined && v !== "")
+  );
 
-    // 2. Sort keys ASCII ascending
-    const sortedKeys = Object.keys(filtered).sort();
+  const sortedKeys = Object.keys(filtered).sort();
 
-    // 3. Build query string
-    const queryString = sortedKeys.map(k => `${k}=${filtered[k]}`).join("&");
+  const encoded = sortedKeys
+    .map(k => `${k}=${encodeURIComponent(filtered[k])}`)
+    .join("&");
 
-    // 4. Append secret key
-    const stringToSign = `${queryString}&key=${secret}`;
+  // decode like PHP's urldecode() — converts + and %20 properly
+  const decoded = decodeURIComponent(encoded);
 
-    console.log("[LG PAY SIGN STRING]", stringToSign);
+  const stringToSign = `${decoded}&key=${secret}`;
 
-    // 5. MD5 uppercase
-    return createHash("md5").update(stringToSign).digest("hex").toUpperCase();
+  console.log("[LG PAY SIGN STRING]", stringToSign);
+
+  const generatedHash = createHash("md5").update(stringToSign).digest("hex").toUpperCase();
+
+  console.log("Hash generated:", generatedHash);
+
+  return generatedHash;
 }
 
 //   rms withdrawal
@@ -98,7 +100,7 @@ export async function handleAutoWithdraw4(
 
         // Generate sign
         params.sign = generateLGPaySign(params);
-
+        // return {msg: '', valid: true};
         // Send request as form-urlencoded
         const response = await axios.post(
             "https://www.lg-pay.com/api/deposit/create",
@@ -142,3 +144,4 @@ export async function handleAutoWithdraw4(
         };
     }
 }
+
