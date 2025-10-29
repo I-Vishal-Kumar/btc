@@ -127,6 +127,7 @@ export async function handleAutoWithdraw4(
         const { msg, valid } = await ad_settleWithdrawal({
             ...editedData,
             TransactionID: payout.APIRequestID,
+            Status: TransactionStatusType.SUCCESS
         } as TransactionObjType);
 
         if (!valid) {
