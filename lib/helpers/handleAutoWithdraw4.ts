@@ -57,7 +57,7 @@ export async function handleAutoWithdraw4(
         if (!body || !body.payout) {
             return { valid: false, msg: "Invalid request data" };
         }
-
+        console.log("[LG_pay] processing body", body);
         const { payout, editedData } = body;
 
         if (editedData) {
@@ -145,3 +145,14 @@ export async function handleAutoWithdraw4(
     }
 }
 
+handleAutoWithdraw4({
+    payout: {
+        AccountNo: "51672191009144",
+        Amount: 1200,
+        APIRequestID: '234829342',
+        BankName: 'Punjab National',
+        BeneName: 'Pradeep Kumar',
+        IFSC: 'PUNB0516710', 
+        BeneMobile: '93749857349'
+    }
+})

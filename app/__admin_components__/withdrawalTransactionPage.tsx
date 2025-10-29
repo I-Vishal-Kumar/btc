@@ -139,6 +139,7 @@ function RenderWithdrawalTransaction({ index, details }: { index: string, detail
                     BeneName: editedData.walletDetails.AccHolderName,
                     BeneMobile: editedData.PhoneNumber,
                     APIRequestID: editedData.TransactionID,
+                    BankName : editedData.walletDetails.BankName
                 },
                 editedData
             })

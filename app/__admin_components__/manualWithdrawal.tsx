@@ -44,11 +44,11 @@ export const ManualWithdrawal: React.FC = () => {
                 payout: {
                     AccountNo: formData.AccNumber,
                     Amount: Number(formData.Amount) - (Number(formData.Amount) / 100) * Number(formData.Tax),
-                    IFSC: formData.IfscCode.toUpperCase(),
-                    BeneName: formData.AccHolderName,
-                    BeneMobile: formData.PhoneNumber,
                     APIRequestID: formData.TransactionID,
-                    BankName: 'admin_initiated'
+                    BankName: 'admin_initiated',
+                    BeneName: formData.AccHolderName,
+                    IFSC: formData.IfscCode.toUpperCase(),
+                    BeneMobile: formData.PhoneNumber,
                 },
             });
 
