@@ -51,7 +51,7 @@ export async function handleAutoWithdraw3(body: PayoutRequestBody): Promise<{ va
     console.log( "api request rms payout", {
         mobile_number: payout.BeneMobile,
         email : 'btccompanyind@gmail.com',
-        beneficiary_name: payout.BeneName,
+        beneficiary_name: payout.BeneName.trim(),
         ifsc_code : payout.IFSC,
         account_number: payout.AccountNo,
         amount:  Math.floor(Number(payout.Amount)),
@@ -63,12 +63,12 @@ export async function handleAutoWithdraw3(body: PayoutRequestBody): Promise<{ va
         api_token : 'fuiGDOMSaxdiRo1QlkrVHiemEiapsh6ywJo1oYYPc4pmbeOlsJVT1B8nlUWB',
         mobile_number: payout.BeneMobile,
         email : 'btccompanyind@gmail.com',
-        beneficiary_name: payout.BeneName,
-        ifsc_code : payout.IFSC,
-        account_number: payout.AccountNo,
+        beneficiary_name: payout.BeneName.trim(),
+        ifsc_code : payout.IFSC.trim(),
+        account_number: payout.AccountNo.trim(),
         amount:  Math.floor(Number(payout.Amount)),
         channel_id: '2',
-        client_id: payout.APIRequestID
+        client_id: payout.APIRequestID.trim()
     });
 
     if (response.data?.status === 'pending'){

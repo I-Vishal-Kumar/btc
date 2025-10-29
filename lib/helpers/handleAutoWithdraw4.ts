@@ -4,6 +4,7 @@ import { TransactionType, TransactionStatusType } from "@/__types__/db.types";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import axios from "axios";
 import { createHash } from "crypto";
+import { CONNECT } from "../_db/db.config";
 
 export type PayoutRequestBody = {
     payout: {
@@ -57,8 +58,9 @@ export async function handleAutoWithdraw4(
         if (!body || !body.payout) {
             return { valid: false, msg: "Invalid request data" };
         }
-        console.log("[LG_pay] processing body", body);
+        // console.log("[LG_pay] processing body", body);
         const { payout, editedData } = body;
+        await CONNECT();
 
         if (editedData) {
             const { PhoneNumber, TransactionID } = editedData;
@@ -88,13 +90,13 @@ export async function handleAutoWithdraw4(
         // ---- LG Pay required params ----
         const params: Record<string, any> = {
             app_id: "YD4489",
-            order_sn: payout.APIRequestID,
+            order_sn: payout.APIRequestID.trim(),
             currency: 'INR', // e.g., "INR"
             money: Math.floor(payout.Amount * 100),
-            name : payout.BeneName,
-            bank_name : payout.BankName,
-            addon1 : payout.IFSC,
-            card_number : payout.AccountNo,
+            name : payout.BeneName.trim(),
+            bank_name : payout.BankName.trim(),
+            addon1 : payout.IFSC.trim(),
+            card_number : payout.AccountNo.trim(),
             notify_url: "https://btcindia.bond/payment/LG_PAY_WITHDRAWAL",
         };
 
