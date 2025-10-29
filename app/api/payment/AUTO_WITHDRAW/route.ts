@@ -14,13 +14,13 @@ export async function POST(request: NextRequest) {
         let res;
         switch (AutoWithdraw) {
             case WithdrawalTypes.RMS :
-            res = await handleAutoWithdraw3({
-                ...body
-            });
-            break;
+                res = await handleAutoWithdraw3({
+                    ...body
+                });
+                break;
             case WithdrawalTypes.LG_PAY:
-            res = await handleAutoWithdraw4(body);
-            break;
+                res = await handleAutoWithdraw4(body);
+                break;
             default:
             res = {valid: false}
             console.log('invalid withdrawal gateway ', AutoWithdraw);
