@@ -407,7 +407,7 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
           },
         });
         break;
-        case WithdrawalTypes.LG_PAY:
+      case WithdrawalTypes.LG_PAY:
         res = await handleAutoWithdraw4({
           payout: {
             AccountNo: bankDetails.AccNumber,
