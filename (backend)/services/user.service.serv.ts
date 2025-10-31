@@ -41,7 +41,7 @@ import { FD } from "../(modals)/schema/fixedDeposit.schema";
 //         BeneName: 'Himanshu Kumar', 
 //         IFSC: 'PUNB0608300'
 //     }
-// })
+// })    
 export const getUserDetails = async (): ServiceReturnType<UserType> => {
     try {
         const cookie = await cookies();

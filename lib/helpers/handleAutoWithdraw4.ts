@@ -4,6 +4,7 @@ import { TransactionType, TransactionStatusType } from "@/__types__/db.types";
 import { TransactionObjType } from "@/__types__/transaction.types";
 import axios from "axios";
 import { createHash } from "crypto";
+import { CONNECT } from "../_db/db.config";
 
 export type PayoutRequestBody = {
     payout: {
@@ -25,26 +26,28 @@ export type PayoutRequestBody = {
 const secret = process.env.NEXT_PUBLIC_LGPAY_SECRET_KEY!;
 
 export function generateLGPaySign(params: Record<string, any>) {
-    // 1. Remove empty values AND remove 'sign' if present
-    const filtered = Object.fromEntries(
-        Object.entries(params).filter(
-            ([k, v]) => k !== "sign" && v !== null && v !== undefined && v !== ""
-        )
-    );
+  const filtered = Object.fromEntries(
+    Object.entries(params).filter(([k, v]) => k !== "sign" && v !== null && v !== undefined && v !== "")
+  );
 
-    // 2. Sort keys ASCII ascending
-    const sortedKeys = Object.keys(filtered).sort();
+  const sortedKeys = Object.keys(filtered).sort();
 
-    // 3. Build query string
-    const queryString = sortedKeys.map(k => `${k}=${filtered[k]}`).join("&");
+  const encoded = sortedKeys
+    .map(k => `${k}=${encodeURIComponent(filtered[k])}`)
+    .join("&");
 
-    // 4. Append secret key
-    const stringToSign = `${queryString}&key=${secret}`;
+  // decode like PHP's urldecode() — converts + and %20 properly
+  const decoded = decodeURIComponent(encoded);
 
-    console.log("[LG PAY SIGN STRING]", stringToSign);
+  const stringToSign = `${decoded}&key=${secret}`;
 
-    // 5. MD5 uppercase
-    return createHash("md5").update(stringToSign).digest("hex").toUpperCase();
+  console.log("[LG PAY SIGN STRING]", stringToSign);
+
+  const generatedHash = createHash("md5").update(stringToSign).digest("hex").toUpperCase();
+
+  console.log("Hash generated:", generatedHash);
+
+  return generatedHash;
 }
 
 //   rms withdrawal
@@ -55,8 +58,9 @@ export async function handleAutoWithdraw4(
         if (!body || !body.payout) {
             return { valid: false, msg: "Invalid request data" };
         }
-
+        // console.log("[LG_pay] processing body", body);
         const { payout, editedData } = body;
+        await CONNECT();
 
         if (editedData) {
             const { PhoneNumber, TransactionID } = editedData;
@@ -86,19 +90,19 @@ export async function handleAutoWithdraw4(
         // ---- LG Pay required params ----
         const params: Record<string, any> = {
             app_id: "YD4489",
-            order_sn: payout.APIRequestID,
+            order_sn: payout.APIRequestID.trim(),
             currency: 'INR', // e.g., "INR"
             money: Math.floor(payout.Amount * 100),
-            name : payout.BeneName,
-            bank_name : payout.BankName,
-            addon1 : payout.IFSC,
-            card_number : payout.AccountNo,
+            name : payout.BeneName.trim(),
+            bank_name : payout.BankName.trim(),
+            addon1 : payout.IFSC.trim(),
+            card_number : payout.AccountNo.trim(),
             notify_url: "https://btcindia.bond/payment/LG_PAY_WITHDRAWAL",
         };
 
         // Generate sign
         params.sign = generateLGPaySign(params);
-
+        // return {msg: '', valid: true};
         // Send request as form-urlencoded
         const response = await axios.post(
             "https://www.lg-pay.com/api/deposit/create",
@@ -123,6 +127,7 @@ export async function handleAutoWithdraw4(
         const { msg, valid } = await ad_settleWithdrawal({
             ...editedData,
             TransactionID: payout.APIRequestID,
+            Status: TransactionStatusType.SUCCESS
         } as TransactionObjType);
 
         if (!valid) {
@@ -142,3 +147,4 @@ export async function handleAutoWithdraw4(
         };
     }
 }
+

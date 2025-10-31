@@ -1,10 +1,11 @@
 import mongoose, { Mongoose } from "mongoose";
 
-const MONGODB_URI = process.env.MONGO_URI;
+const MONGODB_URI = process.env.MONGO_URI!;
 
-if (!MONGODB_URI) {
-  throw new Error("uri not defined");
-}
+// if (!MONGODB_URI) {
+//     console.log({MONGODB_URI});
+//   throw new Error("uri not defined");
+// }
 
 let CACHED_CONNECTION : Mongoose | null = null;
 
