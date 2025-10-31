@@ -393,7 +393,7 @@ export const ad_settleDeposit = async (
                             amount +
                             (!user.Deposited
                                 ? amount * FIRST_DEPOSIT_BONUS_PERCENT
-                                : amount * DEFAULT_DEPOSIT_BONUS_PERCENT),
+                                : 0),
                     },
                 },
             },
