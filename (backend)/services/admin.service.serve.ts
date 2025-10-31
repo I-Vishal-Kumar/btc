@@ -302,7 +302,7 @@ export const ad_getDepositTransactions = async ({
 
 const REFERAL_PERCENT = 8 / 100;
 const FIRST_DEPOSIT_BONUS_PERCENT = 10 / 100;
-const DEFAULT_DEPOSIT_BONUS_PERCENT = 5 / 100;
+// const DEFAULT_DEPOSIT_BONUS_PERCENT = 5 / 100;
 
 export const ad_settleDeposit = async (
     editedDetails: TransactionObjType
