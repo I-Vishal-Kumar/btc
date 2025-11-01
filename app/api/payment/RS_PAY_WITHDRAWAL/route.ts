@@ -53,7 +53,7 @@ export const POST = async (req: NextRequest) => {
 
         // Determine payout status
         let status: TransactionStatusType;
-        if (String(body.status) === "200" && String(body.state) === "2") {
+        if (String(body.state) === "1" || String(body.state) === "2") {
             // 2 = processing → treat as success acknowledged
             status = TransactionStatusType.SUCCESS;
         } else {

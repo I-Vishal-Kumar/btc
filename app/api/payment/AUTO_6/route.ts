@@ -48,7 +48,7 @@ export const POST = async (req: NextRequest) => {
         }
 
         const status =
-            String(body.status) === "200"
+            String(body.state) === "1"
                 ? TransactionStatusType.SUCCESS
                 : TransactionStatusType.FAILED;
 
