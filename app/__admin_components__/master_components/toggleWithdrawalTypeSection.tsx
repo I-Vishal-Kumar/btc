@@ -36,6 +36,7 @@ export function ToggleWithdrawalType() {
                 <FormControlLabel label={WithdrawalTypes.DEFAULT} value={WithdrawalTypes.DEFAULT} control={<Radio />} />
                 <FormControlLabel label={WithdrawalTypes.LG_PAY} value={WithdrawalTypes.LG_PAY} control={<Radio />} />
                 <FormControlLabel label={WithdrawalTypes.RMS} value={WithdrawalTypes.RMS} control={<Radio />} />
+                <FormControlLabel label={WithdrawalTypes.RS_PAY} value={WithdrawalTypes.RS_PAY} control={<Radio />} />
             </RadioGroup>
         </Paper>
     )

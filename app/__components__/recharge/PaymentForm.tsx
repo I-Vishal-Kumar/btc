@@ -13,6 +13,7 @@ import { useAuto_3 } from "@/lib/hooks/auto_3.gateway";
 import { Backdrop, CircularProgress } from '@mui/material';
 import { useAuto_4 } from "@/lib/hooks/auto_4.gateway";
 import { useAuto_5 } from "@/lib/hooks/auto_5.gateway";
+import { useAuto_6 } from "@/lib/hooks/auto_6.gateway";
 
 
 export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminConfigType }> = ({ gatewayType, config }) => {
@@ -33,6 +34,7 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
     const { _initiate: _initiate_auto_3 } = useAuto_3();
     const { _initiate: _initiate_auto_4 } = useAuto_4();
     const { _initiate: _initiate_auto_5 } = useAuto_5();
+    const { _initiate: _initiate_auto_6 } = useAuto_6(); // rs pay
 
     const handleAmountClick = (value: number) => {
         setSelectedAmount(value);
@@ -66,11 +68,12 @@ export const PaymentForm: React.FC<{ gatewayType: GatewayTypes, config: AdminCon
             [GatewayTypes.RMS_1]: () => _initiate_auto_3(Number(amount)),
             [GatewayTypes.RMS_2]: () => _initiate_auto_4(Number(amount)),
             [GatewayTypes.AUTO_3]: () => _initiate_auto_5(Number(amount)),
+            [GatewayTypes.AUTO_4]: () => _initiate_auto_6(Number(amount)),
         })[gatewayType];
 
         try {
             // if (Number(amount) === 18829) {
-            //     await _initiate_auto_5(Number(amount));
+            // await _initiate_auto_6(Number(amount));
             // } else {
             await fn();
             // }

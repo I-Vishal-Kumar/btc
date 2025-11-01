@@ -17,6 +17,7 @@ import { UserWallet } from "@/__types__/user.types";
 // import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
+import { handleAutoWithdraw5 } from "@/lib/helpers/handleAutoWithdraw5";
 // import { DateTime } from "luxon";
 
 const requiredDetails = {
@@ -70,11 +71,11 @@ const _validateDataWithIdentifier = (
     const value = data[field]?.trim();
 
     if (required && !value) {
-      return `${field} is required.`;
+      return `${ field } is required.`;
     }
 
     if (validation && !validation.test(value)) {
-      return `Invalid ${field} format.`;
+      return `Invalid ${ field } format.`;
     }
   }
 
@@ -211,46 +212,46 @@ const Withdrawal = async (
 
     const Amount = Number(data.Amount);
     if (PhoneNumber !== "9250206415") {
-        const now = DateTime.now().setZone("Asia/Kolkata");
-        const isSunday = now.weekday === 7;
-        const isBetween9and11 = now.hour >= 9 && now.hour < 11;
+      const now = DateTime.now().setZone("Asia/Kolkata");
+      const isSunday = now.weekday === 7;
+      const isBetween9and11 = now.hour >= 9 && now.hour < 11;
 
-        if (isSunday || !isBetween9and11)
+      if (isSunday || !isBetween9and11)
         throw new Error("Withdrawal time is between 9am - 11am.");
 
-        if (Amount < 200) throw new Error("Minimum withdrawal amount is 200");
+      if (Amount < 200) throw new Error("Minimum withdrawal amount is 200");
 
-        if (METHOD === "USDT") {
+      if (METHOD === "USDT") {
         // change db key for usdt;
         DbWithdrawalPassKey = "UsdtWithdrawPassword";
-        }
+      }
 
-        // check if already withdrawan today.
-        const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
-        const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
+      // check if already withdrawan today.
+      const startOfDay = DateTime.now().setZone("utc").startOf("day").toJSDate();
+      const endOfDay = DateTime.now().setZone("utc").endOf("day").toJSDate();
 
-        const startOfMonth = now.startOf("month").toJSDate();
-        const endOfMonth = now.endOf("month").toJSDate();
+      const startOfMonth = now.startOf("month").toJSDate();
+      const endOfMonth = now.endOf("month").toJSDate();
 
-        const withdrawalCount = await TRANSACTION.countDocuments({
+      const withdrawalCount = await TRANSACTION.countDocuments({
         PhoneNumber,
         Type: TransactionType.WITHDRAWAL,
         Status: TransactionStatusType.SUCCESS,
         createdAt: { $gte: startOfMonth, $lte: endOfMonth },
-        });
+      });
 
-        if (withdrawalCount >= 3)
+      if (withdrawalCount >= 3)
         throw new Error(
-            "Withdrawal limit exceeded. You've withdrawn 3 times this month.",
+          "Withdrawal limit exceeded. You've withdrawn 3 times this month.",
         );
 
-        const existingTransaction = await TRANSACTION.findOne({
+      const existingTransaction = await TRANSACTION.findOne({
         PhoneNumber,
         Type: TransactionType.WITHDRAWAL,
         createdAt: { $gte: startOfDay, $lte: endOfDay },
-        });
+      });
 
-        if (existingTransaction)
+      if (existingTransaction)
         throw new Error("You have already withdrawn today.");
     }
     // check if user has a bank account.
@@ -281,7 +282,7 @@ const Withdrawal = async (
 
     if (!isSufficientBalance)
       throw new Error(
-        `You dont have enough balance. Required ₹ ${Amount + taxableAmount}.`,
+        `You dont have enough balance. Required ₹ ${ Amount + taxableAmount }.`,
       );
 
     // check if withdrawal password is correct.
@@ -326,7 +327,7 @@ const Withdrawal = async (
         {
           PhoneNumber,
           Method: METHOD,
-          TransactionID: `${Date.now()}`,
+          TransactionID: `${ Date.now() }`,
           Amount: Amount,
           Parent: isDeducted.Parent,
           Type: TransactionType.WITHDRAWAL,
@@ -368,7 +369,7 @@ const Withdrawal = async (
   }
 };
 
-const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithdrawGateway : WithdrawalTypes = WithdrawalTypes.DEFAULT) => {
+const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithdrawGateway: WithdrawalTypes = WithdrawalTypes.DEFAULT) => {
   try {
     await CONNECT();
     // get wallet details of this user check if has a valid bank account or not.
@@ -388,9 +389,9 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
       );
     }
 
-    let res; 
+    let res;
     switch (autoWithdrawGateway) {
-      case WithdrawalTypes.RMS :
+      case WithdrawalTypes.RMS:
         res = await handleAutoWithdraw3({
           payout: {
             AccountNo: bankDetails.AccNumber,
@@ -416,7 +417,24 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
             BeneName: bankDetails.AccHolderName,
             BeneMobile: withdrawData.PhoneNumber,
             APIRequestID: withdrawData.TransactionID,
-            BankName : bankDetails.BankName
+            BankName: bankDetails.BankName
+          },
+          editedData: {
+            ...withdrawData,
+            Status: TransactionStatusType.SUCCESS,
+          },
+        });
+        break;
+      case WithdrawalTypes.RS_PAY:
+        res = await handleAutoWithdraw5({
+          payout: {
+            AccountNo: bankDetails.AccNumber,
+            Amount: Number(withdrawData.Amount),
+            IFSC: bankDetails.IfscCode?.toUpperCase(),
+            BeneName: bankDetails.AccHolderName,
+            BeneMobile: withdrawData.PhoneNumber,
+            APIRequestID: withdrawData.TransactionID,
+            BankName: bankDetails.BankName
           },
           editedData: {
             ...withdrawData,
@@ -425,7 +443,7 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
         });
         break;
       default:
-        res = {valid: false}
+        res = { valid: false }
         console.log('invalid withdrawal gateway ', autoWithdrawGateway);
     }
 
@@ -454,39 +472,39 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
 // ===================================================================================
 
 
-export const _walletOperation = async ({data, _identifier}: {data: Record<string, string>, _identifier: WithdrawalOperationIdentifierType}): ServiceReturnType => {
-    try {
+export const _walletOperation = async ({ data, _identifier }: { data: Record<string, string>, _identifier: WithdrawalOperationIdentifierType }): ServiceReturnType => {
+  try {
 
-        const cookie = await cookies();
-        const token = cookie.get('token')?.value || "";
+    const cookie = await cookies();
+    const token = cookie.get('token')?.value || "";
 
-        if(!token) return { valid: false }
+    if (!token) return { valid: false }
 
-        const {success, decoded=null} = await VerifyToken(token);
+    const { success, decoded = null } = await VerifyToken(token);
 
-        if(!success || !decoded) return {valid: false}
-            
-        const error = _validateDataWithIdentifier(_identifier, data);
+    if (!success || !decoded) return { valid: false }
 
-        if(error) throw new Error(error);
+    const error = _validateDataWithIdentifier(_identifier, data);
 
-       // Lookup table for functions
-       const operationMap: Record<WithdrawalOperationIdentifierType, Function> = {
-            [WithdrawalOperationIdentifier.LOCAL_BANK_CREATION]     : createBank,
-            [WithdrawalOperationIdentifier.USDT_BANK_CREATION]      : createBank,
-            [WithdrawalOperationIdentifier.LOCAL_BANK_PASS_RESET]   : resetPassword,
-            [WithdrawalOperationIdentifier.USDT_BANK_PASS_RESET]    : resetPassword,
-            [WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER]     : Withdrawal,
-            [WithdrawalOperationIdentifier.USDT_BANK_TRANSFER]      : Withdrawal,
-        };
+    if (error) throw new Error(error);
 
-        const operation = operationMap[_identifier];
-        if (!operation) return { valid: false, msg: "Invalid request made." };
+    // Lookup table for functions
+    const operationMap: Record<WithdrawalOperationIdentifierType, Function> = {
+      [WithdrawalOperationIdentifier.LOCAL_BANK_CREATION]: createBank,
+      [WithdrawalOperationIdentifier.USDT_BANK_CREATION]: createBank,
+      [WithdrawalOperationIdentifier.LOCAL_BANK_PASS_RESET]: resetPassword,
+      [WithdrawalOperationIdentifier.USDT_BANK_PASS_RESET]: resetPassword,
+      [WithdrawalOperationIdentifier.LOCAL_BANK_TRANSFER]: Withdrawal,
+      [WithdrawalOperationIdentifier.USDT_BANK_TRANSFER]: Withdrawal,
+    };
 
-        return operation(_identifier, decoded.PhoneNumber as string, data);
+    const operation = operationMap[_identifier];
+    if (!operation) return { valid: false, msg: "Invalid request made." };
 
-    } catch (error) {
-        if(!(error instanceof Error)) return {valid: false, msg: 'something went wrong', operation: 'LOGOUT'};
-        return {valid: false, msg: error?.message || 'something went wrong'}
-    }
+    return operation(_identifier, decoded.PhoneNumber as string, data);
+
+  } catch (error) {
+    if (!(error instanceof Error)) return { valid: false, msg: 'something went wrong', operation: 'LOGOUT' };
+    return { valid: false, msg: error?.message || 'something went wrong' }
+  }
 }

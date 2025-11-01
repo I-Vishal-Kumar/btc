@@ -43,6 +43,7 @@ export const GatewayTypes = {
     RMS_1: "RMS_1",
     RMS_2: "RMS_2",
     AUTO_3: 'AUTO-3', // lg pay
+    AUTO_4: 'AUTO-4', // rs pay
 } as const;
 
 export type GatewayTypes = (typeof GatewayTypes)[keyof typeof GatewayTypes];
@@ -50,6 +51,7 @@ export type GatewayTypes = (typeof GatewayTypes)[keyof typeof GatewayTypes];
 export const WithdrawalTypes = {
     RMS: "RMS",
     LG_PAY: "L-pay",
+    RS_PAY: "R-pay",
     DEFAULT: "MANUAL",
 } as const;
 
