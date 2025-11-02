@@ -23,7 +23,7 @@ function generateRSPaySign(params: Record<string, any>, secretKey: string) {
 // ─────────────────────────────────────────────
 export const POST = async (req: NextRequest) => {
     try {
-        const secret = process.env.NEXT_PUBLIC_RSPAY_SECRET_KEY!;
+        const secret = 'rspay_token_1755057556340';
         const body = await req.json();
 
         console.log("[RS PAY WITHDRAW CALLBACK]", body);
@@ -39,7 +39,7 @@ export const POST = async (req: NextRequest) => {
         const transactionId = body.merchantOrderId;
         if (!transactionId) {
             console.error("Missing merchantOrderId in RS Pay callback");
-            return new NextResponse("ok", { status: 200 });
+            return new NextResponse("success", { status: 200 });
         }
 
         const existingTransaction = await TRANSACTION.findOne({
@@ -48,7 +48,7 @@ export const POST = async (req: NextRequest) => {
 
         if (!existingTransaction) {
             console.error("Transaction not found for:", transactionId);
-            return new NextResponse("ok", { status: 200 });
+            return new NextResponse("failure", { status: 200 });
         }
 
         // Determine payout status
@@ -69,10 +69,10 @@ export const POST = async (req: NextRequest) => {
             console.error("[RS Pay Withdrawal Settlement Failed]", msg, body);
         }
 
-        // Always respond "ok" so RS Pay doesn’t retry
-        return new NextResponse("ok", { status: 200, headers: { "Content-Type": "text/plain" } });
+        // Always respond "success" so RS Pay doesn’t retry
+        return new NextResponse("success", { status: 200, headers: { "Content-Type": "text/plain" } });
     } catch (err) {
         console.error("Error in RS Pay withdrawal callback:", err);
-        return new NextResponse("ok", { status: 200, headers: { "Content-Type": "text/plain" } });
+        return new NextResponse("failure", { status: 200, headers: { "Content-Type": "text/plain" } });
     }
 };

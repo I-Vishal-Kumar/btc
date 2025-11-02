@@ -59,14 +59,14 @@ export const POST = async (req: NextRequest) => {
 
         if (!valid) {
             console.error("[RS Pay Deposit Settlement Failed]", msg, body);
-            return new NextResponse("ok", { status: 200, headers: { "Content-Type": "text/plain" } });
+            return new NextResponse("success", { status: 200, headers: { "Content-Type": "text/plain" } });
         }
 
         console.log("[RS Pay Deposit Processed] ✅", body.merchantOrderId);
-        return new NextResponse("ok", { status: 200, headers: { "Content-Type": "text/plain" } });
+        return new NextResponse("success", { status: 200, headers: { "Content-Type": "text/plain" } });
     } catch (err) {
         console.error("Error in RS Pay Deposit callback:", err);
         // Always reply “ok” so RS Pay doesn’t retry endlessly
-        return new NextResponse("ok", { status: 200, headers: { "Content-Type": "text/plain" } });
+        return new NextResponse("failure", { status: 200, headers: { "Content-Type": "text/plain" } });
     }
 };
