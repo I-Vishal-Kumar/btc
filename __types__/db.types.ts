@@ -53,6 +53,7 @@ export const WithdrawalTypes = {
     LG_PAY: "L-pay",
     RS_PAY: "R-pay",
     DEFAULT: "MANUAL",
+    PAY2ALL: 'P-all'
 } as const;
 
 export type WithdrawalTypes = (typeof WithdrawalTypes)[keyof typeof WithdrawalTypes];

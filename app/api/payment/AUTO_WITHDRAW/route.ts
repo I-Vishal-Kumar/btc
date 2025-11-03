@@ -1,5 +1,6 @@
 import { ADMIN_CONFIG } from "@/(backend)/(modals)/schema/adminConfig.schema";
 import { WithdrawalTypes } from "@/__types__/db.types";
+import { handleAutoWithdraw } from "@/lib/helpers/handleAutoWithdraw";
 import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,11 +11,16 @@ export async function POST(request: NextRequest) {
         const { AutoWithdraw } = await ADMIN_CONFIG.findOne(
             {},
             { AutoWithdraw: 1, _id: 0 },
-            );
+        );
         let res;
         switch (AutoWithdraw) {
-            case WithdrawalTypes.RMS :
+            case WithdrawalTypes.RMS:
                 res = await handleAutoWithdraw3({
+                    ...body
+                });
+                break;
+            case WithdrawalTypes.PAY2ALL:
+                res = await handleAutoWithdraw({
                     ...body
                 });
                 break;
@@ -22,8 +28,8 @@ export async function POST(request: NextRequest) {
                 res = await handleAutoWithdraw4(body);
                 break;
             default:
-            res = {valid: false}
-            console.log('invalid withdrawal gateway ', AutoWithdraw);
+                res = { valid: false }
+                console.log('invalid withdrawal gateway ', AutoWithdraw);
         }
         return NextResponse.json(res);
     } catch (error) {
