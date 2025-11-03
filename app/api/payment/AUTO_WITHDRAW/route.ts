@@ -2,6 +2,7 @@ import { ADMIN_CONFIG } from "@/(backend)/(modals)/schema/adminConfig.schema";
 import { WithdrawalTypes } from "@/__types__/db.types";
 import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
+import { handleAutoWithdraw5 } from "@/lib/helpers/handleAutoWithdraw5";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -20,6 +21,9 @@ export async function POST(request: NextRequest) {
                 break;
             case WithdrawalTypes.LG_PAY:
                 res = await handleAutoWithdraw4(body);
+                break;
+            case WithdrawalTypes.RS_PAY:
+                res = await handleAutoWithdraw5(body);
                 break;
             default:
             res = {valid: false}
