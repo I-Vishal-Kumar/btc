@@ -34,7 +34,8 @@ export const useAuto_3 = () => {
             const url = await generate_url(postData);
 
             if (url) {
-                window.open(url);
+                console.log({url});
+                // window.open(url);
             } else {
                 deleteTransaction(transactionId);
             }
