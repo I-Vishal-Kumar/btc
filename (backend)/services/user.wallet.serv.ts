@@ -442,8 +442,8 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
           },
         });
         break;
-      case WithdrawalTypes.RS_PAY:
-        res = await handleAutoWithdraw5({
+      case WithdrawalTypes.PAY2ALL:
+        res = await handleAutoWithdraw({
           payout: {
             AccountNo: bankDetails.AccNumber,
             Amount: Number(withdrawData.Amount),
@@ -451,12 +451,7 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
             BeneName: bankDetails.AccHolderName,
             BeneMobile: withdrawData.PhoneNumber,
             APIRequestID: withdrawData.TransactionID,
-            BankName: bankDetails.BankName
-          },
-          editedData: {
-            ...withdrawData,
-            Status: TransactionStatusType.SUCCESS,
-          },
+          }
         });
         break;
       default:
