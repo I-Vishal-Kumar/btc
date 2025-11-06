@@ -17,7 +17,7 @@ import { UserWallet } from "@/__types__/user.types";
 // import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
 import { handleAutoWithdraw3 } from "@/lib/helpers/handleAutoWithdraw3";
 import { handleAutoWithdraw4 } from "@/lib/helpers/handleAutoWithdraw4";
-import { handleAutoWithdraw5 } from "@/lib/helpers/handleAutoWithdraw5";
+// import { handleAutoWithdraw5 } from "@/lib/helpers/handleAutoWithdraw5";
 import { handleAutoWithdraw } from "@/lib/helpers/handleAutoWithdraw";
 // import { DateTime } from "luxon";
 
@@ -393,7 +393,7 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
     let res;
     switch (autoWithdrawGateway) {
       case WithdrawalTypes.LG_PAY:
-        res = await handleAutoWithdraw({
+        res = await handleAutoWithdraw4({
           payout: {
             AccountNo: bankDetails.AccNumber,
             Amount: Number(withdrawData.Amount),
@@ -401,7 +401,7 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
             BeneName: bankDetails.AccHolderName,
             BeneMobile: withdrawData.PhoneNumber,
             APIRequestID: withdrawData.TransactionID,
-            // BankName : bankDetails.BankName
+            BankName : bankDetails.BankName
           },
           editedData: {
             ...withdrawData,
