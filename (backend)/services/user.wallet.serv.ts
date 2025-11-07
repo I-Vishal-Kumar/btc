@@ -451,7 +451,11 @@ const processAutoWithdrawal = async (withdrawData: TransactionObjType, autoWithd
             BeneName: bankDetails.AccHolderName,
             BeneMobile: withdrawData.PhoneNumber,
             APIRequestID: withdrawData.TransactionID,
-          }
+          },
+          editedData: {
+            ...withdrawData,
+            Status: TransactionStatusType.SUCCESS,
+          },
         });
         break;
       default:
