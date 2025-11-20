@@ -967,7 +967,7 @@ export const canWatch = async (): ServiceReturnType<boolean> => {
             Amount: { $gte: 1000 },
         })
         if (!hasdepositedAfter19thNov) {
-            return { valid: false, msg: "You need to make a deposit of at least INR 1000 after 19th Nov 2023 to unlock watch and earn feature.", data: false };
+            return { valid: false, msg: "You need to make a deposit of at least INR 1000 after 19th Nov 2023 to unlock watch and spin feature.", data: false };
         }
 
         return {valid: true, data: true}

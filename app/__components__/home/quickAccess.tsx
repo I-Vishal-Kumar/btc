@@ -7,7 +7,7 @@ import { USER_CONTEXT } from "@/lib/hooks/user.context"
 import { DateTime } from "luxon"
 import { enqueueSnackbar } from "notistack"
 import { useMutation } from "@tanstack/react-query"
-import { claimGift } from "@/(backend)/services/user.service.serv"
+import { canWatch, claimGift } from "@/(backend)/services/user.service.serv"
 import { Icon } from '@iconify/react';
 
 const QuickAccess = ({ icon, isPending, label, onClick }: { isPending: boolean, icon: ReactNode, label: string, onClick?: VoidFunction }) => {
@@ -33,10 +33,21 @@ export const QuickAccessSection = () => {
     const { data, isPending, isSuccess, mutate } = useMutation({
         mutationFn: claimGift
     })
+    const {mutateAsync} = useMutation({
+        mutationFn: canWatch ,
+        mutationKey: ['available_videos']
+    })
+ 
+    const handleGiftClaim = async () => {
 
-    const handleGiftClaim = () => {
         // initially it will be null so if it exists then only check it.
         if (userInfo.LastSpinAt) {
+
+            const canWatchResp = await mutateAsync();
+            if(!canWatchResp.valid){
+                enqueueSnackbar(canWatchResp.msg || 'Cannot watch now', {variant: 'error'});
+                return;
+            }
             const today = DateTime.now().startOf("day")
             const lastSpinDate = DateTime.fromJSDate(new Date(userInfo.LastSpinAt)).startOf('day')
             if (lastSpinDate.get("day") === today.get("day")) {
