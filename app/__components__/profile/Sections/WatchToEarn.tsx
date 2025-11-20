@@ -24,18 +24,18 @@ export const WatchToEarn: React.FC = () => {
         queryFn: getAvailableVideosToWatch,
         queryKey: ['available_videos']
     })
-    const {mutateAsync} = useMutation({
-        mutationFn: canWatch ,
+    const { mutateAsync } = useMutation({
+        mutationFn: canWatch,
         mutationKey: ['available_videos']
     })
-    const handlePlayback = async () => {
+    const handlePlayback = async (video: VideoType | undefined) => {
         if (!videos?.data?.length) return;
         const canWatchResp = await mutateAsync();
-        if(!canWatchResp.valid){
-            enqueueSnackbar(canWatchResp.msg || 'Cannot watch now', {variant: 'error'});
+        if (!canWatchResp.valid) {
+            enqueueSnackbar(canWatchResp.msg || 'Cannot watch now', { variant: 'error' });
             return;
         }
-        setPlayableVideo(videos.data[0]);
+        setPlayableVideo(video);
     }
 
     if (!isSuccess && !isPending) return <>Loading...</>
@@ -57,7 +57,7 @@ export const WatchToEarn: React.FC = () => {
                 </Typography>
             </div>
             <div
-                onClick={handlePlayback}
+                onClick={() => handlePlayback(videos?.data?.[0])}
                 className="mt-4 p-1 aspect-[16/9] rounded-2xl bg-slate-50">
                 <Image
                     src={`https://img.youtube.com/vi/${ videoId }/hqdefault.jpg`}
@@ -76,7 +76,7 @@ export const WatchToEarn: React.FC = () => {
                         {
                             videos.data.map(video => (
                                 <ListItem
-                                    onClick={() => setPlayableVideo(video)}
+                                    onClick={() => handlePlayback(video)}
                                     key={video._id} disableGutters>
                                     <VideoDetails video={video} />
                                 </ListItem>
