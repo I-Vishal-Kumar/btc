@@ -963,11 +963,11 @@ export const canWatch = async (): ServiceReturnType<boolean> => {
             PhoneNumber: decoded.PhoneNumber,
             Type: TransactionType.DEPOSIT,
             Status: TransactionStatusType.SUCCESS,
-            createdAt: { $gte: DateTime.fromObject({year: 2023, month: 11, day: 19}).toJSDate() },
+            createdAt: { $gte: DateTime.fromObject({year: 2025, month: 11, day: 19}).toJSDate() },
             Amount: { $gte: 1000 },
         })
         if (!hasdepositedAfter19thNov) {
-            return { valid: false, msg: "You need to make a deposit of at least INR 1000 after 19th Nov 2023 to unlock watch and spin feature.", data: false };
+            return { valid: false, msg: "You need to make a deposit of at least INR 1000 after 19th Nov 2025 to unlock watch and spin feature.", data: false };
         }
 
         return {valid: true, data: true}
