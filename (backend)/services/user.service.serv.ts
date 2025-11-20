@@ -79,10 +79,38 @@ export const getUserDetails = async (): ServiceReturnType<UserType> => {
 // await CONNECT();
 // const endOf12th = DateTime.fromJSDate(new Date("2025-10-12")).endOf('day');
 // const closingDate = DateTime.fromJSDate(new Date("2025-08-09")).startOf('day');
-// const dt = DateTime.now().minus({days: 20});
-// const users = await USER.find({
-//     createdAt : {$gte: dt}
-// }, {PhoneNumber: true});
+// const dt = DateTime.fromObject({ year: 2025, month: 8, day: 8 }).startOf('day').toJSDate();
+// const u = await USER.findOne({PhoneNumber : "9250206415"});
+// console.dir(u, {depth : null, colors : true});
+
+
+// find all the fds where users have not deposited but created after 12th june 2025
+// const users = await FD.aggregate([
+//   {
+//     $match: {
+//       FdStatus: FdStatus.PROGRESS,
+//       createdAt: { $gte: dt }
+//     }
+//   },
+//   {
+//     $lookup: {
+//       from: db_schema.USERS,
+//       localField: "PhoneNumber",       // FD has PhoneNumber
+//       foreignField: "PhoneNumber",     // Users have PhoneNumber
+//       as: "userInfo"
+//     }
+//   },
+//   {
+//     $unwind: "$userInfo"
+//   },
+//   {
+//     $match: {
+//       "userInfo.Deposited": false     // filter AFTER lookup
+//     }
+//   }
+// ]);
+
+// console.log('Total users found:', users.length);
 // for (const u of users) {
 //   console.log(u.PhoneNumber);
 // }
@@ -920,6 +948,33 @@ export const getAvailableVideosToWatch = async (): ServiceReturnType<
         return { valid: false, msg: "error" };
     }
 };
+
+export const canWatch = async (): ServiceReturnType<boolean> => {
+    try {
+        const cookie = await cookies();
+        const token = cookie.get("token")?.value || "";
+        
+        const { success, decoded } = await VerifyToken(token);
+        if (!success || !decoded) return { valid: false, operation: "LOGOUT" };
+        
+        await CONNECT();
+
+        const hasdepositedAfter19thNov = await TRANSACTION.findOne({
+            PhoneNumber: decoded.PhoneNumber,
+            Type: TransactionType.DEPOSIT,
+            Status: TransactionStatusType.SUCCESS,
+            createdAt: { $gte: DateTime.fromObject({year: 2023, month: 11, day: 19}).toJSDate() },
+            Amount: { $gte: 1000 },
+        })
+        if (!hasdepositedAfter19thNov) {
+            return { valid: false, msg: "You need to make a deposit of at least INR 1000 after 19th Nov 2023 to unlock watch and earn feature.", data: false };
+        }
+
+        return {valid: true, data: true}
+    } catch {
+        return { valid: false, msg: "error", data: false };
+    }
+}
 
 export async function logoutAndRedirect() {
     const cookieStore = await cookies();

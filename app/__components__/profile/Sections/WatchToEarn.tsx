@@ -1,13 +1,14 @@
 
 "use client"
 
-import { getAvailableVideosToWatch } from "@/(backend)/services/user.service.serv";
+import { canWatch, getAvailableVideosToWatch } from "@/(backend)/services/user.service.serv";
 import { VideoType } from "@/__types__/user.types";
 import { Typography, List, ListItem, CardHeader, Divider } from "@mui/material";
 import { VideoPlayback } from "../../_commonComponents/VideoPlayback";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import Image from "next/image";
+import { enqueueSnackbar } from "notistack";
 
 
 function extractYouTubeID(url: string) {
@@ -23,6 +24,19 @@ export const WatchToEarn: React.FC = () => {
         queryFn: getAvailableVideosToWatch,
         queryKey: ['available_videos']
     })
+    const {mutateAsync} = useMutation({
+        mutationFn: canWatch ,
+        mutationKey: ['available_videos']
+    })
+    const handlePlayback = async () => {
+        if (!videos?.data?.length) return;
+        const canWatchResp = await mutateAsync();
+        if(!canWatchResp.valid){
+            enqueueSnackbar(canWatchResp.msg || 'Cannot watch now', {variant: 'error'});
+            return;
+        }
+        setPlayableVideo(videos.data[0]);
+    }
 
     if (!isSuccess && !isPending) return <>Loading...</>
     if (!videos?.valid) return <>Failed..</>
@@ -43,7 +57,7 @@ export const WatchToEarn: React.FC = () => {
                 </Typography>
             </div>
             <div
-                onClick={() => setPlayableVideo(videos.data?.[0])}
+                onClick={handlePlayback}
                 className="mt-4 p-1 aspect-[16/9] rounded-2xl bg-slate-50">
                 <Image
                     src={`https://img.youtube.com/vi/${ videoId }/hqdefault.jpg`}

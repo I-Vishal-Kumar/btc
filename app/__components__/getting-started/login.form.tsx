@@ -1,5 +1,4 @@
 import { Button, CircularProgress, Typography } from "@mui/material";
-// @ts-expect-error types not availabe for these
 import { forceUpdateCookies, isNativeApp } from 'webtonative'
 import { motion } from "framer-motion";
 import { useState, ChangeEvent, useEffect } from "react";
