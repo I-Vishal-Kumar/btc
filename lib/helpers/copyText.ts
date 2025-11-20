@@ -1,5 +1,7 @@
 import { enqueueSnackbar } from "notistack";
+// @ts-expect-error types not availabe for these
 import { isNativeApp } from "webtonative";
+// @ts-expect-error types not availabe for these
 import { set } from "webtonative/Clipboard";
 
 export async function copyToClipboard(text: string) {
